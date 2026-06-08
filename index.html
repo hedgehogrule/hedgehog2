@@ -2,63 +2,79 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的行事曆</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Schedule</title>
     <style>
-        body { font-family: sans-serif; background: #f9f9f9; padding: 10px; }
-        .header { display: flex; justify-content: space-between; padding: 10px; background: white; margin-bottom: 5px; }
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ccc; border: 1px solid #ccc; }
-        .day { background: white; min-height: 80px; padding: 5px; cursor: pointer; }
-        .shift { font-size: 12px; font-weight: bold; background: #eee; padding: 2px; border-radius: 4px; margin-top: 5px; text-align: center; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 80%; }
+        :root { --border-color: #e0e0e0; --bg: #f9f9f9; --primary: #a28cdb; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; border: 1px solid var(--border-color); }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border-color); border: 1px solid var(--border-color); margin-top: 10px; }
+        .day { background: white; min-height: 90px; padding: 4px; cursor: pointer; position: relative; }
+        .day.today { border: 2px solid #fbc02d; background: #fffde7; }
+        .date { font-size: 12px; color: #888; font-weight: bold; }
+        .shift { font-size: 11px; font-weight: bold; text-align: center; background: #eee; border-radius: 4px; margin-top: 2px; padding: 2px; }
+        .note { font-size: 10px; color: #777; text-align: center; margin-top: 2px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; }
+        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+        .btn { padding: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="header">
-        <button onclick="changeMonth(-1)">上月</button>
-        <h2 id="monthTitle"></h2>
-        <button onclick="changeMonth(1)">下月</button>
+        <button onclick="changeMonth(-1)">&#10094;</button>
+        <div>
+            <h2 id="monthTitle" style="margin:0; font-size:16px;"></h2>
+            <button class="btn" onclick="goToToday()">今天</button>
+        </div>
+        <button onclick="changeMonth(1)">&#10095;</button>
     </div>
     <div class="calendar" id="calendar"></div>
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 id="modalDate"></h3>
-            <input type="text" id="shiftInput" placeholder="輸入班別">
-            <input type="text" id="noteInput" placeholder="備註(與誰換班)">
-            <button onclick="save()">儲存</button>
-            <button onclick="document.getElementById('modal').style.display='none'">取消</button>
+            <input type="text" id="shiftInput" placeholder="班別">
+            <input type="text" id="noteInput" placeholder="備註/換班對象">
+            <button class="btn" onclick="save()">儲存</button>
+            <button class="btn" onclick="document.getElementById('modal').style.display='none'">取消</button>
         </div>
     </div>
     <script>
-        let curDate = new Date();
-        let data = JSON.parse(localStorage.getItem('calData')) || {};
+        const shifts = [["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"], ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"], ["D10", "D8", "D2", "D", "D4", "D1", "OFF"], ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"], ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"], ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"], ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"], ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"], ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"], ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"], ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"], ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"], ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"], ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"], ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"], ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], ["D'OFF", "D", "D", "D", "D", "OFF", "OFF"], ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"], ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D", "D", "D", "D", "D", "D4", "OFF"], ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]];
+        let cur = new Date(), data = JSON.parse(localStorage.getItem('calData')) || {};
+        function getAuto(y, m, d) {
+            const date = new Date(y, m, d), mon = new Date(y, m, d - (date.getDay() || 7) + 1, 0, 0, 0);
+            const weeks = Math.floor((mon - new Date(2026, 6, 6)) / 604800000);
+            let idx = (13 + weeks) % 34; if (idx < 0) idx += 34;
+            return shifts[idx][date.getDay() === 0 ? 6 : date.getDay() - 1];
+        }
         function render() {
-            const m = curDate.getMonth(), y = curDate.getFullYear();
+            const m = cur.getMonth(), y = cur.getFullYear(), el = document.getElementById('calendar');
             document.getElementById('monthTitle').innerText = `${y}年 ${m+1}月`;
-            const el = document.getElementById('calendar'); el.innerHTML = "";
-            const days = new Date(y, m+1, 0).getDate();
-            for(let i=1; i<=days; i++) {
-                const key = `${y}-${m+1}-${i}`, val = data[key] || {};
-                el.innerHTML += `<div class="day" onclick="openModal('${key}')">
-                    <div>${i}</div>
-                    <div class="shift">${val.shift || '未設'}</div>
-                    <div style="font-size:10px">${val.note || ''}</div>
+            el.innerHTML = "";
+            for(let i=1; i<=new Date(y, m+1, 0).getDate(); i++) {
+                const key = `${y}-${m+1}-${i}`, val = data[key] || {}, auto = getAuto(y, m, i);
+                const today = new Date(); let isToday = (today.getFullYear()==y && today.getMonth()==m && today.getDate()==i);
+                el.innerHTML += `<div class="day ${isToday ? 'today' : ''}" onclick="openModal('${key}')">
+                    <div class="date">${i}</div>
+                    <div class="shift">${val.shift || auto}</div>
+                    <div class="note">${val.note || ''}</div>
                 </div>`;
             }
         }
-        function openModal(key) {
-            document.getElementById('modalDate').innerText = key;
-            document.getElementById('shiftInput').value = data[key]?.shift || '';
-            document.getElementById('noteInput').value = data[key]?.note || '';
+        function goToToday() { cur = new Date(); render(); }
+        function changeMonth(s) { cur.setMonth(cur.getMonth() + s); render(); }
+        function openModal(k) {
+            document.getElementById('modalDate').innerText = k;
+            document.getElementById('shiftInput').value = data[k]?.shift || '';
+            document.getElementById('noteInput').value = data[k]?.note || '';
             document.getElementById('modal').style.display = 'flex';
         }
         function save() {
-            const key = document.getElementById('modalDate').innerText;
-            data[key] = { shift: document.getElementById('shiftInput').value, note: document.getElementById('noteInput').value };
+            const k = document.getElementById('modalDate').innerText;
+            data[k] = { shift: document.getElementById('shiftInput').value, note: document.getElementById('noteInput').value };
             localStorage.setItem('calData', JSON.stringify(data));
-            document.getElementById('modal').style.display = 'none';
-            render();
+            document.getElementById('modal').style.display = 'none'; render();
         }
         render();
     </script>
