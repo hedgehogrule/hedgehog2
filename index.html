@@ -3,55 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的極簡行事曆</title>
+    <title>我的全自動夢幻行事曆</title>
     <style>
         :root {
-            --border-color: #e0e0e0;
-            --dreamy-bg: #f9f9f9;
+            --sat-color: #5b9bd5; 
+            --sun-color: #ed7d31; 
+            --dreamy-bg: linear-gradient(135deg, #ffe0f0 0%, #e0f7fa 50%, #e6d9ff 100%);
+            --cycle-a-bg: rgba(255, 230, 238, 0.85);
+            --cycle-a-border: rgba(255, 174, 195, 0.5);
+            --cycle-b-bg: rgba(225, 242, 255, 0.85);
+            --cycle-b-border: rgba(153, 201, 255, 0.5);
         }
         
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 20px 0; background: var(--dreamy-bg); min-height: 100vh; user-select: none; color: #444; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 20px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; border-bottom: 1px solid var(--border-color); margin-bottom: 1px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
         .header-center { display: flex; align-items: center; gap: 10px; }
         .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 5px 8px; }
         .header h2 { margin: 0; font-size: 18px; font-weight: bold; color: #555; }
-        .today-btn { font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 6px; background: white; color: #666; cursor: pointer; }
+        .today-btn { font-size: 12px; padding: 4px 8px; border: 1px solid #c7c7c7; border-radius: 6px; background: white; color: #666; cursor: pointer; font-weight: bold; }
         
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: white; text-align: center; font-size: 12px; font-weight: bold; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 12px; margin: 0 8px 8px 8px; color: #666; text-align: center; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .weekdays div { padding: 8px 0; }
+        .weekdays div:nth-child(6) { color: #5b9bd5; } 
+        .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; border: 1px solid var(--border-color); }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 8px; }
         
-        .day { background: white; min-height: 100px; padding: 4px; display: flex; flex-direction: column; cursor: pointer; transition: background 0.1s; position: relative; }
-        .day:active { background: #f0f0f0; }
-        .day.empty { background: #fcfcfc; }
+        .day { backdrop-filter: blur(3px); min-height: 100px; padding: 4px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; position: relative; border: 1px solid rgba(255,255,255,0.4); }
+        .day:active { transform: scale(0.96); background: rgba(255, 255, 255, 1) !important; }
+        .day.empty { background: transparent; box-shadow: none; border: none; cursor: default; }
         
-        /* 當天閃光 */
-        @keyframes shine {
-            0%, 100% { background: white; }
-            50% { background: #fffde7; }
-        }
-        .today { animation: shine 2s infinite; border: 2px solid #fbc02d; z-index: 5; }
+        .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
+        .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
+        
+        .day.cycle-top { border-top: 4px solid #a28cdb !important; }
+        .day.cycle-bottom { border-bottom: 4px solid #a28cdb !important; }
+        .day.cycle-left { border-left: 4px solid #a28cdb !important; }
+        .day.cycle-right { border-right: 4px solid #a28cdb !important; }
 
-        .date-number { font-size: 12px; font-weight: bold; color: #888; display: flex; justify-content: space-between; }
-        .manual-dot { width: 5px; height: 5px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 4px; }
-        .sat-text { color: #5b9bd5; }
-        .sun-text { color: #ed7d31; }
+        @keyframes shine {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.4); background: rgba(255, 255, 255, 0.85); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); background: rgba(255, 252, 230, 1); }
+            100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.4); background: rgba(255, 255, 255, 0.85); }
+        }
+        .today { animation: shine 2s infinite ease-in-out; border: 2.5px solid #fbc02d !important; z-index: 5; }
+
+        .date-number { font-size: 13px; font-weight: bold; margin-bottom: 4px; margin-left: 2px; color: #666; display: flex; justify-content: space-between; align-items: center; }
+        .manual-dot { width: 6px; height: 6px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 4px; }
+        .sat-text { color: #4183c4; }
+        .sun-text { color: #d9534f; }
         
-        .week-badge { font-size: 9px; color: #999; border: 1px solid #eee; border-radius: 4px; padding: 0 3px; }
+        .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
         
-        .shift-badge { font-size: 11px; font-weight: bold; text-align: center; padding: 2px 5px; margin: 2px auto; width: 90%; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .shift-off { background: #f3e5f5; color: #7b1fa2; }
-        .shift-d { background: white; color: #444; border: 1px solid #ccc; }
-        .shift-green { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .shift-default { background: #f5f5f5; color: #666; }
+        .shift-badge { font-size: 11px; font-weight: bold; text-align: center; padding: 3px 6px; margin: 2px auto 4px auto; width: 95%; max-width: 68px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; padding: 2px 9px; }
+        .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 8px; }
+        .shift-green { background: #5ece9d; color: white; border: none; border-radius: 8px; }
+        .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 8px; }
         
-        .event-item { font-size: 10px; color: #777; text-align: center; margin-top: 2px; }
+        .event-item { font-size: 11px; background: rgba(91, 155, 213, 0.1); border-left: 3px solid #84bde3; padding: 3px 5px; margin-bottom: 3px; color: #3e6e96; border-radius: 0 4px 4px 0; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: white; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; }
-        .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .quick-btn { background: #fff; border: 1px solid #ccc; padding: 5px 8px; font-size: 12px; cursor: pointer; margin: 2px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 210, 230, 0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 10; }
+        .modal-content { background: rgba(255, 255, 255, 0.95); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(100,80,120,0.2); max-height: 88vh; overflow-y: auto; }
+        .input-group input { width: 100%; padding: 11px; font-size: 16px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; }
+        .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 8px; padding: 5px 9px; font-size: 13px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -73,14 +89,31 @@
 
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin-top:0"></h3>
-            <div id="modalSubtitle" style="font-size:12px; color:#888; margin-bottom:10px"></div>
-            <input type="text" id="shiftInput" placeholder="請點選下方鍵填入">
-            <div id="btnContainer" style="margin:10px 0; display:flex; flex-wrap:wrap;"></div>
-            <input type="text" id="eventInput" placeholder="行程/記事" style="width:100%; padding:10px; box-sizing:border-box;">
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="closeModal()" style="flex:1; padding:8px;">取消</button>
-                <button onclick="saveData()" style="flex:1; padding:8px; background:#555; color:white; border:none;">儲存</button>
+            <h3 id="modalTitle"></h3>
+            <div class="modal-subtitle" id="modalSubtitle"></div>
+            <div class="input-group">
+                <label>班別</label>
+                <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵填入">
+                <div class="quick-section">
+                    <div class="quick-options">
+                        <button class="quick-btn" onclick="setShift('D')">D</button>
+                        <button class="quick-btn" onclick="setShift('D1')">D1</button>
+                        <button class="quick-btn" onclick="setShift('D2')">D2</button>
+                        <button class="quick-btn" onclick="setShift('D3')">D3</button>
+                        <button class="quick-btn" onclick="setShift('D4')">D4</button>
+                        <button class="quick-btn" onclick="setShift('D5')">D5</button>
+                        <button class="quick-btn" onclick="setShift('12-8 1')">12-8 1</button>
+                        <button class="quick-btn" onclick="setShift('N1')">N1</button>
+                        <button class="quick-btn" onclick="setShift('E1')">E1</button>
+                        <button class="quick-btn" onclick="setShift('OFF')">OFF</button>
+                        <button class="quick-btn" onclick="setShift('')" style="color:red">清空</button>
+                    </div>
+                </div>
+            </div>
+            <input type="text" id="eventInput" placeholder="行程/記事" style="width:100%; padding:10px; margin-top:10px;">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeModal()" style="flex:1; padding:10px;">取消</button>
+                <button onclick="saveData()" style="flex:1; padding:10px; background:#a28cdb; color:white; border:none;">儲存</button>
             </div>
         </div>
     </div>
@@ -92,16 +125,21 @@
 
         let currentDate = new Date();
         let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar')) || {};
-        const allShifts = ["D", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "DB1", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "E1", "E2", "E3", "E4", "N1", "N2", "OFF", "D'OFF", "OFF.B", "9-5訪"];
-        
+
         function goToToday() { currentDate = new Date(); renderCalendar(); }
-        function getAuto(y, m, d) {
+        function getAutoShift(y, m, d) {
             const date = new Date(y, m, d), day = date.getDay();
             const mon = new Date(y, m, d - (day === 0 ? 6 : day - 1), 0, 0, 0);
             const ref = new Date(2026, 6, 6, 0, 0, 0); 
             const weeks = Math.floor((mon.getTime() - ref.getTime()) / (1000 * 60 * 60 * 24 * 7));
             let idx = (13 + weeks) % 34; if (idx < 0) idx += 34; 
             return { shift: shiftPatterns[idx][day === 0 ? 6 : day - 1], weekNumber: idx + 1 };
+        }
+        function getCycleInfo(y, m, d) {
+            const date = new Date(y, m, d, 12, 0, 0); const ref = new Date(2026, 5, 8, 12, 0, 0); 
+            const diff = Math.floor((date.getTime() - ref.getTime()) / 86400000);
+            const dayInCycle = ((diff % 28) + 28) % 28;
+            return { isEven: Math.floor(diff / 28) % 2 === 0, dayInCycle: dayInCycle };
         }
         function renderCalendar() {
             const y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -111,34 +149,21 @@
             const days = new Date(y, m + 1, 0).getDate();
             for (let i = 0; i < first; i++) el.innerHTML += `<div class="day empty"></div>`;
             for (let i = 1; i <= days; i++) {
-                const key = `${y}-${m + 1}-${i}`, d = new Date(y, m, i), day = d.getDay(), auto = getAuto(y, m, i), saved = calendarData[key], final = saved && saved.shift !== undefined ? saved.shift : auto.shift;
+                const key = `${y}-${m + 1}-${i}`, status = getCycleInfo(y, m, i), auto = getAutoShift(y, m, i), saved = calendarData[key], final = saved && saved.shift !== undefined ? saved.shift : auto.shift;
+                let classes = status.isEven ? 'cycle-even' : 'cycle-odd';
+                if (status.dayInCycle < 7) classes += ' cycle-top'; if (status.dayInCycle >= 21) classes += ' cycle-bottom';
+                if (status.dayInCycle % 7 === 0) classes += ' cycle-left'; if (status.dayInCycle % 7 === 6) classes += ' cycle-right';
+                const today = new Date(); if(today.getFullYear()==y && today.getMonth()==m && today.getDate()==i) classes += ' today';
                 let type = final.includes("OFF") ? 'shift-off' : (final.startsWith("D") ? 'shift-d' : (final.startsWith("12")||final.startsWith("E")||final.startsWith("N") ? 'shift-green' : 'shift-default'));
-                const today = new Date(); let todayClass = (today.getFullYear()==y && today.getMonth()==m && today.getDate()==i) ? ' today' : '';
-                el.innerHTML += `<div class="day ${todayClass}" onclick="openModal('${key}', '${y}年${m+1}月${i}日', ${y}, ${m}, ${i})">
-                    <div class="date-number"><span class="${day===0?'sun-text':(day===6?'sat-text':'')}">${i}</span>${day===1?`<span class="week-badge">${auto.weekNumber}</span>`:''}</div>
+                el.innerHTML += `<div class="day ${classes}" onclick="openModal('${key}', '${y}年${m+1}月${i}日', ${y}, ${m}, ${i})">
+                    <div class="date-number"><div><span class="${new Date(y,m,i).getDay()==0?'sun-text':(new Date(y,m,i).getDay()==6?'sat-text':'')}">${i}</span>${saved&&saved.shift!==undefined?'<span class="manual-dot"></span>':''}</div><div>${new Date(y,m,i).getDay()==1?`<span class="week-badge">${auto.weekNumber}號班</span>`:''}</div></div>
                     ${final?`<div class="shift-badge ${type}">${final}</div>`:''}${(saved&&saved.event)?`<div class="event-item">${saved.event}</div>`:''}</div>`;
             }
         }
-        function openModal(key, disp, y, m, d) {
-            selectedDateString = key; document.getElementById('modalTitle').innerText = disp;
-            const s = calendarData[key]||{}, a = getAuto(y, m, d);
-            document.getElementById('modalSubtitle').innerText = `輪值第 ${a.weekNumber} 週`;
-            document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift;
-            document.getElementById('eventInput').value = s.event||'';
-            const btnContainer = document.getElementById('btnContainer'); btnContainer.innerHTML = '';
-            allShifts.forEach(s => { const b = document.createElement('button'); b.className = 'quick-btn'; b.innerText = s; b.onclick = () => setShift(s); btnContainer.appendChild(b); });
-            document.getElementById('editModal').style.display = 'flex';
-        }
+        function openModal(key, disp, y, m, d) { selectedDateString = key; document.getElementById('modalTitle').innerText = disp; const s = calendarData[key]||{}, a = getAutoShift(y, m, d); document.getElementById('modalSubtitle').innerText = `輪值第 ${a.weekNumber} 週 (預設: ${a.shift})`; document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift; document.getElementById('eventInput').value = s.event||''; document.getElementById('editModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
         function setShift(v) { document.getElementById('shiftInput').value = v; }
-        function saveData() { 
-            const s = document.getElementById('shiftInput').value.trim(), e = document.getElementById('eventInput').value.trim(), p = selectedDateString.split('-'), a = getAuto(p[0], p[1]-1, p[2]);
-            if(!calendarData[selectedDateString]) calendarData[selectedDateString] = {}; 
-            if(s==='' || s===a.shift) delete calendarData[selectedDateString].shift; else calendarData[selectedDateString].shift = s;
-            if(e==='') delete calendarData[selectedDateString].event; else calendarData[selectedDateString].event = e;
-            if(Object.keys(calendarData[selectedDateString]).length === 0) delete calendarData[selectedDateString];
-            localStorage.setItem('myCustomCalendar', JSON.stringify(calendarData)); closeModal(); renderCalendar(); 
-        }
+        function saveData() { const s = document.getElementById('shiftInput').value.trim(), e = document.getElementById('eventInput').value.trim(), p = selectedDateString.split('-'), a = getAutoShift(p[0], p[1]-1, p[2]); if(!calendarData[selectedDateString]) calendarData[selectedDateString] = {}; if(s==='' || s===a.shift) delete calendarData[selectedDateString].shift; else calendarData[selectedDateString].shift = s; if(e==='') delete calendarData[selectedDateString].event; else calendarData[selectedDateString].event = e; if(calendarData[selectedDateString].shift===undefined && calendarData[selectedDateString].event===undefined) delete calendarData[selectedDateString]; localStorage.setItem('myCustomCalendar', JSON.stringify(calendarData)); closeModal(); renderCalendar(); }
         renderCalendar();
     </script>
 </body>
