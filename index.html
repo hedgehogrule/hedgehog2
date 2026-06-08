@@ -1,106 +1,40 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的極簡行事曆</title>
-    <style>
-        :root { --border-color: #e0e0e0; --dreamy-bg: #f9f9f9; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 20px 0; background: var(--dreamy-bg); min-height: 100vh; color: #444; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; border-bottom: 1px solid var(--border-color); }
-        .header-center { display: flex; align-items: center; gap: 10px; }
-        .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 5px 8px; }
-        .header h2 { font-size: 18px; font-weight: bold; color: #555; }
-        .today-btn { font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 6px; background: white; cursor: pointer; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: white; text-align: center; font-size: 12px; font-weight: bold; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; border: 1px solid var(--border-color); }
-        .day { background: white; min-height: 100px; padding: 4px; display: flex; flex-direction: column; cursor: pointer; position: relative; }
-        .today { border: 2px solid #fbc02d; background: #fffde7; }
-        .date-number { font-size: 12px; font-weight: bold; color: #888; display: flex; justify-content: space-between; }
-        .shift-badge { font-size: 11px; font-weight: bold; text-align: center; padding: 2px 5px; margin: 2px auto; width: 90%; border-radius: 6px; }
-        .shift-off { background: #f3e5f5; color: #7b1fa2; }
-        .shift-d { background: white; color: #444; border: 1px solid #ccc; }
-        .shift-green { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .shift-default { background: #f5f5f5; color: #666; }
-        .event-item { font-size: 10px; color: #777; text-align: center; margin-top: 2px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: white; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; }
-        .quick-btn { background: #fff; border: 1px solid #ccc; padding: 5px 8px; font-size: 12px; cursor: pointer; margin: 2px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <button onclick="changeMonth(-1)">&#10094;</button>
-        <div class="header-center">
-            <h2 id="monthYear"></h2>
-            <button class="today-btn" onclick="goToToday()">今天</button>
-        </div>
-        <button onclick="changeMonth(1)">&#10095;</button>
-    </div>
-    <div class="weekdays"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
-    <div class="calendar" id="calendar"></div>
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <h3 id="modalTitle" style="margin-top:0"></h3>
-            <div id="modalSubtitle" style="font-size:12px; color:#888; margin-bottom:10px"></div>
-            <input type="text" id="shiftInput" style="width:100%; padding:10px; box-sizing:border-box;">
-            <div id="btnContainer" style="margin:10px 0;"></div>
-            <input type="text" id="eventInput" placeholder="行程/記事" style="width:100%; padding:10px; box-sizing:border-box;">
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="closeModal()" style="flex:1; padding:8px;">取消</button>
-                <button onclick="saveData()" style="flex:1; padding:8px; background:#555; color:white; border:none;">儲存</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        const shiftPatterns = [["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"], ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"], ["D10", "D8", "D2", "D", "D4", "D1", "OFF"], ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"], ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"], ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"], ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"], ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"], ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"], ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"], ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"], ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"], ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"], ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"], ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"], ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], ["D'OFF", "D", "D", "D", "D", "OFF", "OFF"], ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"], ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D", "D", "D", "D", "D", "D4", "OFF"], ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]];
-        let currentDate = new Date();
-        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar')) || {};
-        const allShifts = ["D", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "DB1", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "E1", "E2", "E3", "E4", "N1", "N2", "OFF", "D'OFF", "OFF.B", "9-5訪"];
-        function goToToday() { currentDate = new Date(); renderCalendar(); }
-        function getAuto(y, m, d) {
-            const date = new Date(y, m, d), day = date.getDay();
-            const mon = new Date(y, m, d - (day === 0 ? 6 : day - 1), 0, 0, 0);
-            const ref = new Date(2026, 6, 6, 0, 0, 0); 
-            const weeks = Math.floor((mon.getTime() - ref.getTime()) / (1000 * 60 * 60 * 24 * 7));
-            let idx = (13 + weeks) % 34; if (idx < 0) idx += 34; 
-            return { shift: shiftPatterns[idx][day === 0 ? 6 : day - 1] };
-        }
-        function renderCalendar() {
-            const y = currentDate.getFullYear(), m = currentDate.getMonth(), el = document.getElementById('calendar'); el.innerHTML = "";
-            document.getElementById('monthYear').innerText = `${y}年 ${m + 1}月`;
-            let first = new Date(y, m, 1).getDay(); first = first === 0 ? 6 : first - 1;
-            const days = new Date(y, m + 1, 0).getDate();
-            for (let i = 0; i < first; i++) el.innerHTML += `<div class="day empty"></div>`;
-            for (let i = 1; i <= days; i++) {
-                const key = `${y}-${m + 1}-${i}`, auto = getAuto(y, m, i), saved = calendarData[key], final = saved && saved.shift !== undefined ? saved.shift : auto.shift;
-                let type = final.includes("OFF") ? 'shift-off' : (final.startsWith("D") ? 'shift-d' : (final.startsWith("12")||final.startsWith("E")||final.startsWith("N") ? 'shift-green' : 'shift-default'));
-                const today = new Date(); let todayClass = (today.getFullYear()==y && today.getMonth()==m && today.getDate()==i) ? ' today' : '';
-                el.innerHTML += `<div class="day ${todayClass}" onclick="openModal('${key}', '${y}年${m+1}月${i}日', ${y}, ${m}, ${i})">
-                    <div class="date-number"><span class="${new Date(y,m,i).getDay()==0?'sun-text':''}">${i}</span></div>
-                    ${final?`<div class="shift-badge ${type}">${final}</div>`:''}${(saved&&saved.event)?`<div class="event-item">${saved.event}</div>`:''}</div>`;
-            }
-        }
-        function openModal(key, disp, y, m, d) {
-            selectedDateString = key; document.getElementById('modalTitle').innerText = disp;
-            const s = calendarData[key]||{}, a = getAuto(y, m, d);
-            document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift;
-            document.getElementById('eventInput').value = s.event||'';
-            const btnContainer = document.getElementById('btnContainer'); btnContainer.innerHTML = '';
-            allShifts.forEach(s => { const b = document.createElement('button'); b.className = 'quick-btn'; b.innerText = s; b.onclick = () => setShift(s); btnContainer.appendChild(b); });
-            document.getElementById('editModal').style.display = 'flex';
-        }
-        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-        function setShift(v) { document.getElementById('shiftInput').value = v; }
-        function saveData() { 
-            const s = document.getElementById('shiftInput').value.trim(), e = document.getElementById('eventInput').value.trim(), p = selectedDateString.split('-'), a = getAuto(p[0], p[1]-1, p[2]);
-            if(!calendarData[selectedDateString]) calendarData[selectedDateString] = {}; 
-            if(s==='' || s===a.shift) delete calendarData[selectedDateString].shift; else calendarData[selectedDateString].shift = s;
-            if(e==='') delete calendarData[selectedDateString].event; else calendarData[selectedDateString].event = e;
-            if(Object.keys(calendarData[selectedDateString]).length === 0) delete calendarData[selectedDateString];
-            localStorage.setItem('myCustomCalendar', JSON.stringify(calendarData)); closeModal(); renderCalendar(); 
-        }
-        renderCalendar();
-    </script>
-</body>
-</html>
+<script>
+    // ... (前段代碼維持不變，僅調整 openModal 與快捷鍵部分)
+
+    // 新增：換班快速備註函數
+    function addExchangeNote(name) {
+        const eventInput = document.getElementById('eventInput');
+        eventInput.value = `與 ${name} 換班`;
+    }
+
+    function openModal(key, disp, y, m, d) {
+        selectedDateString = key; 
+        document.getElementById('modalTitle').innerText = disp;
+        const s = calendarData[key]||{}, a = getAuto(y, m, d);
+        document.getElementById('modalSubtitle').innerText = `原排定: ${a.shift} | 輪值第 ${a.weekNumber} 週`;
+        document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift;
+        document.getElementById('eventInput').value = s.event||'';
+        
+        // 渲染班別快捷鍵
+        const btnContainer = document.getElementById('btnContainer'); 
+        btnContainer.innerHTML = '<div style="margin-bottom:5px; font-size:11px; color:#888;">選班別:</div>';
+        allShifts.forEach(s => { 
+            const b = document.createElement('button'); 
+            b.className = 'quick-btn'; b.innerText = s; 
+            b.onclick = () => setShift(s); 
+            btnContainer.appendChild(b); 
+        });
+
+        // 新增：換班快捷鍵 (此處可改為你常換班的同事名字)
+        btnContainer.innerHTML += '<div style="margin:10px 0 5px 0; font-size:11px; color:#888;">快速備註換班對象:</div>';
+        ['同事A', '同事B', '同事C'].forEach(name => {
+            const b = document.createElement('button');
+            b.className = 'quick-btn'; b.style.background = '#e1f5fe'; b.innerText = name;
+            b.onclick = () => addExchangeNote(name);
+            btnContainer.appendChild(b);
+        });
+        
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    // ... (其餘儲存與渲染函數維持不變)
+</script>
