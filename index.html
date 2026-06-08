@@ -17,10 +17,12 @@
         
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 20px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; }
         
+        /* 標題欄優化 */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
         .header-center { display: flex; align-items: center; gap: 10px; }
         .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 5px 8px; }
         .header h2 { margin: 0; font-size: 18px; font-weight: bold; color: #555; }
+        /* 今天按鈕樣式 */
         .today-btn { font-size: 12px; padding: 4px 8px; border: 1px solid #c7c7c7; border-radius: 6px; background: white; color: #666; cursor: pointer; font-weight: bold; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 12px; margin: 0 8px 8px 8px; color: #666; text-align: center; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
@@ -37,6 +39,7 @@
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
+        /* 週期框與今天閃光 */
         .day.cycle-top { border-top: 4px solid #a28cdb !important; }
         .day.cycle-bottom { border-bottom: 4px solid #a28cdb !important; }
         .day.cycle-left { border-left: 4px solid #a28cdb !important; }
@@ -55,6 +58,7 @@
         .sun-text { color: #d9534f; }
         
         .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
+        .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; }
         
         .shift-badge { font-size: 11px; font-weight: bold; text-align: center; padding: 3px 6px; margin: 2px auto 4px auto; width: 95%; max-width: 68px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; padding: 2px 9px; }
@@ -127,19 +131,24 @@
         let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar')) || {};
 
         function goToToday() { currentDate = new Date(); renderCalendar(); }
-        function getAutoShift(y, m, d) {
-            const date = new Date(y, m, d), day = date.getDay();
-            const mon = new Date(y, m, d - (day === 0 ? 6 : day - 1), 0, 0, 0);
+        
+        // ...其餘邏輯與上一版相同 (含 getAutoShift, getCycleInfo, renderCalendar 等)...
+        // (註：為節省篇幅，此處省略與前一版相同的函數內容，完整貼上即可覆蓋)
+        
+        // --- 補上完整邏輯以便貼上 ---
+        function getAutoShift(year, month, date) {
+            const d = new Date(year, month, date); const day = d.getDay();
+            const monday = new Date(year, month, date - (day === 0 ? 6 : day - 1), 0, 0, 0);
             const ref = new Date(2026, 6, 6, 0, 0, 0); 
-            const weeks = Math.floor((mon.getTime() - ref.getTime()) / (1000 * 60 * 60 * 24 * 7));
-            let idx = (13 + weeks) % 34; if (idx < 0) idx += 34; 
+            const weeksDiff = Math.floor((monday.getTime() - ref.getTime()) / (1000 * 60 * 60 * 24 * 7));
+            let idx = (13 + weeksDiff) % 34; if (idx < 0) idx += 34; 
             return { shift: shiftPatterns[idx][day === 0 ? 6 : day - 1], weekNumber: idx + 1 };
         }
-        function getCycleInfo(y, m, d) {
-            const date = new Date(y, m, d, 12, 0, 0); const ref = new Date(2026, 5, 8, 12, 0, 0); 
-            const diff = Math.floor((date.getTime() - ref.getTime()) / 86400000);
+        function getCycleInfo(year, month, date) {
+            const d = new Date(year, month, date, 12, 0, 0); const ref = new Date(2026, 5, 8, 12, 0, 0); 
+            const diff = Math.floor((d.getTime() - ref.getTime()) / 86400000);
             const dayInCycle = ((diff % 28) + 28) % 28;
-            return { isEven: Math.floor(diff / 28) % 2 === 0, dayInCycle: dayInCycle };
+            return { isEven: Math.floor(diff / 28) % 2 === 0, isStart: dayInCycle === 0, dayInCycle: dayInCycle };
         }
         function renderCalendar() {
             const y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -149,18 +158,19 @@
             const days = new Date(y, m + 1, 0).getDate();
             for (let i = 0; i < first; i++) el.innerHTML += `<div class="day empty"></div>`;
             for (let i = 1; i <= days; i++) {
-                const key = `${y}-${m + 1}-${i}`, status = getCycleInfo(y, m, i), auto = getAutoShift(y, m, i), saved = calendarData[key], final = saved && saved.shift !== undefined ? saved.shift : auto.shift;
+                const key = `${y}-${m + 1}-${i}`, d = new Date(y, m, i), day = d.getDay(), status = getCycleInfo(y, m, i);
+                const auto = getAutoShift(y, m, i), saved = calendarData[key], final = saved && saved.shift !== undefined ? saved.shift : auto.shift;
                 let classes = status.isEven ? 'cycle-even' : 'cycle-odd';
                 if (status.dayInCycle < 7) classes += ' cycle-top'; if (status.dayInCycle >= 21) classes += ' cycle-bottom';
                 if (status.dayInCycle % 7 === 0) classes += ' cycle-left'; if (status.dayInCycle % 7 === 6) classes += ' cycle-right';
                 const today = new Date(); if(today.getFullYear()==y && today.getMonth()==m && today.getDate()==i) classes += ' today';
                 let type = final.includes("OFF") ? 'shift-off' : (final.startsWith("D") ? 'shift-d' : (final.startsWith("12")||final.startsWith("E")||final.startsWith("N") ? 'shift-green' : 'shift-default'));
                 el.innerHTML += `<div class="day ${classes}" onclick="openModal('${key}', '${y}年${m+1}月${i}日', ${y}, ${m}, ${i})">
-                    <div class="date-number"><div><span class="${new Date(y,m,i).getDay()==0?'sun-text':(new Date(y,m,i).getDay()==6?'sat-text':'')}">${i}</span>${saved&&saved.shift!==undefined?'<span class="manual-dot"></span>':''}</div><div>${new Date(y,m,i).getDay()==1?`<span class="week-badge">${auto.weekNumber}號班</span>`:''}</div></div>
+                    <div class="date-number"><div style="display:flex;align-items:center;"><span class="${day===0?'sun-text':(day===6?'sat-text':'')}">${i}</span>${saved&&saved.shift!==undefined?'<span class="manual-dot"></span>':''}</div><div class="badge-container">${day===1?`<span class="week-badge">${auto.weekNumber}號班</span>`:''}${status.isStart?`<span class="cycle-start-badge">新週期</span>`:''}</div></div>
                     ${final?`<div class="shift-badge ${type}">${final}</div>`:''}${(saved&&saved.event)?`<div class="event-item">${saved.event}</div>`:''}</div>`;
             }
         }
-        function openModal(key, disp, y, m, d) { selectedDateString = key; document.getElementById('modalTitle').innerText = disp; const s = calendarData[key]||{}, a = getAutoShift(y, m, d); document.getElementById('modalSubtitle').innerText = `輪值第 ${a.weekNumber} 週 (預設: ${a.shift})`; document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift; document.getElementById('eventInput').value = s.event||''; document.getElementById('editModal').style.display = 'flex'; }
+        function openModal(key, disp, y, m, d) { selectedDateString = key; document.getElementById('modalTitle').innerText = disp; const s = calendarData[key]||{}, a = getAutoShift(y, m, d); document.getElementById('modalSubtitle').innerText = `系統第 ${a.weekNumber} 週 (預設: ${a.shift})`; document.getElementById('shiftInput').value = s.shift !== undefined ? s.shift : a.shift; document.getElementById('eventInput').value = s.event||''; document.getElementById('editModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
         function setShift(v) { document.getElementById('shiftInput').value = v; }
         function saveData() { const s = document.getElementById('shiftInput').value.trim(), e = document.getElementById('eventInput').value.trim(), p = selectedDateString.split('-'), a = getAutoShift(p[0], p[1]-1, p[2]); if(!calendarData[selectedDateString]) calendarData[selectedDateString] = {}; if(s==='' || s===a.shift) delete calendarData[selectedDateString].shift; else calendarData[selectedDateString].shift = s; if(e==='') delete calendarData[selectedDateString].event; else calendarData[selectedDateString].event = e; if(calendarData[selectedDateString].shift===undefined && calendarData[selectedDateString].event===undefined) delete calendarData[selectedDateString]; localStorage.setItem('myCustomCalendar', JSON.stringify(calendarData)); closeModal(); renderCalendar(); }
