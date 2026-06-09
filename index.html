@@ -11,7 +11,6 @@
         
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 10px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; overflow-x: hidden; }
         
-        /* 頂部縮小，節省垂直空間 */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 2px 8px; font-weight: bold; }
         .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
@@ -24,55 +23,43 @@
         .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 6px; padding: 2px 6px; font-size: 10px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .stat-box span { font-size: 13px; color: #444; }
         
-        /* 星期列壓縮 */
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        /* 日曆網格：無縫隙以利粗方框對齊 */
         .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; padding: 0 3px; }
         
-        /* 日期方格：極致空間利用 */
         .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 65px; height: 11.5vh; max-height: 85px; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
-        
-        /* 跨月日期淡化 */
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
-        
-        /* 今天高亮：絕對置頂並加上紅色框 */
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
-        /* 頂部：日期在左下、班別在右，完全同行 */
-        .day-header { display: flex; align-items: flex-start; gap: 3px; width: 100%; margin-bottom: 2px; }
+        .day-header { display: flex; align-items: flex-start; gap: 2px; width: 100%; margin-bottom: 2px; }
         
-        /* 左側：日期與圈圈上下排列 */
-        .date-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; min-width: 14px; }
-        .date-box { font-size: 12px; font-weight: 900; color: #555; line-height: 1; }
+        .date-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; min-width: 13px; }
+        /* 日期進一步縮小至 10.5px，確保與長班別共存 */
+        .date-box { font-size: 10.5px; font-weight: 900; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        /* 號碼班圈圈 */
-        .week-badge { width: 13px; height: 13px; background: #7a6baf; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .week-badge { width: 12px; height: 12px; background: #7a6baf; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-top: 1px; }
 
-        /* 右側：班別標籤區，單行截斷不換行 */
         .shift-badge-wrap { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 1px; align-items: center; width: 100%; }
-        .shift-badge { font-size: 9px; font-weight: bold; padding: 1px 3px; border-radius: 4px; white-space: nowrap; height: 13px; line-height: 12px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .shift-off { background: #b6a4e3; color: white; border-radius: 8px; }
+        /* 班別字體與內距縮小，字距微調 */
+        .shift-badge { font-size: 8.5px; font-weight: bold; padding: 1px 2px; border-radius: 3px; white-space: nowrap; height: 13px; line-height: 12px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); letter-spacing: -0.3px; }
+        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1px 4px; }
         .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
-        .shift-green { background: #5ece9d; color: white; }
-        .shift-default { background: #e9ecef; color: #555; }
-        .shift-num-tag { font-size: 9px; color: #d9534f; font-weight: 800; padding: 0; flex-shrink: 0; }
+        .shift-green { background: #5ece9d; color: white; border: none; }
+        .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
+        .shift-num-tag { font-size: 9px; color: #d9534f; font-weight: 800; padding: 0; flex-shrink: 0; margin-left: 1px; }
 
-        /* 手動修改標記小紅點 */
         .manual-dot { position: absolute; top: 2px; right: 2px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
-        /* 行程呈現區塊 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); }
         .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Modal 共用樣式 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 17px; color: #444; text-align: center; }
@@ -86,7 +73,13 @@
         
         .quick-section { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
-        .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; color: #555; cursor: pointer; }
+        
+        /* 統一快捷鍵樣式 */
+        .quick-btn { border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .quick-btn-d { background: #ffffff; color: #444; border: 1px solid #ccc; }
+        .quick-btn-green { background: #5ece9d; color: #ffffff; border: 1px solid #5ece9d; }
+        .quick-btn-off { background: #b6a4e3; color: #ffffff; border: 1px solid #b6a4e3; }
+        .quick-btn-clear { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffcccc; }
         
         .color-picker-options { display: flex; gap: 8px; margin-top: 4px; }
         .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.6); }
@@ -94,7 +87,6 @@
 
         .btn-row { display: flex; gap: 8px; margin-top: 12px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
-
         .repeat-display-btn { width: 100%; padding: 8px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -137,24 +129,52 @@
                     <button class="circle-btn" style="background:#ffa67c" onclick="toggleTag('國假')">國假</button>
                 </div>
                 
-                <div class="quick-section" style="border-top:none;">
+                <div class="quick-section">
+                    <div class="section-title">D 班系列</div>
                     <div class="quick-options">
-                        <button class="quick-btn" onclick="setShift('D')">D</button>
-                        <button class="quick-btn" onclick="setShift('D1')">D1</button>
-                        <button class="quick-btn" onclick="setShift('D2')">D2</button>
-                        <button class="quick-btn" onclick="setShift('D3')">D3</button>
-                        <button class="quick-btn" onclick="setShift('D4')">D4</button>
-                        <button class="quick-btn" onclick="setShift('D5')">D5</button>
-                        <button class="quick-btn" onclick="setShift('D6')">D6</button>
-                        <button class="quick-btn" onclick="setShift('DB1')">DB1</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('12-8 1')">12-8 1</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('12-8 2')">12-8 2</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('E1')">E1</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('E2')">E2</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('N1')">N1</button>
-                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('N2')">N2</button>
-                        <button class="quick-btn" style="background:#fdfbff; color:#8d77c4; border-color:#b6a4e3;" onclick="setShift('OFF')">OFF</button>
-                        <button class="quick-btn" style="background:#fff5f5; color:#ff6b6b; border-color:#ff6b6b;" onclick="setShift('')">重置</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D')">D</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D1')">D1</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D2')">D2</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D3')">D3</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D4')">D4</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D5')">D5</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D6')">D6</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D7')">D7</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D8')">D8</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D9')">D9</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D10')">D10</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D11')">D11</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D12')">D12</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D13')">D13</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('DB1')">DB1</button>
+                    </div>
+                </div>
+
+                <div class="quick-section">
+                    <div class="section-title">12 / E / N 班系列</div>
+                    <div class="quick-options">
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 1')">12-8 1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 2')">12-8 2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 3')">12-8 3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 4')">12-8 4</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 5')">12-8 5</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E1')">E1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E2')">E2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E3')">E3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E4')">E4</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('N1')">N1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('N2')">N2</button>
+                    </div>
+                </div>
+
+                <div class="quick-section">
+                    <div class="section-title">放假 / 其他</div>
+                    <div class="quick-options">
+                        <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('D\'OFF')">D'OFF</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('OFF.B')">OFF.B</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('9-5訪')">9-5訪</button>
+                        <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置清空</button>
                     </div>
                 </div>
             </div>
@@ -276,7 +296,6 @@
     </div>
 
     <script>
-        // 34 週班表資料庫
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
             ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
@@ -297,7 +316,6 @@
             ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
         ];
 
-        // 週期顏色陣列，供四週輪替使用
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
 
         const colorStyles = {
@@ -326,25 +344,18 @@
 
         function getCycleInfo(y, m, d) {
             let target = new Date(y, m, d, 12);
-            let ref = new Date(2026, 5, 8, 12); // June 8, 2026 (Monday)
+            let ref = new Date(2026, 5, 8, 12); 
             let daysDiff = Math.floor((target - ref) / 864e5);
             let cycleIdx = Math.floor(daysDiff / 28);
             let dayInCycle = daysDiff % 28;
             if (dayInCycle < 0) dayInCycle += 28;
             
-            // 判斷是否位於 28天 的邊界
             let isTop = dayInCycle < 7;
             let isBottom = dayInCycle >= 21;
             let isLeft = (target.getDay() === 1);
             let isRight = (target.getDay() === 0);
             
-            return { 
-                idx: Math.abs(cycleIdx), 
-                isTop: isTop, 
-                isBottom: isBottom, 
-                isLeft: isLeft, 
-                isRight: isRight 
-            };
+            return { idx: Math.abs(cycleIdx), isTop: isTop, isBottom: isBottom, isLeft: isLeft, isRight: isRight };
         }
 
         let currentDate = new Date();
@@ -424,14 +435,12 @@
         function goToday() { currentDate = new Date(); renderCalendar(); }
         function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
 
-        // 多重標籤切割與單行化渲染邏輯
         function generateShiftBadges(finalShift) {
             if (!finalShift) return "";
             let html = '<div class="shift-badge-wrap">';
             let text = finalShift.trim();
             let tokens = [];
             
-            // 抓取 12-8 特殊格式，防止下方出現孤立數字
             let m128 = text.match(/12-8\s\d+/g);
             if(m128) {
                 m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); });
@@ -474,7 +483,6 @@
 
                 let calendarSlots = [];
                 
-                // 1. 填補上個月的尾巴
                 let prevMonthLastDate = new Date(year, month, 0).getDate();
                 for (let i = firstDay - 1; i >= 0; i--) {
                     let d = prevMonthLastDate - i;
@@ -483,13 +491,11 @@
                     calendarSlots.push({ type: 'other', date: d, dateKey: `${y}-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`, dayOfWeek: new Date(y, m, d).getDay() });
                 }
                 
-                // 2. 填補這個月
                 for (let i = 1; i <= daysInMonth; i++) {
                     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
                     calendarSlots.push({ type: 'current', date: i, dateKey: dateKey, dayOfWeek: new Date(year, month, i).getDay() });
                 }
 
-                // 3. 填補下個月的開頭 (確保行事曆共有 42 格)
                 let rem = 42 - calendarSlots.length;
                 for (let i = 1; i <= rem; i++) {
                     let m = month + 1; let y = year;
@@ -534,9 +540,7 @@
                                     if (currKey >= ev.startDate && currKey <= ev.endDate) { tracks[trackIdx][dIdx] = ev; }
                                 }
                                 assigned = true;
-                            } else {
-                                trackIdx++;
-                            }
+                            } else { trackIdx++; }
                         }
                     });
                     week.tracks = tracks; 
@@ -596,17 +600,14 @@
                         }
                         
                         let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
-                        
-                        // 黃金佈局：日期和號碼班組合成左側小直行
                         let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
                         
-                        // 動態計算四週期粗方框樣式
                         let bColor = cycleBorderColors[cycleInfo.idx % 4];
                         let inlineStyle = "";
-                        if (cycleInfo.isTop) inlineStyle += `border-top: 2.5px solid ${bColor}; `;
-                        if (cycleInfo.isBottom) inlineStyle += `border-bottom: 2.5px solid ${bColor}; `;
-                        if (cycleInfo.isLeft) inlineStyle += `border-left: 2.5px solid ${bColor}; `;
-                        if (cycleInfo.isRight) inlineStyle += `border-right: 2.5px solid ${bColor}; `;
+                        if (cycleInfo.isTop) inlineStyle += `border-top: 2px solid ${bColor}; `;
+                        if (cycleInfo.isBottom) inlineStyle += `border-bottom: 2px solid ${bColor}; `;
+                        if (cycleInfo.isLeft) inlineStyle += `border-left: 2px solid ${bColor}; `;
+                        if (cycleInfo.isRight) inlineStyle += `border-right: 2px solid ${bColor}; `;
                         
                         let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
                         let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
@@ -701,7 +702,6 @@
             closeModal(); renderCalendar();
         }
 
-        // --- 結餘明細 ---
         function openStatsModal(t) {
             currentStatType = t;
             document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
@@ -744,7 +744,6 @@
         }
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
-        // --- 行程功能 ---
         function renderEventListInModal() {
             let ex = getExpandedEvents(selectedDateString, selectedDateString);
             let html = "";
@@ -806,7 +805,6 @@
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
-        // --- 重複設定子視窗 ---
         function openRepeatModal() { syncRepeatSummary(); document.getElementById('repeatModal').style.display = 'flex'; }
         function closeRepeatModal() { document.getElementById('repeatModal').style.display = 'none'; }
         function setRepType(t) { tempRepeatSetting.type = t; document.querySelectorAll('.rep-tab').forEach(el => el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); updateRepSummary(); }
