@@ -36,7 +36,6 @@
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
-        /* 調整日期與班別水平排列的容器 */
         .day-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
         
         .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; }
@@ -48,26 +47,32 @@
         .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
         .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 3px rgba(255,107,129,0.3); }
         
-        /* 班別標籤調整為適應水平版面 */
         .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 4px; max-width: 65%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; padding: 2px 6px; }
         .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 6px; }
         .shift-green { background: #5ece9d; color: white; border: none; border-radius: 6px; }
         .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
         
-        /* 行程記事區塊調整 */
-        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 3px; }
-        .event-item { font-size: 10px; background: rgba(91, 155, 213, 0.15); border-left: 3px solid #84bde3; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3e6e96; border-radius: 0 4px 4px 0; }
+        /* 行程呈現區塊 (每個獨立) */
+        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+        .event-item { font-size: 10px; background: rgba(255, 255, 255, 0.7); border-left: 3px solid #84bde3; padding: 4px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .event-item-title { font-weight: bold; color: #3e6e96; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-item-time { font-size: 9px; color: #777; }
+        .event-item-img { width: 100%; height: 35px; object-fit: cover; border-radius: 4px; margin-top: 2px; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 210, 230, 0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: rgba(255, 255, 255, 0.95); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(100,80,120,0.2); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.5); max-height: 88vh; overflow-y: auto; }
-        .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 19px; color: #555; text-align: center; }
+        /* Modal 共用樣式 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
+        .modal-content { background: rgba(255, 255, 255, 0.98); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; color: #444; text-align: center; }
         .modal-subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         
         .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: bold; color: #777; }
-        .input-group input { width: 100%; padding: 11px; font-size: 16px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        .input-group label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: bold; color: #666; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
         .input-group input:focus { outline: none; border-color: #b6a4e3; background: white; }
+        
+        /* 雙欄輸入框 (例如日期+時間) */
+        .row-inputs { display: flex; gap: 10px; }
         
         .quick-section { margin-top: 12px; border-top: 1px dashed #eee; padding-top: 8px; }
         .quick-section:first-of-type { border-top: none; padding-top: 0; }
@@ -79,6 +84,26 @@
         .quick-btn-green { border-color: #5ece9d; color: #3ba377; }
         .quick-btn-off { border-color: #b6a4e3; color: #8d77c4; background: #fdfbff; }
         .quick-btn-clear { border-color: #ff6b6b; color: #ff6b6b; background: #fff5f5; }
+        
+        /* 行程清單樣式 */
+        .event-list-container { margin-top: 15px; border-top: 2px solid #eee; padding-top: 15px; }
+        .existing-events { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+        .edit-event-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border-left: 4px solid #a28cdb; cursor: pointer; }
+        .edit-event-item:active { background: #e9ecef; }
+        
+        /* 按鈕樣式 */
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; }
+        .btn-cancel { background: #f1f1f1; color: #666; }
+        .btn-save { background: linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color: white; }
+        .btn-add { background: #fff; color: #a28cdb; border: 2px dashed #a28cdb; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+        .btn-danger { background: #ffefef; color: #ff6b6b; border: 1px solid #ffcccc; margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        
+        /* 照片預覽 */
+        .photo-preview-box { width: 100%; height: 120px; border-radius: 10px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 10px; position: relative; cursor: pointer; }
+        .photo-preview-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        .photo-placeholder { color: #999; font-size: 13px; pointer-events: none; }
+        .remove-photo-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 12px; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
@@ -105,7 +130,7 @@
                 <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵填入">
                 
                 <div class="quick-section">
-                    <div class="section-title">D 班系列 (白底標籤)</div>
+                    <div class="section-title">D 班系列</div>
                     <div class="quick-options">
                         <button class="quick-btn" onclick="setShift('D')">D</button>
                         <button class="quick-btn" onclick="setShift('D1')">D1</button>
@@ -116,35 +141,18 @@
                         <button class="quick-btn" onclick="setShift('D6')">D6</button>
                         <button class="quick-btn" onclick="setShift('D7')">D7</button>
                         <button class="quick-btn" onclick="setShift('D8')">D8</button>
-                        <button class="quick-btn" onclick="setShift('D9')">D9</button>
-                        <button class="quick-btn" onclick="setShift('D10')">D10</button>
-                        <button class="quick-btn" onclick="setShift('D11')">D11</button>
-                        <button class="quick-btn" onclick="setShift('D12')">D12</button>
-                        <button class="quick-btn" onclick="setShift('D13')">D13</button>
                         <button class="quick-btn" onclick="setShift('DB1')">DB1</button>
                     </div>
                 </div>
 
                 <div class="quick-section">
-                    <div class="section-title">12 班系列 (綠底標籤)</div>
+                    <div class="section-title">12 / E / N 班系列</div>
                     <div class="quick-options">
                         <button class="quick-btn quick-btn-green" onclick="setShift('12-8 1')">12-8 1</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('12-8 2')">12-8 2</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 3')">12-8 3</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 4')">12-8 4</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 5')">12-8 5</button>
-                    </div>
-                </div>
-
-                <div class="quick-section">
-                    <div class="section-title">E / N 班系列 (綠底標籤)</div>
-                    <div class="quick-options">
                         <button class="quick-btn quick-btn-green" onclick="setShift('E1')">E1</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('E2')">E2</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('E3')">E3</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('E4')">E4</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('N1')">N1</button>
-                        <button class="quick-btn quick-btn-green" onclick="setShift('N2')">N2</button>
                     </div>
                 </div>
 
@@ -153,60 +161,89 @@
                     <div class="quick-options">
                         <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('D\'OFF')">D'OFF</button>
-                        <button class="quick-btn quick-btn-off" onclick="setShift('OFF.B')">OFF.B</button>
                         <button class="quick-btn" onclick="setShift('9-5訪')">9-5訪</button>
-                        <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置清空</button>
+                        <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置班別</button>
                     </div>
                 </div>
             </div>
             
-            <div class="input-group" style="margin-bottom: 20px;">
-                <label>行程 / 記事</label>
-                <input type="text" id="eventInput" placeholder="例如: 洗車、聚餐">
+            <div class="event-list-container">
+                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">當日行程與記事</label>
+                <div id="existingEventsList" class="existing-events">
+                    </div>
+                <button class="btn-add" onclick="openEventDetailModal()">+ 新增行程</button>
             </div>
-            <div class="btn-row" style="display:flex;">
-                <button class="btn btn-cancel" style="flex:1; padding:12px; border:none; border-radius:10px; font-weight:bold; background:#f1f1f1; color:#666; margin-right:12px;" onclick="closeModal()">取消</button>
-                <button class="btn btn-save" style="flex:1; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; background: linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color:white;" onclick="saveData()">儲存</button>
+
+            <div class="btn-row">
+                <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn btn-save" onclick="saveShiftOnly()">儲存班表變更</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="eventDetailModal" style="z-index: 20;">
+        <div class="modal-content">
+            <h3 id="eventModalTitle">新增行程</h3>
+            
+            <div class="input-group">
+                <label>行程標題 <span style="color:red">*</span></label>
+                <input type="text" id="eventTitle" placeholder="例如: 洗車、聚餐、會議">
+            </div>
+
+            <div class="input-group">
+                <label>開始時間</label>
+                <div class="row-inputs">
+                    <input type="date" id="eventStartDate">
+                    <input type="time" id="eventStartTime">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>結束時間</label>
+                <div class="row-inputs">
+                    <input type="date" id="eventEndDate">
+                    <input type="time" id="eventEndTime">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>附上照片 (點擊框框上傳)</label>
+                <input type="file" id="eventPhotoInput" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
+                <div class="photo-preview-box" onclick="document.getElementById('eventPhotoInput').click()">
+                    <span class="photo-placeholder" id="photoPlaceholder">+ 點擊上傳照片</span>
+                    <img id="eventPhotoPreview" src="">
+                    <button class="remove-photo-btn" id="removePhotoBtn" onclick="removePhoto(event)">X</button>
+                </div>
+            </div>
+
+            <button id="deleteEventBtn" class="btn-danger" style="display:none;" onclick="deleteCurrentEvent()">刪除此行程</button>
+
+            <div class="btn-row">
+                <button class="btn btn-cancel" onclick="closeEventDetailModal()">返回</button>
+                <button class="btn btn-save" onclick="saveEventDetail()">確認儲存</button>
             </div>
         </div>
     </div>
 
     <script>
         const shiftPatterns = [
-            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"],     // 01
-            ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],  // 02
-            ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"],    // 03
-            ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],   // 04
-            ["D10", "D8", "D2", "D", "D4", "D1", "OFF"],    // 05
-            ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"],    // 06
-            ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"],  // 07
-            ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"],   // 08
-            ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"],    // 09
-            ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"],    // 10
-            ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"],  // 11
-            ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],   // 12
-            ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], // 13
-            ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"], // 14
-            ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"],// 15
-            ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"],   // 16
-            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   // 17
-            ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"], // 18
-            ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"],// 19
-            ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"],  // 20
-            ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"],   // 21
-            ["D", "D", "D", "D", "D", "OFF", "OFF"],        // 22
-            ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], // 23
-            ["D'OFF", "D", "D", "D", "D", "OFF", "OFF"],    // 24
-            ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"],// 25
-            ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"],  // 26
-            ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"],   // 27
-            ["D", "D", "D", "D", "D", "OFF", "OFF"],        // 28
-            ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], // 29
-            ["D", "D", "D", "D", "D", "OFF", "OFF"],        // 30
-            ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], // 31
-            ["D", "D", "D", "D", "D", "OFF", "OFF"],        // 32
-            ["D", "D", "D", "D", "D", "D4", "OFF"],         // 33
-            ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]  // 34
+            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"],     ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
+            ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"],    ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
+            ["D10", "D8", "D2", "D", "D4", "D1", "OFF"],    ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"],
+            ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"],  ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"],
+            ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"],    ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"],
+            ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"],  ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],
+            ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"],
+            ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"],
+            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"],
+            ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"],
+            ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], ["D'OFF", "D", "D", "D", "D", "OFF", "OFF"],
+            ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"],
+            ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
         ];
 
         function getAutoShift(year, month, date) {
@@ -214,51 +251,53 @@
             const dayOfWeek = targetDate.getDay(); 
             const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             const targetMonday = new Date(year, month, date + diffToMonday, 0, 0, 0);
-            
             const refDate = new Date(2026, 6, 6, 0, 0, 0); 
-            const refWeekIdx = 13; 
-            
             const msDiff = targetMonday.getTime() - refDate.getTime();
             const daysDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
             const weeksDiff = Math.floor(daysDiff / 7);
             
-            let currentWeekIdx = (refWeekIdx + weeksDiff) % 34;
+            let currentWeekIdx = (13 + weeksDiff) % 34;
             if (currentWeekIdx < 0) currentWeekIdx += 34; 
             
             const patternDayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-            
-            return {
-                shift: shiftPatterns[currentWeekIdx][patternDayIdx],
-                weekNumber: currentWeekIdx + 1
-            };
+            return { shift: shiftPatterns[currentWeekIdx][patternDayIdx], weekNumber: currentWeekIdx + 1 };
         }
 
         function getCycleInfo(year, month, date) {
             const targetDate = new Date(year, month, date, 12, 0, 0);
             const refDate = new Date(2026, 5, 8, 12, 0, 0); 
-            
-            const msDiff = targetDate.getTime() - refDate.getTime();
-            const daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24));
-            
+            const daysDiff = Math.floor((targetDate.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
             let cycleIdx = Math.floor(daysDiff / 28);
             let dayInCycle = daysDiff % 28;
             if (dayInCycle < 0) dayInCycle += 28;
-            
-            return {
-                isEven: Math.abs(cycleIdx) % 2 === 0,
-                isStart: dayInCycle === 0
-            };
+            return { isEven: Math.abs(cycleIdx) % 2 === 0, isStart: dayInCycle === 0 };
         }
 
         let currentDate = new Date();
         let selectedDateString = "";
-        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar')) || {};
+        // 增加支援事件陣列 (確保舊資料相容)
+        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar2')) || {}; 
+        
+        // 處理舊版資料結構轉換
+        for (let key in calendarData) {
+            if (calendarData[key].event && !calendarData[key].events) {
+                calendarData[key].events = [{
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                    title: calendarData[key].event,
+                    startDate: key, startTime: "", endDate: "", endTime: "", photoUrl: ""
+                }];
+                delete calendarData[key].event;
+            }
+        }
+
+        // 用於追蹤當前正在編輯的行程
+        let currentEditingEventId = null;
+        let tempPhotoBase64 = "";
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
-            
             const calendarEl = document.getElementById('calendar');
             calendarEl.innerHTML = "";
 
@@ -271,7 +310,7 @@
             }
 
             for (let i = 1; i <= daysInMonth; i++) {
-                const dateKey = `${year}-${month + 1}-${i}`;
+                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
                 const dayOfWeek = new Date(year, month, i).getDay();
                 
                 let dateClass = "date-box";
@@ -282,57 +321,49 @@
                 const autoInfo = getAutoShift(year, month, i);
                 const cycleInfo = getCycleInfo(year, month, i);
                 
-                let finalShift = "";
-                let isManual = false;
-
-                if (savedData && savedData.shift !== undefined) {
-                    finalShift = savedData.shift;
-                    isManual = true;
-                } else {
-                    finalShift = autoInfo.shift;
-                }
-                
+                let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
+                let isManual = (savedData && savedData.shift !== undefined);
                 let shiftHtml = "";
+
                 if (finalShift) {
                     const s = finalShift.trim().toUpperCase();
-                    if (s.includes("OFF")) {
-                        shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
-                    } else if (s.startsWith("D")) {
-                        shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
-                    } else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) {
-                        shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
-                    } else {
-                        shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
-                    }
+                    if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
+                    else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
+                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
+                    else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
                 }
 
-                let eventHtml = (savedData && savedData.event) ? `<div class="event-item">${savedData.event}</div>` : "";
-                let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
+                // 獨立渲染每個行程
+                let eventsHtml = "";
+                if (savedData && savedData.events && savedData.events.length > 0) {
+                    savedData.events.forEach(ev => {
+                        let timeStr = ev.startTime ? ev.startTime : "";
+                        let imgHtml = ev.photoUrl ? `<img src="${ev.photoUrl}" class="event-item-img">` : "";
+                        eventsHtml += `
+                            <div class="event-item">
+                                <div class="event-item-title">${ev.title}</div>
+                                ${timeStr ? `<div class="event-item-time">${timeStr} 開始</div>` : ''}
+                                ${imgHtml}
+                            </div>
+                        `;
+                    });
+                }
                 
+                let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
                 let badgesHtml = "";
-                if (dayOfWeek === 1) {
-                    badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
-                }
-                if (cycleInfo.isStart) {
-                    badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
-                }
+                if (dayOfWeek === 1) badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
+                if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
 
                 let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
 
                 calendarEl.innerHTML += `
-                    <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日', ${year}, ${month}, ${i})">
+                    <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
                         <div class="day-header">
-                            <div class="${dateClass}">
-                                <span>${i}</span>${dotIndicator}
-                            </div>
+                            <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
                             ${shiftHtml}
                         </div>
-                        
                         ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
-                        
-                        <div class="event-area">
-                            ${eventHtml}
-                        </div>
+                        <div class="event-area">${eventsHtml}</div>
                     </div>
                 `;
             }
@@ -343,22 +374,19 @@
             renderCalendar();
         }
 
-        function openModal(dateKey, displayDate, y, m, d) {
+        // --- 主視窗邏輯 ---
+        function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
             
-            const savedData = calendarData[dateKey] || { shift: undefined, event: "" };
-            const autoInfo = getAutoShift(y, m, d);
-            
-            document.getElementById('modalSubtitle').innerText = `系統排班進度：輪值第 ${autoInfo.weekNumber} 週 \n (系統預設班別為：${autoInfo.shift})`;
+            const parts = selectedDateString.split('-');
+            const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+            document.getElementById('modalSubtitle').innerText = `輪值第 ${autoInfo.weekNumber} 週 (系統預設：${autoInfo.shift})`;
 
-            if (savedData.shift !== undefined) {
-                document.getElementById('shiftInput').value = savedData.shift;
-            } else {
-                document.getElementById('shiftInput').value = autoInfo.shift;
-            }
+            const savedData = calendarData[dateKey] || {};
+            document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
             
-            document.getElementById('eventInput').value = savedData.event;
+            renderEventListInModal();
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -370,16 +398,12 @@
             document.getElementById('shiftInput').value = value;
         }
 
-        function saveData() {
+        function saveShiftOnly() {
             const shiftVal = document.getElementById('shiftInput').value.trim();
-            const eventVal = document.getElementById('eventInput').value.trim();
-            
             const parts = selectedDateString.split('-');
             const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
 
-            if (!calendarData[selectedDateString]) {
-                calendarData[selectedDateString] = {};
-            }
+            if (!calendarData[selectedDateString]) calendarData[selectedDateString] = { events: [] };
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
                 delete calendarData[selectedDateString].shift;
@@ -387,19 +411,190 @@
                 calendarData[selectedDateString].shift = shiftVal;
             }
 
-            if (eventVal === "") {
-                delete calendarData[selectedDateString].event;
-            } else {
-                calendarData[selectedDateString].event = eventVal;
-            }
-
-            if (calendarData[selectedDateString].shift === undefined && calendarData[selectedDateString].event === undefined) {
-                delete calendarData[selectedDateString];
-            }
-            
-            localStorage.setItem('myCustomCalendar', JSON.stringify(calendarData));
+            cleanUpEmptyDate(selectedDateString);
+            localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
             closeModal();
             renderCalendar();
+        }
+
+        function renderEventListInModal() {
+            const listEl = document.getElementById('existingEventsList');
+            listEl.innerHTML = "";
+            const savedData = calendarData[selectedDateString];
+            
+            if (savedData && savedData.events && savedData.events.length > 0) {
+                savedData.events.forEach(ev => {
+                    listEl.innerHTML += `
+                        <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
+                            <div>
+                                <strong style="color:#555; font-size:14px;">${ev.title}</strong>
+                                <div style="font-size:11px; color:#888;">${ev.startTime ? ev.startTime : '全天'}</div>
+                            </div>
+                            <span style="color:#a28cdb; font-size:18px;">✎</span>
+                        </div>
+                    `;
+                });
+            } else {
+                listEl.innerHTML = `<div style="text-align:center; font-size:12px; color:#aaa; padding:10px 0;">目前無行程</div>`;
+            }
+        }
+
+        // --- 行程詳細設定視窗邏輯 ---
+        function openEventDetailModal(eventId = null) {
+            currentEditingEventId = eventId;
+            tempPhotoBase64 = "";
+            
+            // 重置表單
+            document.getElementById('eventTitle').value = "";
+            document.getElementById('eventStartDate').value = selectedDateString;
+            document.getElementById('eventStartTime').value = "";
+            document.getElementById('eventEndDate').value = selectedDateString;
+            document.getElementById('eventEndTime').value = "";
+            document.getElementById('eventPhotoInput').value = "";
+            resetPhotoPreview();
+
+            if (eventId) {
+                document.getElementById('eventModalTitle').innerText = "編輯行程";
+                document.getElementById('deleteEventBtn').style.display = "block";
+                
+                // 載入現有資料
+                const ev = calendarData[selectedDateString].events.find(e => e.id === eventId);
+                if (ev) {
+                    document.getElementById('eventTitle').value = ev.title;
+                    document.getElementById('eventStartDate').value = ev.startDate || selectedDateString;
+                    document.getElementById('eventStartTime').value = ev.startTime || "";
+                    document.getElementById('eventEndDate').value = ev.endDate || selectedDateString;
+                    document.getElementById('eventEndTime').value = ev.endTime || "";
+                    if (ev.photoUrl) {
+                        tempPhotoBase64 = ev.photoUrl;
+                        showPhotoPreview(ev.photoUrl);
+                    }
+                }
+            } else {
+                document.getElementById('eventModalTitle').innerText = "新增行程";
+                document.getElementById('deleteEventBtn').style.display = "none";
+            }
+
+            document.getElementById('eventDetailModal').style.display = 'flex';
+        }
+
+        function closeEventDetailModal() {
+            document.getElementById('eventDetailModal').style.display = 'none';
+        }
+
+        // --- 照片壓縮處理 ---
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // 將照片壓縮至最大寬度 500px，防止 localStorage 爆滿
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500; 
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // 降低畫質至 60%
+                    showPhotoPreview(tempPhotoBase64);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPhotoPreview(src) {
+            document.getElementById('photoPlaceholder').style.display = 'none';
+            const imgEl = document.getElementById('eventPhotoPreview');
+            imgEl.src = src;
+            imgEl.style.display = 'block';
+            document.getElementById('removePhotoBtn').style.display = 'block';
+        }
+
+        function resetPhotoPreview() {
+            tempPhotoBase64 = "";
+            document.getElementById('photoPlaceholder').style.display = 'block';
+            document.getElementById('eventPhotoPreview').style.display = 'none';
+            document.getElementById('eventPhotoPreview').src = "";
+            document.getElementById('removePhotoBtn').style.display = 'none';
+            document.getElementById('eventPhotoInput').value = "";
+        }
+
+        function removePhoto(e) {
+            e.stopPropagation(); // 防止觸發上傳點擊
+            resetPhotoPreview();
+        }
+
+        function saveEventDetail() {
+            const title = document.getElementById('eventTitle').value.trim();
+            if (!title) {
+                alert("請填寫行程標題！");
+                return;
+            }
+
+            if (!calendarData[selectedDateString]) {
+                calendarData[selectedDateString] = { events: [] };
+            }
+            if (!calendarData[selectedDateString].events) {
+                calendarData[selectedDateString].events = [];
+            }
+
+            const eventObj = {
+                id: currentEditingEventId || (Date.now().toString() + Math.random().toString(36).substr(2, 5)),
+                title: title,
+                startDate: document.getElementById('eventStartDate').value,
+                startTime: document.getElementById('eventStartTime').value,
+                endDate: document.getElementById('eventEndDate').value,
+                endTime: document.getElementById('eventEndTime').value,
+                photoUrl: tempPhotoBase64
+            };
+
+            if (currentEditingEventId) {
+                const idx = calendarData[selectedDateString].events.findIndex(e => e.id === currentEditingEventId);
+                if (idx !== -1) calendarData[selectedDateString].events[idx] = eventObj;
+            } else {
+                calendarData[selectedDateString].events.push(eventObj);
+            }
+
+            localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
+            renderEventListInModal(); 
+            renderCalendar(); 
+            closeEventDetailModal();
+        }
+
+        function deleteCurrentEvent() {
+            if (!confirm("確定要刪除這個行程嗎？")) return;
+            
+            if (calendarData[selectedDateString] && calendarData[selectedDateString].events) {
+                calendarData[selectedDateString].events = calendarData[selectedDateString].events.filter(e => e.id !== currentEditingEventId);
+                cleanUpEmptyDate(selectedDateString);
+                localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
+            }
+            
+            renderEventListInModal();
+            renderCalendar();
+            closeEventDetailModal();
+        }
+
+        function cleanUpEmptyDate(dateKey) {
+            const data = calendarData[dateKey];
+            if (data) {
+                if (data.shift === undefined && (!data.events || data.events.length === 0)) {
+                    delete calendarData[dateKey];
+                }
+            }
         }
 
         renderCalendar();
