@@ -29,17 +29,18 @@
         
         .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 8px; }
         
-        .day { backdrop-filter: blur(3px); min-height: 100px; padding: 5px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; }
+        .day { backdrop-filter: blur(3px); min-height: 110px; padding: 5px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; }
         .day:active { transform: scale(0.96); background: rgba(255, 255, 255, 1) !important; }
         .day.empty { background: transparent; box-shadow: none; border: none; cursor: default; }
         
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
-        .day-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        /* 調整：班別直接緊接在日期右邊，且拉長呈現空間 */
+        .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
         
-        .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; }
-        .manual-dot { width: 6px; height: 6px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 4px; }
+        .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; flex-shrink: 0; }
+        .manual-dot { width: 6px; height: 6px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 3px; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
@@ -47,18 +48,27 @@
         .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
         .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 3px rgba(255,107,129,0.3); }
         
-        .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 4px; max-width: 65%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; padding: 2px 6px; }
+        /* 班別標籤：長度調整為兩倍寬，滿版延伸 */
+        .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 6px; flex-grow: 1; min-width: 42px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; }
         .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 6px; }
         .shift-green { background: #5ece9d; color: white; border: none; border-radius: 6px; }
         .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
         
-        /* 行程呈現區塊 (每個獨立) */
-        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
-        .event-item { font-size: 10px; background: rgba(255, 255, 255, 0.7); border-left: 3px solid #84bde3; padding: 4px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .event-item-title { font-weight: bold; color: #3e6e96; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .event-item-time { font-size: 9px; color: #777; }
+        /* 行程呈現區塊：左右外距縮緊以利跨格連續方框填滿間隙 */
+        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; margin-left: -5px; margin-right: -5px; width: calc(100% + 10px); }
+        
+        /* 獨立行程方框樣式 */
+        .event-item { font-size: 10px; padding: 3px 5px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; }
+        .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-item-time { font-size: 8px; opacity: 0.8; }
         .event-item-img { width: 100%; height: 35px; object-fit: cover; border-radius: 4px; margin-top: 2px; }
+        
+        /* 顏色選擇器圓點樣式 */
+        .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
+        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
+        .color-dot:active { transform: scale(0.9); }
+        .color-dot.selected { border-color: #444; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
         
         /* Modal 共用樣式 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
@@ -71,7 +81,6 @@
         .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
         .input-group input:focus { outline: none; border-color: #b6a4e3; background: white; }
         
-        /* 雙欄輸入框 (例如日期+時間) */
         .row-inputs { display: flex; gap: 10px; }
         
         .quick-section { margin-top: 12px; border-top: 1px dashed #eee; padding-top: 8px; }
@@ -85,13 +94,10 @@
         .quick-btn-off { border-color: #b6a4e3; color: #8d77c4; background: #fdfbff; }
         .quick-btn-clear { border-color: #ff6b6b; color: #ff6b6b; background: #fff5f5; }
         
-        /* 行程清單樣式 */
         .event-list-container { margin-top: 15px; border-top: 2px solid #eee; padding-top: 15px; }
         .existing-events { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
         .edit-event-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border-left: 4px solid #a28cdb; cursor: pointer; }
-        .edit-event-item:active { background: #e9ecef; }
         
-        /* 按鈕樣式 */
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; }
         .btn-cancel { background: #f1f1f1; color: #666; }
@@ -99,7 +105,6 @@
         .btn-add { background: #fff; color: #a28cdb; border: 2px dashed #a28cdb; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
         .btn-danger { background: #ffefef; color: #ff6b6b; border: 1px solid #ffcccc; margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
-        /* 照片預覽 */
         .photo-preview-box { width: 100%; height: 120px; border-radius: 10px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 10px; position: relative; cursor: pointer; }
         .photo-preview-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
         .photo-placeholder { color: #999; font-size: 13px; pointer-events: none; }
@@ -168,10 +173,9 @@
             </div>
             
             <div class="event-list-container">
-                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">當日行程與記事</label>
-                <div id="existingEventsList" class="existing-events">
-                    </div>
-                <button class="btn-add" onclick="openEventDetailModal()">+ 新增行程</button>
+                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">包含此日的行程與記事</label>
+                <div id="existingEventsList" class="existing-events"></div>
+                <button class="btn-add" onclick="openEventDetailModal()">+ 新增獨立行程</button>
             </div>
 
             <div class="btn-row">
@@ -187,7 +191,19 @@
             
             <div class="input-group">
                 <label>行程標題 <span style="color:red">*</span></label>
-                <input type="text" id="eventTitle" placeholder="例如: 洗車、聚餐、會議">
+                <input type="text" id="eventTitle" placeholder="例如: 墾丁三日遊、洗車">
+            </div>
+
+            <div class="input-group">
+                <label>行程呈現顏色</label>
+                <div class="color-picker-options" id="colorPickerContainer">
+                    <div class="color-dot selected" data-color="blue" style="background: #84bde3;"></div>
+                    <div class="color-dot" data-color="pink" style="background: #ff9ebb;"></div>
+                    <div class="color-dot" data-color="green" style="background: #7fd9b2;"></div>
+                    <div class="color-dot" data-color="purple" style="background: #c3b3ef;"></div>
+                    <div class="color-dot" data-color="yellow" style="background: #fcd372;"></div>
+                    <div class="color-dot" data-color="orange" style="background: #ffa67c;"></div>
+                </div>
             </div>
 
             <div class="input-group">
@@ -220,7 +236,7 @@
 
             <div class="btn-row">
                 <button class="btn btn-cancel" onclick="closeEventDetailModal()">返回</button>
-                <button class="btn btn-save" onclick="saveEventDetail()">確認儲存</button>
+                <button class="btn btn-save" onclick="saveEventDetail()">確認儲存行程</button>
             </div>
         </div>
     </div>
@@ -246,6 +262,16 @@
             ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
         ];
 
+        // 6款色系色碼對照表
+        const colorStyles = {
+            blue: { bg: 'rgba(91, 155, 213, 0.2)', text: '#3e6e96', border: '#84bde3' },
+            pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
+            green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
+            purple: { bg: 'rgba(195, 179, 239, 0.25)', text: '#5c439c', border: '#c3b3ef' },
+            yellow: { bg: 'rgba(252, 211, 114, 0.3)', text: '#704f02', border: '#fcd372' },
+            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' }
+        };
+
         function getAutoShift(year, month, date) {
             const targetDate = new Date(year, month, date);
             const dayOfWeek = targetDate.getDay(); 
@@ -253,12 +279,9 @@
             const targetMonday = new Date(year, month, date + diffToMonday, 0, 0, 0);
             const refDate = new Date(2026, 6, 6, 0, 0, 0); 
             const msDiff = targetMonday.getTime() - refDate.getTime();
-            const daysDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
-            const weeksDiff = Math.floor(daysDiff / 7);
-            
+            const weeksDiff = Math.floor(Math.round(msDiff / (1000 * 60 * 60 * 24)) / 7);
             let currentWeekIdx = (13 + weeksDiff) % 34;
             if (currentWeekIdx < 0) currentWeekIdx += 34; 
-            
             const patternDayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
             return { shift: shiftPatterns[currentWeekIdx][patternDayIdx], weekNumber: currentWeekIdx + 1 };
         }
@@ -275,25 +298,44 @@
 
         let currentDate = new Date();
         let selectedDateString = "";
-        // 增加支援事件陣列 (確保舊資料相容)
-        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar2')) || {}; 
-        
-        // 處理舊版資料結構轉換
-        for (let key in calendarData) {
-            if (calendarData[key].event && !calendarData[key].events) {
-                calendarData[key].events = [{
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                    title: calendarData[key].event,
-                    startDate: key, startTime: "", endDate: "", endTime: "", photoUrl: ""
-                }];
-                delete calendarData[key].event;
+        let selectedEventColor = "blue";
+        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
+
+        // 提取系統中不重複的所有獨立行程
+        function getAllEvents() {
+            let all = [];
+            let seenIds = new Set();
+            for (let key in calendarData) {
+                if (calendarData[key].events) {
+                    calendarData[key].events.forEach(ev => {
+                        if (!seenIds.has(ev.id)) {
+                            seenIds.add(ev.id);
+                            all.push(ev);
+                        }
+                    });
+                }
             }
+            return all;
         }
 
-        // 用於追蹤當前正在編輯的行程
-        let currentEditingEventId = null;
-        let tempPhotoBase64 = "";
+        // 綁定選色圓點點擊事件
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.addEventListener('click', function() {
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedEventColor = this.getAttribute('data-color');
+            });
+        });
 
+        function selectColorInPicker(color) {
+            selectedEventColor = color || 'blue';
+            document.querySelectorAll('.color-dot').forEach(d => {
+                if (d.getAttribute('data-color') === selectedEventColor) d.classList.add('selected');
+                else d.classList.remove('selected');
+            });
+        }
+
+        // --- 核心算圖渲染邏輯：將單月格子切分出週行，進行水平跨格排軌 ---
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -305,68 +347,195 @@
             firstDay = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+            // 建立日曆總格子陣列
+            let calendarSlots = [];
             for (let i = 0; i < firstDay; i++) {
-                calendarEl.innerHTML += `<div class="day empty"></div>`;
+                calendarSlots.push({ type: 'empty' });
             }
-
             for (let i = 1; i <= daysInMonth; i++) {
                 const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-                const dayOfWeek = new Date(year, month, i).getDay();
-                
-                let dateClass = "date-box";
-                if (dayOfWeek === 0) dateClass += " sun-text";
-                if (dayOfWeek === 6) dateClass += " sat-text";
-
-                const savedData = calendarData[dateKey];
-                const autoInfo = getAutoShift(year, month, i);
-                const cycleInfo = getCycleInfo(year, month, i);
-                
-                let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
-                let isManual = (savedData && savedData.shift !== undefined);
-                let shiftHtml = "";
-
-                if (finalShift) {
-                    const s = finalShift.trim().toUpperCase();
-                    if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
-                    else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
-                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
-                    else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
-                }
-
-                // 獨立渲染每個行程
-                let eventsHtml = "";
-                if (savedData && savedData.events && savedData.events.length > 0) {
-                    savedData.events.forEach(ev => {
-                        let timeStr = ev.startTime ? ev.startTime : "";
-                        let imgHtml = ev.photoUrl ? `<img src="${ev.photoUrl}" class="event-item-img">` : "";
-                        eventsHtml += `
-                            <div class="event-item">
-                                <div class="event-item-title">${ev.title}</div>
-                                ${timeStr ? `<div class="event-item-time">${timeStr} 開始</div>` : ''}
-                                ${imgHtml}
-                            </div>
-                        `;
-                    });
-                }
-                
-                let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
-                let badgesHtml = "";
-                if (dayOfWeek === 1) badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
-                if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
-
-                let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
-
-                calendarEl.innerHTML += `
-                    <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
-                        <div class="day-header">
-                            <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
-                            ${shiftHtml}
-                        </div>
-                        ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
-                        <div class="event-area">${eventsHtml}</div>
-                    </div>
-                `;
+                calendarSlots.push({
+                    type: 'day',
+                    date: i,
+                    dateKey: dateKey,
+                    dayOfWeek: new Date(year, month, i).getDay()
+                });
             }
+
+            // 將格子切成「週列」(每列7天) 用於計算水平軌道線
+            let weeks = [];
+            for (let i = 0; i < calendarSlots.length; i += 7) {
+                weeks.push(calendarSlots.slice(i, i + 7));
+            }
+
+            const allEvents = getAllEvents();
+
+            // 週軌道演算法核心：計算每一週行程的上下對齊高度
+            weeks.forEach(week => {
+                let dayRealObj = week.filter(d => d.type === 'day');
+                if (dayRealObj.length === 0) return;
+                let wStart = dayRealObj[0].dateKey;
+                let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
+
+                // 篩選與這週有交集的行程
+                let wEvents = allEvents.filter(ev => {
+                    return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
+                });
+
+                // 長行程優先排在上方軌道
+                wEvents.sort((a, b) => {
+                    let lenA = new Date(a.endDate) - new Date(a.startDate);
+                    let lenB = new Date(b.endDate) - new Date(b.startDate);
+                    return lenB - lenA || a.id.localeCompare(b.id);
+                });
+
+                let tracks = []; // 存放各層軌道的分配狀況
+                wEvents.forEach(ev => {
+                    let assigned = false;
+                    let trackIdx = 0;
+                    while (!assigned) {
+                        if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
+                        
+                        // 檢查該軌道這幾天是否被佔用
+                        let conflict = false;
+                        for (let dIdx = 0; dIdx < 7; dIdx++) {
+                            if (week[dIdx].type === 'day') {
+                                let currKey = week[dIdx].dateKey;
+                                let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
+                                if (isCovered && tracks[trackIdx][dIdx] !== null) {
+                                    conflict = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!conflict) {
+                            for (let dIdx = 0; dIdx < 7; dIdx++) {
+                                if (week[dIdx].type === 'day') {
+                                    let currKey = week[dIdx].dateKey;
+                                    if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) {
+                                        tracks[trackIdx][dIdx] = ev;
+                                    }
+                                }
+                            }
+                            assigned = true;
+                        } else {
+                            trackIdx++;
+                        }
+                    }
+                });
+                week.tracks = tracks; // 將這週算好的軌道資料存回 week 物件
+            });
+
+            // 開始生成 HTML 畫面
+            weeks.forEach(week => {
+                week.forEach((slot, dIdx) => {
+                    if (slot.type === 'empty') {
+                        calendarEl.innerHTML += `<div class="day empty"></div>`;
+                        return;
+                    }
+
+                    const dateKey = slot.dateKey;
+                    const i = slot.date;
+                    const dayOfWeek = slot.dayOfWeek;
+                    
+                    let dateClass = "date-box";
+                    if (dayOfWeek === 0) dateClass += " sun-text";
+                    if (dayOfWeek === 6) dateClass += " sat-text";
+
+                    const savedData = calendarData[dateKey];
+                    const autoInfo = getAutoShift(year, month, i);
+                    const cycleInfo = getCycleInfo(year, month, i);
+                    
+                    let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
+                    let isManual = (savedData && savedData.shift !== undefined);
+                    let shiftHtml = "";
+
+                    if (finalShift) {
+                        const s = finalShift.trim().toUpperCase();
+                        if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
+                        else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
+                        else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
+                        else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
+                    }
+
+                    // 渲染該格子的所有軌道行程
+                    let tracksHtml = "";
+                    if (week.tracks && week.tracks.length > 0) {
+                        week.tracks.forEach(trackLine => {
+                            const ev = trackLine[dIdx];
+                            if (ev) {
+                                // 判斷本地週內連續性 (用於計算跨格方框連接)
+                                let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
+                                let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
+                                
+                                // 判斷全域跨週連續性 (用於週邊界壓平圓角)
+                                let globalLeft = (ev.startDate < dateKey);
+                                let globalRight = ((ev.endDate || ev.startDate) > dateKey);
+
+                                let marginStyle = "";
+                                let radiusStyle = "border-radius: 4px;";
+
+                                // 關鍵 CSS 技術：利用負外距 (Negative Margin) 自動填滿格子的 Grid Gap 縫隙，達成連貫方框
+                                if (hasRight) {
+                                    marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
+                                    radiusStyle = "border-radius: 4px 0 0 4px;";
+                                }
+                                if (hasLeft) {
+                                    radiusStyle = "border-radius: 0 4px 4px 0;";
+                                }
+                                if (hasLeft && hasRight) {
+                                    marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
+                                    radiusStyle = "border-radius: 0;";
+                                }
+
+                                // 處理邊界
+                                if (dIdx === 0 && globalLeft) {
+                                    radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;";
+                                }
+                                if (dIdx === 6 && globalRight) {
+                                    radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 4px 0 0 4px;";
+                                }
+
+                                const cStyle = colorStyles[ev.color || 'blue'];
+                                let imgHtml = ev.photoUrl ? `<img src="${ev.photoUrl}" class="event-item-img">` : "";
+                                
+                                // 後續天數只呈現色塊線條，不重覆顯示字體，乾淨清晰
+                                let showText = !hasLeft; 
+
+                                tracksHtml += `
+                                    <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: ${ev.photoUrl ? 'auto' : '22px'}; min-height:22px;">
+                                        ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+                                        ${(showText && imgHtml) ? imgHtml : ''}
+                                    </div>
+                                `;
+                            } else {
+                                // 空白軌道：置入透明佔位符，確保隔壁天同一條行程在水平線上能對齊
+                                let trackHasPhoto = trackLine.some(e => e && e.photoUrl);
+                                tracksHtml += `<div style="height: ${trackHasPhoto ? '61px' : '22px'}; pointer-events: none;"></div>`;
+                            }
+                        });
+                    }
+                    
+                    let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
+                    let badgesHtml = "";
+                    if (dayOfWeek === 1) badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
+                    if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
+
+                    let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
+
+                    calendarEl.innerHTML += `
+                        <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
+                            <div class="day-header">
+                                <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
+                                ${shiftHtml}
+                            </div>
+                            ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
+                            <div class="event-area">${tracksHtml}</div>
+                        </div>
+                    `;
+                });
+            });
         }
 
         function changeMonth(step) {
@@ -374,14 +543,14 @@
             renderCalendar();
         }
 
-        // --- 主視窗邏輯 ---
+        // --- 主彈出視窗：修改班表及列表檢視 ---
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
             
             const parts = selectedDateString.split('-');
             const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-            document.getElementById('modalSubtitle').innerText = `輪值第 ${autoInfo.weekNumber} 週 (系統預設：${autoInfo.shift})`;
+            document.getElementById('modalSubtitle').innerText = `輪值第 ${autoInfo.weekNumber} 週 (預設：${autoInfo.shift})`;
 
             const savedData = calendarData[dateKey] || {};
             document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
@@ -412,67 +581,72 @@
             }
 
             cleanUpEmptyDate(selectedDateString);
-            localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar3', JSON.stringify(calendarData));
             closeModal();
             renderCalendar();
         }
 
+        // 行程列表優化：凡包含此日期的多天行程，皆會呈現在編輯清單內
         function renderEventListInModal() {
             const listEl = document.getElementById('existingEventsList');
             listEl.innerHTML = "";
-            const savedData = calendarData[selectedDateString];
+            const allEvents = getAllEvents();
+            const filtered = allEvents.filter(ev => selectedDateString >= ev.startDate && selectedDateString <= (ev.endDate || ev.startDate));
             
-            if (savedData && savedData.events && savedData.events.length > 0) {
-                savedData.events.forEach(ev => {
+            if (filtered.length > 0) {
+                filtered.forEach(ev => {
                     listEl.innerHTML += `
                         <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
                             <div>
-                                <strong style="color:#555; font-size:14px;">${ev.title}</strong>
-                                <div style="font-size:11px; color:#888;">${ev.startTime ? ev.startTime : '全天'}</div>
+                                <strong style="color:#444; font-size:14px;">${ev.title}</strong>
+                                <div style="font-size:11px; color:#888;">期間：${ev.startDate} ~ ${ev.endDate || ev.startDate}</div>
                             </div>
                             <span style="color:#a28cdb; font-size:18px;">✎</span>
                         </div>
                     `;
                 });
             } else {
-                listEl.innerHTML = `<div style="text-align:center; font-size:12px; color:#aaa; padding:10px 0;">目前無行程</div>`;
+                listEl.innerHTML = `<div style="text-align:center; font-size:12px; color:#aaa; padding:10px 0;">當日無排定行程</div>`;
             }
         }
 
-        // --- 行程詳細設定視窗邏輯 ---
+        // --- 獨立行程詳細規格設定視窗 (開始日、結束日、顏色選取、相片) ---
+        let currentEditingEventId = null;
+        let tempPhotoBase64 = "";
+
         function openEventDetailModal(eventId = null) {
             currentEditingEventId = eventId;
             tempPhotoBase64 = "";
             
-            // 重置表單
             document.getElementById('eventTitle').value = "";
             document.getElementById('eventStartDate').value = selectedDateString;
             document.getElementById('eventStartTime').value = "";
             document.getElementById('eventEndDate').value = selectedDateString;
             document.getElementById('eventEndTime').value = "";
-            document.getElementById('eventPhotoInput').value = "";
             resetPhotoPreview();
 
             if (eventId) {
-                document.getElementById('eventModalTitle').innerText = "編輯行程";
+                document.getElementById('eventModalTitle').innerText = "編輯行程資訊";
                 document.getElementById('deleteEventBtn').style.display = "block";
                 
-                // 載入現有資料
-                const ev = calendarData[selectedDateString].events.find(e => e.id === eventId);
+                const all = getAllEvents();
+                const ev = all.find(e => e.id === eventId);
                 if (ev) {
                     document.getElementById('eventTitle').value = ev.title;
-                    document.getElementById('eventStartDate').value = ev.startDate || selectedDateString;
+                    document.getElementById('eventStartDate').value = ev.startDate;
                     document.getElementById('eventStartTime').value = ev.startTime || "";
-                    document.getElementById('eventEndDate').value = ev.endDate || selectedDateString;
+                    document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
                     document.getElementById('eventEndTime').value = ev.endTime || "";
+                    selectColorInPicker(ev.color);
                     if (ev.photoUrl) {
                         tempPhotoBase64 = ev.photoUrl;
                         showPhotoPreview(ev.photoUrl);
                     }
                 }
             } else {
-                document.getElementById('eventModalTitle').innerText = "新增行程";
+                document.getElementById('eventModalTitle').innerText = "新增獨立行程";
                 document.getElementById('deleteEventBtn').style.display = "none";
+                selectColorInPicker('blue'); // 預設藍色
             }
 
             document.getElementById('eventDetailModal').style.display = 'flex';
@@ -482,7 +656,6 @@
             document.getElementById('eventDetailModal').style.display = 'none';
         }
 
-        // --- 照片壓縮處理 ---
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -491,7 +664,6 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // 將照片壓縮至最大寬度 500px，防止 localStorage 爆滿
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 500; 
                     let width = img.width;
@@ -501,13 +673,12 @@
                         height *= MAX_WIDTH / width;
                         width = MAX_WIDTH;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // 降低畫質至 60%
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
                     showPhotoPreview(tempPhotoBase64);
                 };
                 img.src = e.target.result;
@@ -533,7 +704,7 @@
         }
 
         function removePhoto(e) {
-            e.stopPropagation(); // 防止觸發上傳點擊
+            e.stopPropagation();
             resetPhotoPreview();
         }
 
@@ -544,31 +715,41 @@
                 return;
             }
 
-            if (!calendarData[selectedDateString]) {
-                calendarData[selectedDateString] = { events: [] };
-            }
-            if (!calendarData[selectedDateString].events) {
-                calendarData[selectedDateString].events = [];
+            const startD = document.getElementById('eventStartDate').value;
+            const endD = document.getElementById('eventEndDate').value;
+
+            if (startD > endD) {
+                alert("結束日期不能早於開始日期！");
+                return;
             }
 
+            // 封裝行程物件
             const eventObj = {
                 id: currentEditingEventId || (Date.now().toString() + Math.random().toString(36).substr(2, 5)),
                 title: title,
-                startDate: document.getElementById('eventStartDate').value,
+                color: selectedEventColor,
+                startDate: startD,
                 startTime: document.getElementById('eventStartTime').value,
-                endDate: document.getElementById('eventEndDate').value,
+                endDate: endD,
                 endTime: document.getElementById('eventEndTime').value,
                 photoUrl: tempPhotoBase64
             };
 
+            // 全域資料清理與更新
             if (currentEditingEventId) {
-                const idx = calendarData[selectedDateString].events.findIndex(e => e.id === currentEditingEventId);
-                if (idx !== -1) calendarData[selectedDateString].events[idx] = eventObj;
-            } else {
-                calendarData[selectedDateString].events.push(eventObj);
+                for (let key in calendarData) {
+                    if (calendarData[key].events) {
+                        calendarData[key].events = calendarData[key].events.filter(e => e.id !== currentEditingEventId);
+                    }
+                }
             }
 
-            localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
+            // 一律將主要實體儲存在其開始日期的節點下
+            if (!calendarData[startD]) calendarData[startD] = { events: [] };
+            if (!calendarData[startD].events) calendarData[startD].events = [];
+            calendarData[startD].events.push(eventObj);
+
+            localStorage.setItem('myCustomCalendar3', JSON.stringify(calendarData));
             renderEventListInModal(); 
             renderCalendar(); 
             closeEventDetailModal();
@@ -576,13 +757,13 @@
 
         function deleteCurrentEvent() {
             if (!confirm("確定要刪除這個行程嗎？")) return;
-            
-            if (calendarData[selectedDateString] && calendarData[selectedDateString].events) {
-                calendarData[selectedDateString].events = calendarData[selectedDateString].events.filter(e => e.id !== currentEditingEventId);
-                cleanUpEmptyDate(selectedDateString);
-                localStorage.setItem('myCustomCalendar2', JSON.stringify(calendarData));
+            for (let key in calendarData) {
+                if (calendarData[key].events) {
+                    calendarData[key].events = calendarData[key].events.filter(e => e.id !== currentEditingEventId);
+                    cleanUpEmptyDate(key);
+                }
             }
-            
+            localStorage.setItem('myCustomCalendar3', JSON.stringify(calendarData));
             renderEventListInModal();
             renderCalendar();
             closeEventDetailModal();
@@ -590,10 +771,8 @@
 
         function cleanUpEmptyDate(dateKey) {
             const data = calendarData[dateKey];
-            if (data) {
-                if (data.shift === undefined && (!data.events || data.events.length === 0)) {
-                    delete calendarData[dateKey];
-                }
+            if (data && data.shift === undefined && (!data.events || data.events.length === 0)) {
+                delete calendarData[dateKey];
             }
         }
 
