@@ -21,10 +21,17 @@
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
         .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 5px 10px; }
         
+        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .header-center { display: flex; align-items: center; gap: 12px; }
         .header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #555; letter-spacing: 1px; }
         .today-btn { font-size: 14px !important; background: #ffffff !important; color: #ff6b81 !important; border: 2px solid #ff6b81 !important; border-radius: 8px !important; padding: 4px 10px !important; font-weight: bold; box-shadow: 0 2px 5px rgba(255,107,129,0.2); transition: all 0.1s; }
         .today-btn:active { transform: scale(0.9); background: #fff0f2 !important; }
+        
+        /* 首頁統計結餘小方框 */
+        .header-stats { display: flex; gap: 10px; }
+        .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.1s; }
+        .stat-box span { font-size: 15px; color: #444; }
+        .stat-box:active { transform: scale(0.95); background: #f8f9fa; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 12px; margin: 0 8px 8px 8px; color: #666; text-align: center; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .weekdays div { padding: 8px 0; }
@@ -39,7 +46,6 @@
         
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
-        
         .day.today-highlight { border: 3px solid #ff4757 !important; box-shadow: inset 0 0 8px rgba(255,71,87,0.15), 0 4px 12px rgba(255,71,87,0.3) !important; position: relative; z-index: 1; }
         
         .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
@@ -60,12 +66,10 @@
         .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
         
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; margin-left: -5px; margin-right: -5px; width: calc(100% + 10px); }
-        
         .event-item { font-size: 10px; padding: 3px 5px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
-        /* 確保文字置中、純白，並加上陰影增強辨識度 */
         .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 15px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 4px rgba(0,0,0,0.6); }
         .color-dot:active { transform: scale(0.9); }
         .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
@@ -80,13 +84,20 @@
         .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
         .input-group input:focus { outline: none; border-color: #b6a4e3; background: white; }
         
+        /* 班別輸入列排版 (輸入框 + 三個按鈕) */
+        .shift-input-row { display: flex; gap: 6px; align-items: center; }
+        .shift-action-btn { background: #f8f9fa; border: 1px solid #ccd0d5; border-radius: 8px; padding: 10px 6px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.1s; }
+        .shift-action-btn:active { transform: scale(0.95); }
+        .btn-ot { color: #d9534f; border-color: #f5c6cb; background: #fdf1f2; }
+        .btn-take { color: #5b9bd5; border-color: #b8daff; background: #eef5ff; }
+        .btn-al { color: #5ece9d; border-color: #c3e6cb; background: #eafaf1; }
+
         .row-inputs { display: flex; gap: 10px; }
         
         .quick-section { margin-top: 12px; border-top: 1px dashed #eee; padding-top: 8px; }
         .quick-section:first-of-type { border-top: none; padding-top: 0; }
         .section-title { font-size: 11px; color: #999; font-weight: bold; margin-bottom: 6px; padding-left: 2px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 6px; }
-        
         .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: bold; color: #555; cursor: pointer; transition: all 0.1s; }
         .quick-btn:active { transform: scale(0.9); background: #f0f0f0; }
         .quick-btn-green { border-color: #5ece9d; color: #3ba377; }
@@ -114,9 +125,15 @@
 
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
-        <div class="header-center">
-            <h2 id="monthYear"></h2>
-            <button class="today-btn" onclick="goToday()">今天</button>
+        <div class="header-center-wrap">
+            <div class="header-center">
+                <h2 id="monthYear"></h2>
+                <button class="today-btn" onclick="goToday()">今天</button>
+            </div>
+            <div class="header-stats">
+                <div class="stat-box" onclick="openStatsModal('hours')">時數 <span id="hdrHours">0</span></div>
+                <div class="stat-box" onclick="openStatsModal('annualLeave')">年休 <span id="hdrAL">0</span></div>
+            </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
     </div>
@@ -134,7 +151,12 @@
             
             <div class="input-group">
                 <label id="shiftLabel">班別</label>
-                <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵填入">
+                <div class="shift-input-row">
+                    <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵" style="flex: 1;">
+                    <button class="shift-action-btn btn-ot" onclick="handleQuickStat('加班')">加班</button>
+                    <button class="shift-action-btn btn-take" onclick="handleQuickStat('拿時間')">拿時間</button>
+                    <button class="shift-action-btn btn-al" onclick="handleQuickStat('年休')">年休</button>
+                </div>
                 
                 <div class="quick-section">
                     <div class="section-title">D 班系列</div>
@@ -194,8 +216,29 @@
 
             <div class="btn-row">
                 <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn btn-save" onclick="saveShiftOnly()">儲存班表變更</button>
+                <button class="btn btn-save" onclick="saveShiftOnly()">儲存變更</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal" id="statsModal" style="z-index: 30;">
+        <div class="modal-content">
+            <h3 id="statsModalTitle">明細紀錄</h3>
+            <div style="text-align:center; margin-bottom:10px; font-weight:bold; color:#555;">目前結餘: <span id="statsModalBalance" style="font-size:24px; color:#a28cdb; margin-left:5px;">0</span></div>
+            
+            <div class="stats-list" id="statsList" style="max-height: 40vh; overflow-y: auto; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-bottom: 15px; background: #fafafa;">
+                </div>
+            
+            <div style="border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="font-size: 13px; font-weight: bold; color: #888;">手動新增 / 校正紀錄</label>
+                <div class="row-inputs" style="margin-top: 8px;">
+                    <input type="date" id="statDate" style="flex:1;">
+                    <input type="number" id="statAmount" placeholder="數量 (+ 加 / - 減)" style="flex:1;">
+                </div>
+                <input type="text" id="statDesc" placeholder="備註 (如: 系統配發、年度特休)" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-top:8px; margin-bottom:10px; box-sizing:border-box;">
+                <button class="btn-save" style="width:100%; padding: 10px;" onclick="saveManualStat()">手動寫入紀錄</button>
+            </div>
+            <button class="btn btn-cancel" style="width:100%; margin-top:12px;" onclick="closeStatsModal()">關閉明細</button>
         </div>
     </div>
 
@@ -312,20 +355,28 @@
         let currentDate = new Date();
         let selectedDateString = "";
         let selectedEventColor = "blue";
-        let calendarData = {};
         
+        let calendarData = {};
         try {
             calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
         } catch(e) {
-            console.error("資料解析錯誤", e);
             calendarData = {};
         }
 
-        for (let key in calendarData) {
-            if (calendarData[key].prevShift) {
-                calendarData[key].shiftHistory = [calendarData[key].prevShift];
-                delete calendarData[key].prevShift;
-            }
+        // 新增：統計與結餘資料庫
+        let globalStats = { hours: [], annualLeave: [] };
+        try {
+            globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats')) || { hours: [], annualLeave: [] };
+        } catch(e) {
+            globalStats = { hours: [], annualLeave: [] };
+        }
+        let currentStatType = 'hours';
+
+        function updateStatsDisplay() {
+            let hBal = globalStats.hours.reduce((sum, item) => sum + item.amount, 0);
+            let aBal = globalStats.annualLeave.reduce((sum, item) => sum + item.amount, 0);
+            document.getElementById('hdrHours').innerText = hBal;
+            document.getElementById('hdrAL').innerText = aBal;
         }
 
         function getAllEvents() {
@@ -365,9 +416,7 @@
             renderCalendar();
         }
 
-        // 修改：加入徹底防跳月與防呆機制
         function changeMonth(step) {
-            // 先強制將日期設為 1 號，絕對避免 31 號切換月份時溢位跳月的 JavaScript 核心 Bug
             currentDate.setDate(1); 
             currentDate.setMonth(currentDate.getMonth() + step);
             renderCalendar();
@@ -375,6 +424,8 @@
 
         function renderCalendar() {
             try {
+                updateStatsDisplay(); // 更新儀表板
+                
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
@@ -420,7 +471,6 @@
                         return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
                     });
 
-                    // 增加 NaN 判定安全網，防止舊資料污染算圖引擎
                     wEvents.sort((a, b) => {
                         let startA = a.startDate || "";
                         let endA = a.endDate || startA;
@@ -444,19 +494,16 @@
                         let trackIdx = 0;
                         while (!assigned) {
                             if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
-                            
                             let conflict = false;
                             for (let dIdx = 0; dIdx < 7; dIdx++) {
                                 if (week[dIdx].type === 'day') {
                                     let currKey = week[dIdx].dateKey;
                                     let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
                                     if (isCovered && tracks[trackIdx][dIdx] !== null) {
-                                        conflict = true;
-                                        break;
+                                        conflict = true; break;
                                     }
                                 }
                             }
-
                             if (!conflict) {
                                 for (let dIdx = 0; dIdx < 7; dIdx++) {
                                     if (week[dIdx].type === 'day') {
@@ -513,33 +560,18 @@
                                 if (ev) {
                                     let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
                                     let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
-                                    
                                     let globalLeft = (ev.startDate < dateKey);
                                     let globalRight = ((ev.endDate || ev.startDate) > dateKey);
 
                                     let marginStyle = "";
                                     let radiusStyle = "border-radius: 4px;";
 
-                                    if (hasRight) {
-                                        marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
-                                        radiusStyle = "border-radius: 4px 0 0 4px;";
-                                    }
-                                    if (hasLeft) {
-                                        radiusStyle = "border-radius: 0 4px 4px 0;";
-                                    }
-                                    if (hasLeft && hasRight) {
-                                        marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
-                                        radiusStyle = "border-radius: 0;";
-                                    }
+                                    if (hasRight) { marginStyle += "margin-right: -7px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 4px 0 0 4px;"; }
+                                    if (hasLeft) { radiusStyle = "border-radius: 0 4px 4px 0;"; }
+                                    if (hasLeft && hasRight) { marginStyle += "margin-right: -7px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 0;"; }
+                                    if (dIdx === 0 && globalLeft) { radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;"; }
+                                    if (dIdx === 6 && globalRight) { radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 4px 0 0 4px;"; }
 
-                                    if (dIdx === 0 && globalLeft) {
-                                        radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;";
-                                    }
-                                    if (dIdx === 6 && globalRight) {
-                                        radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 4px 0 0 4px;";
-                                    }
-
-                                    // 加入安全網，若顏色錯亂則回退至藍色
                                     const cStyle = colorStyles[ev.color] || colorStyles['blue'];
                                     let showText = !hasLeft; 
 
@@ -579,6 +611,7 @@
             }
         }
 
+        // --- 主視窗 ---
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
@@ -607,6 +640,43 @@
 
         function setShift(value) {
             document.getElementById('shiftInput').value = value;
+        }
+
+        // 新增：處理快捷按鈕 (加班、拿時間、年休)
+        function handleQuickStat(action) {
+            let type = (action === '年休') ? 'annualLeave' : 'hours';
+            let unit = (action === '年休') ? '天/時' : '小時';
+            let sign = (action === '加班') ? 1 : -1; // 加班加時數，拿時間/年休扣時數
+
+            let val = prompt(`請輸入「${action}」的數量 (${unit})：\n(輸入數字即可，系統會自動轉換為加或減)`);
+            if(val === null || val.trim() === '') return;
+
+            let num = parseFloat(val);
+            if(isNaN(num)) {
+                alert("請輸入有效的數字！");
+                return;
+            }
+
+            // 計算最終異動數值
+            let finalAmount = Math.abs(num) * sign;
+
+            let entry = {
+                id: "st_" + Date.now(),
+                date: selectedDateString,
+                desc: action,
+                amount: finalAmount
+            };
+
+            globalStats[type].push(entry);
+            localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
+            updateStatsDisplay();
+
+            // 將標籤加到輸入框內
+            let shiftInput = document.getElementById('shiftInput');
+            if(shiftInput.value.length > 0 && !shiftInput.value.endsWith(' ')) {
+                shiftInput.value += ' ';
+            }
+            shiftInput.value += action;
         }
 
         function saveShiftOnly() {
@@ -639,6 +709,93 @@
             renderCalendar();
         }
 
+        // --- 結餘管理 Modal 邏輯 ---
+        function openStatsModal(type) {
+            currentStatType = type;
+            document.getElementById('statsModalTitle').innerText = type === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
+            
+            // 預設日期為當日或今天
+            document.getElementById('statDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('statAmount').value = "";
+            document.getElementById('statDesc').value = "";
+            
+            renderStatsList();
+            document.getElementById('statsModal').style.display = 'flex';
+        }
+
+        function renderStatsList() {
+            let listEl = document.getElementById('statsList');
+            let data = globalStats[currentStatType] || [];
+            
+            // 依照日期由新到舊排序
+            data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+
+            let balance = data.reduce((sum, item) => sum + item.amount, 0);
+            document.getElementById('statsModalBalance').innerText = balance;
+
+            listEl.innerHTML = "";
+            if(data.length === 0) {
+                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px;'>目前無紀錄</div>";
+                return;
+            }
+
+            data.forEach(item => {
+                let isPos = item.amount >= 0;
+                let color = isPos ? "#3ba377" : "#ff6b6b";
+                let sign = isPos ? "+" : "";
+                listEl.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;">
+                        <div>
+                            <div style="font-size:13px; font-weight:bold; color:#555;">${item.desc}</div>
+                            <div style="font-size:11px; color:#999;">${item.date}</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span style="font-weight:bold; color:${color}; font-size:16px;">${sign}${item.amount}</span>
+                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-size:15px; font-weight:bold; padding:0;">X</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function saveManualStat() {
+            let date = document.getElementById('statDate').value;
+            let amount = parseFloat(document.getElementById('statAmount').value);
+            let desc = document.getElementById('statDesc').value.trim() || "手動調整";
+
+            if(!date || isNaN(amount)) {
+                alert("請填寫完整的日期與數量！");
+                return;
+            }
+
+            globalStats[currentStatType].push({
+                id: "st_" + Date.now(),
+                date: date,
+                desc: desc,
+                amount: amount
+            });
+
+            localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            renderStatsList();
+
+            document.getElementById('statAmount').value = "";
+            document.getElementById('statDesc').value = "";
+        }
+
+        function deleteStat(id) {
+            if(!confirm("確定要刪除這筆紀錄嗎？這將影響總結餘。")) return;
+            globalStats[currentStatType] = globalStats[currentStatType].filter(item => item.id !== id);
+            localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            renderStatsList();
+        }
+
+        function closeStatsModal() {
+            document.getElementById('statsModal').style.display = 'none';
+        }
+
+        // --- 獨立行程 Modal 邏輯 ---
         function renderEventListInModal() {
             const listEl = document.getElementById('existingEventsList');
             listEl.innerHTML = "";
