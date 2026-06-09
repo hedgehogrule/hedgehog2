@@ -21,7 +21,6 @@
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
         .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 5px 10px; }
         
-        /* 調整頂部月份與今天按鈕的排版 */
         .header-center { display: flex; align-items: center; gap: 12px; }
         .header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #555; letter-spacing: 1px; }
         .today-btn { font-size: 14px !important; background: #ffffff !important; color: #ff6b81 !important; border: 2px solid #ff6b81 !important; border-radius: 8px !important; padding: 4px 10px !important; font-weight: bold; box-shadow: 0 2px 5px rgba(255,107,129,0.2); transition: all 0.1s; }
@@ -41,7 +40,6 @@
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
-        /* 今天的專屬標示：大粗框明顯 */
         .day.today-highlight { border: 3px solid #ff4757 !important; box-shadow: inset 0 0 8px rgba(255,71,87,0.15), 0 4px 12px rgba(255,71,87,0.3) !important; position: relative; z-index: 1; }
         
         .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
@@ -67,7 +65,8 @@
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
-        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.5); }
+        /* 確保文字置中、純白，並加上陰影增強辨識度 */
+        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 15px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 4px rgba(0,0,0,0.6); }
         .color-dot:active { transform: scale(0.9); }
         .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         
@@ -313,7 +312,14 @@
         let currentDate = new Date();
         let selectedDateString = "";
         let selectedEventColor = "blue";
-        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
+        let calendarData = {};
+        
+        try {
+            calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
+        } catch(e) {
+            console.error("資料解析錯誤", e);
+            calendarData = {};
+        }
 
         for (let key in calendarData) {
             if (calendarData[key].prevShift) {
@@ -354,202 +360,223 @@
             });
         }
 
-        // 回到今天的函數
         function goToday() {
             currentDate = new Date();
             renderCalendar();
         }
 
+        // 修改：加入徹底防跳月與防呆機制
+        function changeMonth(step) {
+            // 先強制將日期設為 1 號，絕對避免 31 號切換月份時溢位跳月的 JavaScript 核心 Bug
+            currentDate.setDate(1); 
+            currentDate.setMonth(currentDate.getMonth() + step);
+            renderCalendar();
+        }
+
         function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
-            const calendarEl = document.getElementById('calendar');
-            calendarEl.innerHTML = "";
+            try {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
+                const calendarEl = document.getElementById('calendar');
+                calendarEl.innerHTML = "";
 
-            let firstDay = new Date(year, month, 1).getDay();
-            firstDay = firstDay === 0 ? 6 : firstDay - 1;
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+                let firstDay = new Date(year, month, 1).getDay();
+                firstDay = firstDay === 0 ? 6 : firstDay - 1;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            // 取得今天的真實日期，用來判斷大粗框
-            const realToday = new Date();
-            const isCurrentMonthYear = (realToday.getFullYear() === year && realToday.getMonth() === month);
-            const todayDateNum = realToday.getDate();
+                const realToday = new Date();
+                const isCurrentMonthYear = (realToday.getFullYear() === year && realToday.getMonth() === month);
+                const todayDateNum = realToday.getDate();
 
-            let calendarSlots = [];
-            for (let i = 0; i < firstDay; i++) {
-                calendarSlots.push({ type: 'empty' });
-            }
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-                calendarSlots.push({
-                    type: 'day',
-                    date: i,
-                    dateKey: dateKey,
-                    dayOfWeek: new Date(year, month, i).getDay()
-                });
-            }
+                let calendarSlots = [];
+                for (let i = 0; i < firstDay; i++) {
+                    calendarSlots.push({ type: 'empty' });
+                }
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                    calendarSlots.push({
+                        type: 'day',
+                        date: i,
+                        dateKey: dateKey,
+                        dayOfWeek: new Date(year, month, i).getDay()
+                    });
+                }
 
-            let weeks = [];
-            for (let i = 0; i < calendarSlots.length; i += 7) {
-                weeks.push(calendarSlots.slice(i, i + 7));
-            }
+                let weeks = [];
+                for (let i = 0; i < calendarSlots.length; i += 7) {
+                    weeks.push(calendarSlots.slice(i, i + 7));
+                }
 
-            const allEvents = getAllEvents();
+                const allEvents = getAllEvents();
 
-            weeks.forEach(week => {
-                let dayRealObj = week.filter(d => d.type === 'day');
-                if (dayRealObj.length === 0) return;
-                let wStart = dayRealObj[0].dateKey;
-                let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
+                weeks.forEach(week => {
+                    let dayRealObj = week.filter(d => d.type === 'day');
+                    if (dayRealObj.length === 0) return;
+                    let wStart = dayRealObj[0].dateKey;
+                    let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
 
-                let wEvents = allEvents.filter(ev => {
-                    return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
-                });
+                    let wEvents = allEvents.filter(ev => {
+                        return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
+                    });
 
-                wEvents.sort((a, b) => {
-                    let lenA = new Date(a.endDate) - new Date(a.startDate);
-                    let lenB = new Date(b.endDate) - new Date(b.startDate);
-                    return lenB - lenA || a.id.localeCompare(b.id);
-                });
-
-                let tracks = []; 
-                wEvents.forEach(ev => {
-                    let assigned = false;
-                    let trackIdx = 0;
-                    while (!assigned) {
-                        if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
+                    // 增加 NaN 判定安全網，防止舊資料污染算圖引擎
+                    wEvents.sort((a, b) => {
+                        let startA = a.startDate || "";
+                        let endA = a.endDate || startA;
+                        let startB = b.startDate || "";
+                        let endB = b.endDate || startB;
                         
-                        let conflict = false;
-                        for (let dIdx = 0; dIdx < 7; dIdx++) {
-                            if (week[dIdx].type === 'day') {
-                                let currKey = week[dIdx].dateKey;
-                                let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
-                                if (isCovered && tracks[trackIdx][dIdx] !== null) {
-                                    conflict = true;
-                                    break;
-                                }
-                            }
-                        }
+                        let lenA = new Date(endA).getTime() - new Date(startA).getTime();
+                        let lenB = new Date(endB).getTime() - new Date(startB).getTime();
+                        if (isNaN(lenA)) lenA = 0;
+                        if (isNaN(lenB)) lenB = 0;
+                        
+                        let idA = a.id || "";
+                        let idB = b.id || "";
+                        
+                        return lenB - lenA || idA.localeCompare(idB);
+                    });
 
-                        if (!conflict) {
+                    let tracks = []; 
+                    wEvents.forEach(ev => {
+                        let assigned = false;
+                        let trackIdx = 0;
+                        while (!assigned) {
+                            if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
+                            
+                            let conflict = false;
                             for (let dIdx = 0; dIdx < 7; dIdx++) {
                                 if (week[dIdx].type === 'day') {
                                     let currKey = week[dIdx].dateKey;
-                                    if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) {
-                                        tracks[trackIdx][dIdx] = ev;
+                                    let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
+                                    if (isCovered && tracks[trackIdx][dIdx] !== null) {
+                                        conflict = true;
+                                        break;
                                     }
                                 }
                             }
-                            assigned = true;
-                        } else {
-                            trackIdx++;
-                        }
-                    }
-                });
-                week.tracks = tracks; 
-            });
 
-            weeks.forEach(week => {
-                week.forEach((slot, dIdx) => {
-                    if (slot.type === 'empty') {
-                        calendarEl.innerHTML += `<div class="day empty"></div>`;
-                        return;
-                    }
-
-                    const dateKey = slot.dateKey;
-                    const i = slot.date;
-                    const dayOfWeek = slot.dayOfWeek;
-                    
-                    let dateClass = "date-box";
-                    if (dayOfWeek === 0) dateClass += " sun-text";
-                    if (dayOfWeek === 6) dateClass += " sat-text";
-
-                    const savedData = calendarData[dateKey];
-                    const autoInfo = getAutoShift(year, month, i);
-                    const cycleInfo = getCycleInfo(year, month, i);
-                    
-                    let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
-                    let isManual = (savedData && savedData.shift !== undefined);
-                    let shiftHtml = "";
-
-                    if (finalShift) {
-                        const s = finalShift.trim().toUpperCase();
-                        if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
-                        else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
-                        else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
-                        else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
-                    }
-
-                    let tracksHtml = "";
-                    if (week.tracks && week.tracks.length > 0) {
-                        week.tracks.forEach(trackLine => {
-                            const ev = trackLine[dIdx];
-                            if (ev) {
-                                let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
-                                let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
-                                
-                                let globalLeft = (ev.startDate < dateKey);
-                                let globalRight = ((ev.endDate || ev.startDate) > dateKey);
-
-                                let marginStyle = "";
-                                let radiusStyle = "border-radius: 4px;";
-
-                                if (hasRight) {
-                                    marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
-                                    radiusStyle = "border-radius: 4px 0 0 4px;";
+                            if (!conflict) {
+                                for (let dIdx = 0; dIdx < 7; dIdx++) {
+                                    if (week[dIdx].type === 'day') {
+                                        let currKey = week[dIdx].dateKey;
+                                        if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) {
+                                            tracks[trackIdx][dIdx] = ev;
+                                        }
+                                    }
                                 }
-                                if (hasLeft) {
-                                    radiusStyle = "border-radius: 0 4px 4px 0;";
-                                }
-                                if (hasLeft && hasRight) {
-                                    marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
-                                    radiusStyle = "border-radius: 0;";
-                                }
-
-                                if (dIdx === 0 && globalLeft) {
-                                    radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;";
-                                }
-                                if (dIdx === 6 && globalRight) {
-                                    radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 4px 0 0 4px;";
-                                }
-
-                                const cStyle = colorStyles[ev.color || 'blue'];
-                                let showText = !hasLeft; 
-
-                                tracksHtml += `
-                                    <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: 22px; min-height: 22px;">
-                                        ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
-                                    </div>
-                                `;
+                                assigned = true;
                             } else {
-                                tracksHtml += `<div style="height: 22px; pointer-events: none;"></div>`;
+                                trackIdx++;
                             }
-                        });
-                    }
-                    
-                    let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
-                    let badgesHtml = "";
-                    if (dayOfWeek === 1) badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
-                    if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
-
-                    let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
-                    
-                    // 判斷是否為「今天」，若是則加入高亮 Class
-                    let todayHighlightClass = (isCurrentMonthYear && i === todayDateNum) ? "today-highlight" : "";
-
-                    calendarEl.innerHTML += `
-                        <div class="day ${cycleClass} ${todayHighlightClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
-                            <div class="day-header">
-                                <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
-                                ${shiftHtml}
-                            </div>
-                            ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
-                            <div class="event-area">${tracksHtml}</div>
-                        </div>
-                    `;
+                        }
+                    });
+                    week.tracks = tracks; 
                 });
-            });
+
+                weeks.forEach(week => {
+                    week.forEach((slot, dIdx) => {
+                        if (slot.type === 'empty') {
+                            calendarEl.innerHTML += `<div class="day empty"></div>`;
+                            return;
+                        }
+
+                        const dateKey = slot.dateKey;
+                        const i = slot.date;
+                        const dayOfWeek = slot.dayOfWeek;
+                        
+                        let dateClass = "date-box";
+                        if (dayOfWeek === 0) dateClass += " sun-text";
+                        if (dayOfWeek === 6) dateClass += " sat-text";
+
+                        const savedData = calendarData[dateKey];
+                        const autoInfo = getAutoShift(year, month, i);
+                        const cycleInfo = getCycleInfo(year, month, i);
+                        
+                        let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
+                        let isManual = (savedData && savedData.shift !== undefined);
+                        let shiftHtml = "";
+
+                        if (finalShift) {
+                            const s = finalShift.trim().toUpperCase();
+                            if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
+                            else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
+                            else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
+                            else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
+                        }
+
+                        let tracksHtml = "";
+                        if (week.tracks && week.tracks.length > 0) {
+                            week.tracks.forEach(trackLine => {
+                                const ev = trackLine[dIdx];
+                                if (ev) {
+                                    let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
+                                    let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
+                                    
+                                    let globalLeft = (ev.startDate < dateKey);
+                                    let globalRight = ((ev.endDate || ev.startDate) > dateKey);
+
+                                    let marginStyle = "";
+                                    let radiusStyle = "border-radius: 4px;";
+
+                                    if (hasRight) {
+                                        marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
+                                        radiusStyle = "border-radius: 4px 0 0 4px;";
+                                    }
+                                    if (hasLeft) {
+                                        radiusStyle = "border-radius: 0 4px 4px 0;";
+                                    }
+                                    if (hasLeft && hasRight) {
+                                        marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
+                                        radiusStyle = "border-radius: 0;";
+                                    }
+
+                                    if (dIdx === 0 && globalLeft) {
+                                        radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;";
+                                    }
+                                    if (dIdx === 6 && globalRight) {
+                                        radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 4px 0 0 4px;";
+                                    }
+
+                                    // 加入安全網，若顏色錯亂則回退至藍色
+                                    const cStyle = colorStyles[ev.color] || colorStyles['blue'];
+                                    let showText = !hasLeft; 
+
+                                    tracksHtml += `
+                                        <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: 22px; min-height: 22px;">
+                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名行程"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+                                        </div>
+                                    `;
+                                } else {
+                                    tracksHtml += `<div style="height: 22px; pointer-events: none;"></div>`;
+                                }
+                            });
+                        }
+                        
+                        let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
+                        let badgesHtml = "";
+                        if (dayOfWeek === 1) badgesHtml += `<span class="week-badge">${autoInfo.weekNumber}號班</span>`;
+                        if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
+
+                        let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
+                        let todayHighlightClass = (isCurrentMonthYear && i === todayDateNum) ? "today-highlight" : "";
+
+                        calendarEl.innerHTML += `
+                            <div class="day ${cycleClass} ${todayHighlightClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
+                                <div class="day-header">
+                                    <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
+                                    ${shiftHtml}
+                                </div>
+                                ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
+                                <div class="event-area">${tracksHtml}</div>
+                            </div>
+                        `;
+                    });
+                });
+            } catch (error) {
+                console.error("渲染過程發生未預期錯誤:", error);
+            }
         }
 
         function openModal(dateKey, displayDate) {
@@ -623,7 +650,7 @@
                     listEl.innerHTML += `
                         <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
                             <div>
-                                <strong style="color:#444; font-size:14px;">${ev.title}</strong>
+                                <strong style="color:#444; font-size:14px;">${ev.title || "未命名行程"}</strong>
                                 <div style="font-size:11px; color:#888;">期間：${ev.startDate} ~ ${ev.endDate || ev.startDate}</div>
                             </div>
                             <span style="color:#a28cdb; font-size:18px;">✎</span>
@@ -748,7 +775,7 @@
             }
 
             const eventObj = {
-                id: currentEditingEventId || (Date.now().toString() + Math.random().toString(36).substr(2, 5)),
+                id: currentEditingEventId || ("ev_" + Date.now().toString()),
                 title: title,
                 color: selectedEventColor,
                 startDate: startD,
