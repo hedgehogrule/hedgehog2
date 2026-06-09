@@ -20,7 +20,12 @@
         
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
         .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 5px 10px; }
+        
+        /* 調整頂部月份與今天按鈕的排版 */
+        .header-center { display: flex; align-items: center; gap: 12px; }
         .header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #555; letter-spacing: 1px; }
+        .today-btn { font-size: 14px !important; background: #ffffff !important; color: #ff6b81 !important; border: 2px solid #ff6b81 !important; border-radius: 8px !important; padding: 4px 10px !important; font-weight: bold; box-shadow: 0 2px 5px rgba(255,107,129,0.2); transition: all 0.1s; }
+        .today-btn:active { transform: scale(0.9); background: #fff0f2 !important; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 12px; margin: 0 8px 8px 8px; color: #666; text-align: center; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .weekdays div { padding: 8px 0; }
@@ -35,6 +40,9 @@
         
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
+        
+        /* 今天的專屬標示：大粗框明顯 */
+        .day.today-highlight { border: 3px solid #ff4757 !important; box-shadow: inset 0 0 8px rgba(255,71,87,0.15), 0 4px 12px rgba(255,71,87,0.3) !important; position: relative; z-index: 1; }
         
         .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
         
@@ -59,8 +67,7 @@
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
-        /* 調整顏色圓點，讓裡面的文字置中顯示 */
-        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 13px; font-weight: bold; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.5); }
         .color-dot:active { transform: scale(0.9); }
         .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         
@@ -108,7 +115,10 @@
 
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
-        <h2 id="monthYear"></h2>
+        <div class="header-center">
+            <h2 id="monthYear"></h2>
+            <button class="today-btn" onclick="goToday()">今天</button>
+        </div>
         <button onclick="changeMonth(1)">&#10095;</button>
     </div>
 
@@ -305,7 +315,6 @@
         let selectedEventColor = "blue";
         let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
 
-        // 自動升級舊版資料：把原本的 prevShift 單一字串轉成 shiftHistory 陣列
         for (let key in calendarData) {
             if (calendarData[key].prevShift) {
                 calendarData[key].shiftHistory = [calendarData[key].prevShift];
@@ -345,6 +354,12 @@
             });
         }
 
+        // 回到今天的函數
+        function goToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -355,6 +370,11 @@
             let firstDay = new Date(year, month, 1).getDay();
             firstDay = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // 取得今天的真實日期，用來判斷大粗框
+            const realToday = new Date();
+            const isCurrentMonthYear = (realToday.getFullYear() === year && realToday.getMonth() === month);
+            const todayDateNum = realToday.getDate();
 
             let calendarSlots = [];
             for (let i = 0; i < firstDay; i++) {
@@ -514,9 +534,12 @@
                     if (cycleInfo.isStart) badgesHtml += `<span class="cycle-start-badge">新週期</span>`;
 
                     let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
+                    
+                    // 判斷是否為「今天」，若是則加入高亮 Class
+                    let todayHighlightClass = (isCurrentMonthYear && i === todayDateNum) ? "today-highlight" : "";
 
                     calendarEl.innerHTML += `
-                        <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
+                        <div class="day ${cycleClass} ${todayHighlightClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日')">
                             <div class="day-header">
                                 <div class="${dateClass}"><span>${i}</span>${dotIndicator}</div>
                                 ${shiftHtml}
@@ -527,11 +550,6 @@
                     `;
                 });
             });
-        }
-
-        function changeMonth(step) {
-            currentDate.setMonth(currentDate.getMonth() + step);
-            renderCalendar();
         }
 
         function openModal(dateKey, displayDate) {
@@ -545,7 +563,6 @@
             const savedData = calendarData[dateKey] || {};
             document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
             
-            // 顯示歷次班別變更紀錄 (陣列轉換為字串)
             if (savedData.shiftHistory && savedData.shiftHistory.length > 0) {
                 const historyStr = savedData.shiftHistory.join(' → ');
                 document.getElementById('shiftLabel').innerHTML = `班別 <span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(變更紀錄: ${historyStr})</span>`;
@@ -578,13 +595,11 @@
             if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
-                // 如果是變回預設班，且之前有改過，就記錄原本被改的班
                 if (currentDisplayShift !== autoInfo.shift) {
                     savedData.shiftHistory.push(currentDisplayShift);
                 }
                 delete savedData.shift;
             } else {
-                // 如果設定為新班別，且跟目前顯示的不一樣，紀錄被換掉的班
                 if (currentDisplayShift !== shiftVal) {
                     savedData.shiftHistory.push(currentDisplayShift);
                 }
