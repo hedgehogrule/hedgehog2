@@ -59,9 +59,10 @@
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
-        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
+        /* 調整顏色圓點，讓裡面的文字置中顯示 */
+        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; font-size: 13px; font-weight: bold; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .color-dot:active { transform: scale(0.9); }
-        .color-dot.selected { border-color: #444; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+        .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
@@ -201,10 +202,10 @@
             <div class="input-group">
                 <label>行程呈現顏色</label>
                 <div class="color-picker-options" id="colorPickerContainer">
-                    <div class="color-dot selected" data-color="blue" style="background: #84bde3;"></div>
+                    <div class="color-dot selected" data-color="blue" style="background: #84bde3;">蕎</div>
                     <div class="color-dot" data-color="pink" style="background: #ff9ebb;"></div>
                     <div class="color-dot" data-color="green" style="background: #7fd9b2;"></div>
-                    <div class="color-dot" data-color="purple" style="background: #c3b3ef;"></div>
+                    <div class="color-dot" data-color="purple" style="background: #c3b3ef;">芷</div>
                     <div class="color-dot" data-color="yellow" style="background: #fcd372;"></div>
                     <div class="color-dot" data-color="orange" style="background: #ffa67c;"></div>
                 </div>
@@ -303,6 +304,14 @@
         let selectedDateString = "";
         let selectedEventColor = "blue";
         let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
+
+        // 自動升級舊版資料：把原本的 prevShift 單一字串轉成 shiftHistory 陣列
+        for (let key in calendarData) {
+            if (calendarData[key].prevShift) {
+                calendarData[key].shiftHistory = [calendarData[key].prevShift];
+                delete calendarData[key].prevShift;
+            }
+        }
 
         function getAllEvents() {
             let all = [];
@@ -488,14 +497,12 @@
                                 const cStyle = colorStyles[ev.color || 'blue'];
                                 let showText = !hasLeft; 
 
-                                // 移除了照片顯示，高度統一設為 22px
                                 tracksHtml += `
                                     <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: 22px; min-height: 22px;">
                                         ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
                                     </div>
                                 `;
                             } else {
-                                // 空白軌道高度也固定為 22px 確保對齊
                                 tracksHtml += `<div style="height: 22px; pointer-events: none;"></div>`;
                             }
                         });
@@ -538,9 +545,10 @@
             const savedData = calendarData[dateKey] || {};
             document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
             
-            // 顯示前次班別紀錄
-            if (savedData.prevShift) {
-                document.getElementById('shiftLabel').innerHTML = `班別 <span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(前次紀錄: ${savedData.prevShift})</span>`;
+            // 顯示歷次班別變更紀錄 (陣列轉換為字串)
+            if (savedData.shiftHistory && savedData.shiftHistory.length > 0) {
+                const historyStr = savedData.shiftHistory.join(' → ');
+                document.getElementById('shiftLabel').innerHTML = `班別 <span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(變更紀錄: ${historyStr})</span>`;
             } else {
                 document.getElementById('shiftLabel').innerHTML = `班別`;
             }
@@ -567,16 +575,18 @@
             const savedData = calendarData[selectedDateString];
             const currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
 
+            if (!savedData.shiftHistory) savedData.shiftHistory = [];
+
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
                 // 如果是變回預設班，且之前有改過，就記錄原本被改的班
-                if (savedData.shift !== undefined && savedData.shift !== autoInfo.shift) {
-                    savedData.prevShift = savedData.shift;
+                if (currentDisplayShift !== autoInfo.shift) {
+                    savedData.shiftHistory.push(currentDisplayShift);
                 }
                 delete savedData.shift;
             } else {
                 // 如果設定為新班別，且跟目前顯示的不一樣，紀錄被換掉的班
                 if (currentDisplayShift !== shiftVal) {
-                    savedData.prevShift = currentDisplayShift;
+                    savedData.shiftHistory.push(currentDisplayShift);
                 }
                 savedData.shift = shiftVal;
             }
@@ -767,8 +777,7 @@
 
         function cleanUpEmptyDate(dateKey) {
             const data = calendarData[dateKey];
-            // 如果沒有手動班表、沒有行程、也沒有前次班別紀錄，就清空該日期的資料以節省空間
-            if (data && data.shift === undefined && (!data.events || data.events.length === 0) && data.prevShift === undefined) {
+            if (data && data.shift === undefined && (!data.events || data.events.length === 0) && (!data.shiftHistory || data.shiftHistory.length === 0)) {
                 delete calendarData[dateKey];
             }
         }
