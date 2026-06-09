@@ -7,11 +7,11 @@
     <style>
         :root {
             --dreamy-bg: linear-gradient(135deg, #ffe0f0 0%, #e0f7fa 50%, #e6d9ff 100%);
+            --cycle-border-color: #a28cdb; 
         }
         
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
         
-        /* 頂部導列與按鈕放大 */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 2px 10px; font-weight: bold; }
         .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -20,17 +20,19 @@
         .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); }
         .today-btn:active { transform: scale(0.9); }
         
-        /* 時數與年休按鈕加大 */
-        .header-stats { display: flex; gap: 8px; }
-        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
-        .stat-box span { font-size: 16px; font-weight: 900; color: #444; }
+        /* 頂部結餘方框加大 */
+        .header-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-box span { font-size: 15px; font-weight: 900; color: #444; }
+        /* 夜班費專用欄位樣式 */
+        .stat-box.night-fee { border-color: #ffcc80; color: #e65100; cursor: default; }
+        .stat-box.night-fee span { color: #e65100; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        /* 日曆網格與方格高度加長填滿畫面 */
         .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px 6px 3px; }
         
         .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 13.5vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
@@ -38,40 +40,41 @@
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
-        /* 1. 第一行：日期在左、班別在右同行 */
-        .day-header { display: flex; align-items: flex-start; gap: 2px; width: 100%; margin-bottom: 1px; }
+        /* 第一行：日期欄(左) + 加班、國假、例休標籤(右) */
+        .day-row-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 2px; }
+        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 16px; }
         
-        /* 日期與號碼班垂直排列 */
-        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 13px; }
-        .date-box { font-size: 9.5px; font-weight: 900; color: #555; line-height: 1; }
+        /* 日期放大至 15px */
+        .date-box { font-size: 15px; font-weight: 900; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        /* 號碼班圈圈：改為淺灰色底 */
-        .week-badge { width: 11px; height: 11px; background: #e5e5e5; color: #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7.5px; font-weight: 900; line-height: 1; margin-top: 1px; }
+        /* 號碼圈圈：去灰色，改為清爽藍底白字 */
+        .week-badge { width: 12px; height: 12px; background: #5b9bd5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; line-height: 1; margin-top: 1px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
 
-        /* 班別單行呈現 (確保 12-8 完整呈現) */
-        .shift-badge-wrap { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 1px; align-items: center; width: 100%; }
-        .shift-badge { font-size: 8px; font-weight: bold; padding: 1px 2px; border-radius: 3px; white-space: nowrap; height: 12px; line-height: 11px; flex-shrink: 0; letter-spacing: -0.4px; }
-        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1px 3px; }
-        .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
-        .shift-green { background: #5ece9d; color: white; border: none; }
-        .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
-        .shift-num-tag { font-size: 8.5px; color: #d9534f; font-weight: 900; padding: 0; flex-shrink: 0; margin-left: 1px; }
-        .manual-dot { position: absolute; top: 2px; right: 2px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
-
-        /* 2. 第二行：例休 / 國假 專屬放置區 */
-        .special-leave-wrap { display: flex; gap: 2px; flex-wrap: wrap; margin-bottom: 2px; margin-left: 14px; }
-        .special-badge { font-size: 8px; font-weight: bold; padding: 1px 4px; border-radius: 8px; color: white; line-height: 11px; letter-spacing: -0.2px; display: inline-block; }
+        .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
+        .shift-num-tag { font-size: 11px; font-weight: 900; padding: 0 1px; flex-shrink: 0; line-height: 14px; }
+        .special-badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 8px; color: white; line-height: 12px; letter-spacing: -0.2px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .bg-pink { background: #ff9ebb; }
         .bg-orange { background: #ffa67c; }
 
-        /* 3. 第三行以後：行程區域 */
+        /* 第二行：專屬班別呈現列，完全獨立一行空間 */
+        .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 16px; align-items: center; }
+        .bottom-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; width: 100%; }
+        .shift-badge { font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 4px; white-space: nowrap; height: 16px; line-height: 12px; flex-shrink: 0; letter-spacing: -0.2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; }
+        .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
+        .shift-green { background: #5ece9d; color: white; border: none; }
+        .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
+
+        .manual-dot { position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
+
+        /* 第三行以後：行程區域 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); }
-        .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
+        .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 15px; min-height: 15px; line-height: 13px; border-radius: 2px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Modal 樣式 */
+        /* Modal 視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 17px; color: #444; text-align: center; }
@@ -85,6 +88,7 @@
         
         .quick-section { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
+        
         .quick-btn { border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .quick-btn-d { background: #ffffff; color: #444; border: 1px solid #ccc; }
         .quick-btn-green { background: #5ece9d; color: #ffffff; border: 1px solid #5ece9d; }
@@ -112,6 +116,7 @@
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">年休 <span id="hdrAL">0</span></div>
+                <div class="stat-box night-fee">夜班費 $<span id="hdrNightFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
@@ -135,8 +140,8 @@
                     <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2;" onclick="handleQuickStat('加班')">加班</button>
                     <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff;" onclick="handleQuickStat('拿時間')">拿時間</button>
                     <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1;" onclick="handleQuickStat('年休')">年休</button>
-                    <button class="circle-btn bg-pink" onclick="toggleTag('例休')">例休</button>
-                    <button class="circle-btn bg-orange" onclick="toggleTag('國假')">國假</button>
+                    <button class="circle-btn" style="background:#ff9ebb" onclick="toggleTag('例休')">例休</button>
+                    <button class="circle-btn" style="background:#ffa67c" onclick="toggleTag('國假')">國假</button>
                 </div>
                 
                 <div class="quick-section">
@@ -307,12 +312,12 @@
 
     <script>
         const shiftPatterns = [
-            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
-            ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
-            ["D10", "D8", "D2", "D", "D4", "D1", "OFF"], ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"],
-            ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"], ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"],
-            ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"], ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"],
-            ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"], ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],
+            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"],     ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
+            ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"],    ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
+            ["D10", "D8", "D2", "D", "D4", "D1", "OFF"],    ["E1", "E1", "E1", "E1", "E1", "OFF", "N1"],
+            ["N2", "N1", "N1", "N2", "OFF", "OFF", "OFF"],  ["D4", "D6", "D", "D10", "D3", "OFF", "OFF"],
+            ["E2", "E2", "E2", "E2", "E2", "E2", "OFF"],    ["D5", "D", "D6", "D2", "DB1", "D2", "OFF"],
+            ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"],  ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],
             ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"],
             ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"],
             ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"],
@@ -373,9 +378,9 @@
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar5')) || {}; } catch(e) {}
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar6')) || {}; } catch(e) {}
         let globalStats = { hours: [], annualLeave: [] };
-        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats5')) || { hours: [], annualLeave: [] }; } catch(e) {}
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats6')) || { hours: [], annualLeave: [] }; } catch(e) {}
         let currentStatType = 'hours';
 
         function updateStatsDisplay() {
@@ -418,7 +423,7 @@
                         else if (ev.repeat.type === 'day') currS.setDate(currS.getDate() + ev.repeat.interval);
                         else break;
                         
-                        safe++; if(safe>1000) break;
+                        safe++; if(safe>1000) break;maxE
                     }
                 }
             });
@@ -444,36 +449,41 @@
         function goToday() { currentDate = new Date(); renderCalendar(); }
         function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
 
-        // 多重標籤切割與單行化渲染邏輯 (回傳班別與特休分開)
-        function generateShiftAndSpecialHtml(finalShift) {
-            if (!finalShift) return { shiftHtml: "", specialHtml: "" };
-            let shiftHtml = '<div class="shift-badge-wrap">';
-            let specialHtml = '<div class="special-leave-wrap">';
+        // 三層式切割改寫：Top (資訊、例休), Bottom (專屬班別一行)
+        function generateDayTags(finalShift) {
+            if (!finalShift) return { topHtml: "", bottomHtml: "" };
+            let topHtml = '<div class="top-tags-wrap">';
+            let bottomHtml = '<div class="bottom-tags-wrap">';
             let text = finalShift.trim();
             let tokens = [];
-            let hasSpecial = false;
             
             let m128 = text.match(/12-8\s\d+/g);
             if(m128) { m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); }); }
             text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
 
+            let hasTop = false;
+            let hasBottom = false;
+
             tokens.forEach(p => {
                 let s = p.toUpperCase();
-                if (s === "例休") { specialHtml += `<div class="special-badge bg-pink">${p}</div>`; hasSpecial = true; }
-                else if (s === "國假") { specialHtml += `<div class="special-badge bg-orange">${p}</div>`; hasSpecial = true; }
-                else if (s.includes("OFF")) shiftHtml += `<div class="shift-badge shift-off">${p}</div>`;
+                // 1. 附加資訊放到第一行 (Top)
+                if (s === "例休") { topHtml += `<div class="special-badge bg-pink">${p}</div>`; hasTop = true; }
+                else if (s === "國假") { topHtml += `<div class="special-badge bg-orange">${p}</div>`; hasTop = true; }
                 else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
                     let color = s.includes("-") ? "#5b9bd5" : "#d9534f";
                     if(s.startsWith("年休")) color = "#5ece9d";
-                    shiftHtml += `<div class="shift-num-tag" style="color:${color};">${p}</div>`;
+                    topHtml += `<div class="shift-num-tag" style="color:${color};">${p}</div>`;
+                    hasTop = true;
                 } 
-                else if (s.startsWith("D")) shiftHtml += `<div class="shift-badge shift-d">${p}</div>`;
-                else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml += `<div class="shift-badge shift-green">${p}</div>`;
-                else shiftHtml += `<div class="shift-badge shift-default">${p}</div>`;
+                // 2. 主班別單獨放置到第二行 (Bottom)
+                else if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge shift-off">${p}</div>`; hasBottom = true; }
+                else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge shift-d">${p}</div>`; hasBottom = true; }
+                else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; hasBottom = true; }
+                else { bottomHtml += `<div class="shift-badge shift-default">${p}</div>`; hasBottom = true; }
             });
-            shiftHtml += '</div>';
-            specialHtml += '</div>';
-            return { shiftHtml, specialHtml: hasSpecial ? specialHtml : "" };
+            topHtml += '</div>';
+            bottomHtml += '</div>';
+            return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
         }
 
         function renderCalendar() {
@@ -558,6 +568,9 @@
                     week.tracks = tracks; 
                 });
 
+                // 用於統計當月夜班費
+                let monthlyNightFee = 0;
+
                 weeks.forEach(week => {
                     week.forEach((slot, dIdx) => {
                         const dateKey = slot.dateKey;
@@ -577,7 +590,18 @@
                         let finalShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
                         let isManual = savedData.shift !== undefined;
                         
-                        let htmlObj = generateShiftAndSpecialHtml(finalShift);
+                        // 動態加總計算本月(current)的夜班費
+                        if (slot.type === 'current' && finalShift) {
+                            let tokens = finalShift.trim().split(/\s+/);
+                            tokens.forEach(tok => {
+                                let s = tok.toUpperCase();
+                                if (s.startsWith('12-8')) monthlyNightFee += 270;
+                                else if (s.startsWith('E')) monthlyNightFee += 560;
+                                else if (s.startsWith('N')) monthlyNightFee += 800;
+                            });
+                        }
+
+                        let htmlObj = generateDayTags(finalShift);
 
                         let tracksHtml = "";
                         if (week.tracks && week.tracks.length > 0) {
@@ -607,12 +631,12 @@
                                         </div>
                                     `;
                                 } else {
-                                    tracksHtml += `<div style="height: 14px; pointer-events: none;"></div>`;
+                                    tracksHtml += `<div style="height: 15px; pointer-events: none;"></div>`;
                                 }
                             });
                         }
                         
-                        let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
+                        let dotIndicator = isManual && finalShift !== "" ? `<div class="manual-dot"></div>` : ``;
                         let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
                         
                         let bColor = cycleBorderColors[cycleInfo.idx % 4];
@@ -628,19 +652,22 @@
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass}" style="${inlineStyle}" onclick="openModal('${dateKey}', '${y}年${m+1}月${d}日')">
                                 ${dotIndicator}
-                                <div class="day-header">
+                                <div class="day-row-1">
                                     <div class="date-col">
                                         <span class="${dateClass}">${d}</span>
                                         ${weekBadge}
                                     </div>
-                                    ${htmlObj.shiftHtml}
+                                    ${htmlObj.topHtml}
                                 </div>
-                                ${htmlObj.specialHtml}
+                                ${htmlObj.bottomHtml ? `<div class="day-row-2">${htmlObj.bottomHtml}</div>` : ''}
                                 <div class="event-area">${tracksHtml}</div>
                             </div>
                         `;
                     });
                 });
+                
+                // 動態刷新最上面的夜班費數據
+                document.getElementById('hdrNightFee').innerText = monthlyNightFee;
             } catch (error) { console.error("渲染過程發生錯誤:", error); }
         }
 
@@ -683,7 +710,7 @@
             let sign = (act === '加班') ? 1 : -1;
             
             globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
             updateStatsDisplay();
             
             let input = document.getElementById('shiftInput');
@@ -747,13 +774,13 @@
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
             globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
-            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
 
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
