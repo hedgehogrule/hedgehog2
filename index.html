@@ -84,13 +84,19 @@
         .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
         .input-group input:focus { outline: none; border-color: #b6a4e3; background: white; }
         
-        /* 班別輸入列排版 (輸入框 + 三個按鈕) */
-        .shift-input-row { display: flex; gap: 6px; align-items: center; }
+        /* 班別輸入列排版 (換行支援) */
+        .shift-input-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .shift-action-btn { background: #f8f9fa; border: 1px solid #ccd0d5; border-radius: 8px; padding: 10px 6px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.1s; }
         .shift-action-btn:active { transform: scale(0.95); }
         .btn-ot { color: #d9534f; border-color: #f5c6cb; background: #fdf1f2; }
         .btn-take { color: #5b9bd5; border-color: #b8daff; background: #eef5ff; }
         .btn-al { color: #5ece9d; border-color: #c3e6cb; background: #eafaf1; }
+
+        /* 彩色圈圈按鈕專用 */
+        .circle-btn { width: 34px; height: 34px; border-radius: 50%; border: none; font-size: 11px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); padding: 0; letter-spacing: -0.5px; transition: transform 0.1s; }
+        .circle-btn:active { transform: scale(0.9); }
+        .bg-pink { background: #ff9ebb; }
+        .bg-orange { background: #ffa67c; }
 
         .row-inputs { display: flex; gap: 10px; }
         
@@ -152,10 +158,12 @@
             <div class="input-group">
                 <label id="shiftLabel">班別</label>
                 <div class="shift-input-row">
-                    <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵" style="flex: 1;">
+                    <input type="text" id="shiftInput" placeholder="請點選快捷鍵" style="flex: 1; min-width: 100px;">
                     <button class="shift-action-btn btn-ot" onclick="handleQuickStat('加班')">加班</button>
                     <button class="shift-action-btn btn-take" onclick="handleQuickStat('拿時間')">拿時間</button>
                     <button class="shift-action-btn btn-al" onclick="handleQuickStat('年休')">年休</button>
+                    <button class="circle-btn bg-pink" onclick="setShift('例休')">例休</button>
+                    <button class="circle-btn bg-orange" onclick="setShift('國假')">國假</button>
                 </div>
                 
                 <div class="quick-section">
@@ -357,19 +365,10 @@
         let selectedEventColor = "blue";
         
         let calendarData = {};
-        try {
-            calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
-        } catch(e) {
-            calendarData = {};
-        }
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; } catch(e) { calendarData = {}; }
 
-        // 新增：統計與結餘資料庫
         let globalStats = { hours: [], annualLeave: [] };
-        try {
-            globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats')) || { hours: [], annualLeave: [] };
-        } catch(e) {
-            globalStats = { hours: [], annualLeave: [] };
-        }
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats')) || { hours: [], annualLeave: [] }; } catch(e) { globalStats = { hours: [], annualLeave: [] }; }
         let currentStatType = 'hours';
 
         function updateStatsDisplay() {
@@ -424,7 +423,7 @@
 
         function renderCalendar() {
             try {
-                updateStatsDisplay(); // 更新儀表板
+                updateStatsDisplay();
                 
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
@@ -446,12 +445,7 @@
                 }
                 for (let i = 1; i <= daysInMonth; i++) {
                     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-                    calendarSlots.push({
-                        type: 'day',
-                        date: i,
-                        dateKey: dateKey,
-                        dayOfWeek: new Date(year, month, i).getDay()
-                    });
+                    calendarSlots.push({ type: 'day', date: i, dateKey: dateKey, dayOfWeek: new Date(year, month, i).getDay() });
                 }
 
                 let weeks = [];
@@ -467,25 +461,14 @@
                     let wStart = dayRealObj[0].dateKey;
                     let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
 
-                    let wEvents = allEvents.filter(ev => {
-                        return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
-                    });
+                    let wEvents = allEvents.filter(ev => ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart);
 
                     wEvents.sort((a, b) => {
-                        let startA = a.startDate || "";
-                        let endA = a.endDate || startA;
-                        let startB = b.startDate || "";
-                        let endB = b.endDate || startB;
-                        
-                        let lenA = new Date(endA).getTime() - new Date(startA).getTime();
-                        let lenB = new Date(endB).getTime() - new Date(startB).getTime();
+                        let lenA = new Date(a.endDate || a.startDate).getTime() - new Date(a.startDate).getTime();
+                        let lenB = new Date(b.endDate || b.startDate).getTime() - new Date(b.startDate).getTime();
                         if (isNaN(lenA)) lenA = 0;
                         if (isNaN(lenB)) lenB = 0;
-                        
-                        let idA = a.id || "";
-                        let idB = b.id || "";
-                        
-                        return lenB - lenA || idA.localeCompare(idB);
+                        return lenB - lenA || (a.id || "").localeCompare(b.id || "");
                     });
 
                     let tracks = []; 
@@ -499,18 +482,14 @@
                                 if (week[dIdx].type === 'day') {
                                     let currKey = week[dIdx].dateKey;
                                     let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
-                                    if (isCovered && tracks[trackIdx][dIdx] !== null) {
-                                        conflict = true; break;
-                                    }
+                                    if (isCovered && tracks[trackIdx][dIdx] !== null) { conflict = true; break; }
                                 }
                             }
                             if (!conflict) {
                                 for (let dIdx = 0; dIdx < 7; dIdx++) {
                                     if (week[dIdx].type === 'day') {
                                         let currKey = week[dIdx].dateKey;
-                                        if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) {
-                                            tracks[trackIdx][dIdx] = ev;
-                                        }
+                                        if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) { tracks[trackIdx][dIdx] = ev; }
                                     }
                                 }
                                 assigned = true;
@@ -547,7 +526,10 @@
 
                         if (finalShift) {
                             const s = finalShift.trim().toUpperCase();
+                            // 加入例休與國假的彩色圓角膠囊呈現
                             if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
+                            else if (s.includes("例休")) shiftHtml = `<div class="shift-badge" style="background:#ff9ebb; color:white; border:none; border-radius:14px;">${finalShift}</div>`;
+                            else if (s.includes("國假")) shiftHtml = `<div class="shift-badge" style="background:#ffa67c; color:white; border:none; border-radius:14px;">${finalShift}</div>`;
                             else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
                             else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
                             else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
@@ -607,11 +589,10 @@
                     });
                 });
             } catch (error) {
-                console.error("渲染過程發生未預期錯誤:", error);
+                console.error("渲染過程發生錯誤:", error);
             }
         }
 
-        // --- 主視窗 ---
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
@@ -642,11 +623,11 @@
             document.getElementById('shiftInput').value = value;
         }
 
-        // 新增：處理快捷按鈕 (加班、拿時間、年休)
+        // 精簡數字寫入邏輯
         function handleQuickStat(action) {
             let type = (action === '年休') ? 'annualLeave' : 'hours';
             let unit = (action === '年休') ? '天/時' : '小時';
-            let sign = (action === '加班') ? 1 : -1; // 加班加時數，拿時間/年休扣時數
+            let sign = (action === '加班') ? 1 : -1;
 
             let val = prompt(`請輸入「${action}」的數量 (${unit})：\n(輸入數字即可，系統會自動轉換為加或減)`);
             if(val === null || val.trim() === '') return;
@@ -657,26 +638,34 @@
                 return;
             }
 
-            // 計算最終異動數值
             let finalAmount = Math.abs(num) * sign;
 
-            let entry = {
+            globalStats[type].push({
                 id: "st_" + Date.now(),
                 date: selectedDateString,
                 desc: action,
                 amount: finalAmount
-            };
-
-            globalStats[type].push(entry);
+            });
             localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
             updateStatsDisplay();
 
-            // 將標籤加到輸入框內
             let shiftInput = document.getElementById('shiftInput');
-            if(shiftInput.value.length > 0 && !shiftInput.value.endsWith(' ')) {
+            shiftInput.value = shiftInput.value.trim();
+            
+            // 加入數字標籤 (例: +2.5 / -1)
+            let appendStr = "";
+            if (action === '加班') {
+                appendStr = `+${Math.abs(num)}`;
+            } else if (action === '拿時間') {
+                appendStr = `-${Math.abs(num)}`;
+            } else if (action === '年休') {
+                appendStr = `年休-${Math.abs(num)}`;
+            }
+
+            if(shiftInput.value.length > 0) {
                 shiftInput.value += ' ';
             }
-            shiftInput.value += action;
+            shiftInput.value += appendStr;
         }
 
         function saveShiftOnly() {
@@ -709,12 +698,9 @@
             renderCalendar();
         }
 
-        // --- 結餘管理 Modal 邏輯 ---
         function openStatsModal(type) {
             currentStatType = type;
             document.getElementById('statsModalTitle').innerText = type === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
-            
-            // 預設日期為當日或今天
             document.getElementById('statDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('statAmount').value = "";
             document.getElementById('statDesc').value = "";
@@ -727,7 +713,6 @@
             let listEl = document.getElementById('statsList');
             let data = globalStats[currentStatType] || [];
             
-            // 依照日期由新到舊排序
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
 
             let balance = data.reduce((sum, item) => sum + item.amount, 0);
@@ -795,7 +780,6 @@
             document.getElementById('statsModal').style.display = 'none';
         }
 
-        // --- 獨立行程 Modal 邏輯 ---
         function renderEventListInModal() {
             const listEl = document.getElementById('existingEventsList');
             listEl.innerHTML = "";
