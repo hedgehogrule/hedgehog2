@@ -6,76 +6,96 @@
     <title>我的全自動夢幻行事曆</title>
     <style>
         :root {
-            --sat-color: #5b9bd5; 
-            --sun-color: #ed7d31; 
             --dreamy-bg: linear-gradient(135deg, #ffe0f0 0%, #e0f7fa 50%, #e6d9ff 100%);
-            --cycle-border-color: #a28cdb; /* 週期粗框顏色 */
         }
         
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 10px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 10px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; overflow-x: hidden; }
         
-        /* Header 調整 */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 5px; }
-        .header button { background: none; border: none; font-size: 18px; color: #777; cursor: pointer; padding: 5px; }
-        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        /* 頂部縮小，節省垂直空間 */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 2px 8px; font-weight: bold; }
+        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
         .header-center { display: flex; align-items: center; gap: 8px; }
-        .header h2 { margin: 0; font-size: 18px; font-weight: bold; color: #555; }
-        .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 6px !important; font-weight: bold; }
+        .header h2 { margin: 0; font-size: 18px; font-weight: 800; color: #555; letter-spacing: 1px; }
+        .today-btn { font-size: 11px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 6px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); }
+        .today-btn:active { transform: scale(0.9); }
         
         .header-stats { display: flex; gap: 6px; }
-        .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 6px; padding: 2px 8px; font-size: 10px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 6px; padding: 2px 6px; font-size: 10px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .stat-box span { font-size: 13px; color: #444; }
         
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 8px; margin: 0 4px 4px 4px; color: #666; text-align: center; font-size: 11px; font-weight: bold; }
+        /* 星期列壓縮 */
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 0 4px; }
+        /* 日曆網格：無縫隙以利粗方框對齊 */
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; padding: 0 3px; }
         
-        /* 方格基礎樣式 - 移除底色交替，改為透明底 */
-        .day { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(2px); min-height: 75px; padding: 2px; display: flex; flex-direction: column; cursor: pointer; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05); }
+        /* 日期方格：極致空間利用 */
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 65px; height: 11.5vh; max-height: 85px; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         
-        /* 週期表現方式：改為粗方框區別 */
-        .day.cycle-even { border: 2px solid var(--cycle-border-color) !important; background: rgba(255, 255, 255, 0.7); }
-        .day.cycle-odd { border: 1px solid rgba(0,0,0,0.1) !important; }
+        /* 跨月日期淡化 */
+        .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         
-        /* 今日高亮 */
-        .day.today-highlight { background: #fff5f6 !important; border: 2.5px solid #ff4757 !important; box-shadow: 0 0 8px rgba(255,71,87,0.3) !important; z-index: 1; }
-        .day.empty { background: transparent; border: none !important; }
-
-        /* 關鍵：強制單行排列日期與班別 */
-        .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 2px; width: 100%; height: 18px; overflow: hidden; white-space: nowrap; }
+        /* 今天高亮：絕對置頂並加上紅色框 */
+        .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
-        .date-box { font-size: 11px; font-weight: bold; color: #666; display: flex; align-items: center; flex-shrink: 0; min-width: 14px; }
+        /* 頂部：日期在左下、班別在右，完全同行 */
+        .day-header { display: flex; align-items: flex-start; gap: 3px; width: 100%; margin-bottom: 2px; }
+        
+        /* 左側：日期與圈圈上下排列 */
+        .date-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; min-width: 14px; }
+        .date-box { font-size: 12px; font-weight: 900; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        /* 號碼班：改為微型圓圈 */
-        .badge-container { display: inline-flex; align-items: center; margin-left: 1px; flex-shrink: 0; }
-        .week-badge { width: 13px; height: 13px; background: #7a6baf; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; transform: scale(0.9); }
+        /* 號碼班圈圈 */
+        .week-badge { width: 13px; height: 13px; background: #7a6baf; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
-        /* 班別膠囊：優化為緊湊型 */
-        .shift-badge-wrap { display: flex; gap: 1px; align-items: center; overflow: hidden; }
-        .shift-badge { font-size: 9px; font-weight: bold; padding: 1px 3px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; height: 14px; line-height: 12px; }
-        .shift-off { background: #b6a4e3; color: white; }
+        /* 右側：班別標籤區，單行截斷不換行 */
+        .shift-badge-wrap { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 1px; align-items: center; width: 100%; }
+        .shift-badge { font-size: 9px; font-weight: bold; padding: 1px 3px; border-radius: 4px; white-space: nowrap; height: 13px; line-height: 12px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .shift-off { background: #b6a4e3; color: white; border-radius: 8px; }
         .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
         .shift-green { background: #5ece9d; color: white; }
         .shift-default { background: #e9ecef; color: #555; }
-        .shift-num-tag { font-size: 9px; color: #d9534f; font-weight: bold; padding: 0 1px; } /* 加減時數樣式 */
+        .shift-num-tag { font-size: 9px; color: #d9534f; font-weight: 800; padding: 0; flex-shrink: 0; }
 
-        /* 行程區域 */
-        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; width: 100%; }
-        .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; white-space: nowrap; height: 14px; line-height: 12px; border-radius: 2px; }
-        .event-item-title { font-weight: bold; overflow: hidden; text-overflow: ellipsis; }
+        /* 手動修改標記小紅點 */
+        .manual-dot { position: absolute; top: 2px; right: 2px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
-        /* Modal 樣式保持原樣但縮小間距 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: #fff; padding: 15px; width: 92%; max-width: 400px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
-        .input-group { margin-bottom: 10px; }
+        /* 行程呈現區塊 */
+        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); }
+        .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
+        .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Modal 共用樣式 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
+        .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 17px; color: #444; text-align: center; }
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: bold; color: #666; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fafafa; }
+        
         .shift-input-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-        .shift-action-btn { padding: 6px 4px; font-size: 11px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; }
-        .circle-btn { width: 30px; height: 30px; border-radius: 50%; border: none; color: white; font-weight: bold; font-size: 10px; cursor: pointer; }
+        .shift-action-btn { background: #f8f9fa; border: 1px solid #ccd0d5; border-radius: 6px; padding: 6px 4px; font-size: 11px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; transition: all 0.1s; }
+        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 10px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        
+        .quick-section { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; }
+        .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
+        .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; color: #555; cursor: pointer; }
+        
+        .color-picker-options { display: flex; gap: 8px; margin-top: 4px; }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.6); }
+        .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
+
+        .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
+
+        .repeat-display-btn { width: 100%; padding: 8px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -104,46 +124,156 @@
     <div class="modal" id="editModal">
         <div class="modal-content">
             <h3 id="modalTitle"></h3>
-            <div id="modalSubtitle" style="text-align:center; font-size:11px; color:#888; margin-bottom:10px;"></div>
+            <div id="modalSubtitle" style="text-align:center; font-size:11px; color:#888; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px;"></div>
             
             <div class="input-group">
-                <label id="shiftLabel" style="font-size:12px; font-weight:bold;">班別</label>
+                <label id="shiftLabel">班別</label>
                 <div class="shift-input-row">
-                    <input type="text" id="shiftInput" placeholder="請點選快捷鍵" style="flex: 1; padding:8px; border-radius:6px; border:1px solid #ddd;">
-                    <button class="shift-action-btn" style="color:#d9534f" onclick="handleQuickStat('加班')">加班</button>
-                    <button class="shift-action-btn" style="color:#5b9bd5" onclick="handleQuickStat('拿時間')">拿時間</button>
-                    <button class="shift-action-btn" style="color:#5ece9d" onclick="handleQuickStat('年休')">年休</button>
+                    <input type="text" id="shiftInput" placeholder="快捷鍵填入" style="flex: 1; min-width: 70px;">
+                    <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2;" onclick="handleQuickStat('加班')">加班</button>
+                    <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff;" onclick="handleQuickStat('拿時間')">拿時間</button>
+                    <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1;" onclick="handleQuickStat('年休')">年休</button>
                     <button class="circle-btn" style="background:#ff9ebb" onclick="toggleTag('例休')">例休</button>
                     <button class="circle-btn" style="background:#ffa67c" onclick="toggleTag('國假')">國假</button>
                 </div>
                 
-                <div style="margin-top:10px; display:grid; grid-template-columns: repeat(5, 1fr); gap:4px;">
-                    <button onclick="setShift('D')" style="font-size:11px; padding:5px;">D</button>
-                    <button onclick="setShift('D1')" style="font-size:11px; padding:5px;">D1</button>
-                    <button onclick="setShift('D2')" style="font-size:11px; padding:5px;">D2</button>
-                    <button onclick="setShift('E1')" style="font-size:11px; padding:5px; background:#eafaf1;">E1</button>
-                    <button onclick="setShift('N1')" style="font-size:11px; padding:5px; background:#eafaf1;">N1</button>
-                    <button onclick="setShift('12-8 1')" style="font-size:11px; padding:5px; background:#eafaf1;">12-8 1</button>
-                    <button onclick="setShift('12-8 2')" style="font-size:11px; padding:5px; background:#eafaf1;">12-8 2</button>
-                    <button onclick="setShift('OFF')" style="font-size:11px; padding:5px; background:#f3eefd;">OFF</button>
+                <div class="quick-section" style="border-top:none;">
+                    <div class="quick-options">
+                        <button class="quick-btn" onclick="setShift('D')">D</button>
+                        <button class="quick-btn" onclick="setShift('D1')">D1</button>
+                        <button class="quick-btn" onclick="setShift('D2')">D2</button>
+                        <button class="quick-btn" onclick="setShift('D3')">D3</button>
+                        <button class="quick-btn" onclick="setShift('D4')">D4</button>
+                        <button class="quick-btn" onclick="setShift('D5')">D5</button>
+                        <button class="quick-btn" onclick="setShift('D6')">D6</button>
+                        <button class="quick-btn" onclick="setShift('DB1')">DB1</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('12-8 1')">12-8 1</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('12-8 2')">12-8 2</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('E1')">E1</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('E2')">E2</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('N1')">N1</button>
+                        <button class="quick-btn" style="color:#3ba377; border-color:#5ece9d;" onclick="setShift('N2')">N2</button>
+                        <button class="quick-btn" style="background:#fdfbff; color:#8d77c4; border-color:#b6a4e3;" onclick="setShift('OFF')">OFF</button>
+                        <button class="quick-btn" style="background:#fff5f5; color:#ff6b6b; border-color:#ff6b6b;" onclick="setShift('')">重置</button>
+                    </div>
                 </div>
-                <div style="font-size:10px; color:#999; margin-top:5px;">(點擊班別即可填入)</div>
             </div>
             
-            <div class="event-list-container">
-                <div id="existingEventsList" class="existing-events"></div>
-                <button class="btn-add" style="width:100%; border:1px dashed #a28cdb; padding:8px; border-radius:6px; color:#a28cdb; background:none;" onclick="openEventDetailModal()">+ 新增獨立行程</button>
+            <div style="margin-top: 12px; border-top: 2px solid #eee; padding-top: 12px;">
+                <label style="display:block; font-size:12px; font-weight:bold; color:#666; margin-bottom:6px;">包含此日的行程與記事</label>
+                <div id="existingEventsList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                <button style="width:100%; border:2px dashed #a28cdb; padding:8px; border-radius:8px; color:#a28cdb; background:#fff; font-weight:bold;" onclick="openEventDetailModal()">+ 新增獨立行程</button>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:15px;">
-                <button onclick="closeModal()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#eee;">取消</button>
-                <button onclick="saveShiftOnly()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#a28cdb; color:white; font-weight:bold;">儲存</button>
+            <div class="btn-row">
+                <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeModal()">取消</button>
+                <button class="btn" style="background:linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color:white;" onclick="saveShiftOnly()">儲存變更</button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="statsModal"> <div class="modal-content"><h3 id="statsModalTitle"></h3><div id="statsModalBalance"></div><div id="statsList"></div><button onclick="closeStatsModal()">關閉</button></div> </div>
-    <div class="modal" id="eventDetailModal"> <div class="modal-content"><h3>行程設定</h3><input type="text" id="eventTitle" placeholder="行程名稱"><input type="date" id="eventStartDate"><input type="date" id="eventEndDate"><button onclick="saveEventDetail()">儲存</button><button onclick="closeEventDetailModal()">取消</button></div> </div>
+    <div class="modal" id="statsModal" style="z-index: 30;">
+        <div class="modal-content">
+            <h3 id="statsModalTitle">明細紀錄</h3>
+            <div style="text-align:center; margin-bottom:10px; font-weight:bold; color:#555;">結餘: <span id="statsModalBalance" style="font-size:24px; color:#a28cdb; margin-left:5px;">0</span></div>
+            <div id="statsList" style="max-height: 40vh; overflow-y: auto; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-bottom: 15px; background: #fafafa;"></div>
+            <div style="border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="font-size: 12px; font-weight: bold; color: #888;">手動新增 / 校正紀錄</label>
+                <div style="display:flex; gap:8px; margin-top: 8px;">
+                    <input type="date" id="statDate" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
+                    <input type="number" id="statAmount" placeholder="數量 (+ / -)" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
+                </div>
+                <input type="text" id="statDesc" placeholder="備註 (如: 系統配發)" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; margin-top:8px; margin-bottom:10px; box-sizing:border-box;">
+                <button class="btn" style="width:100%; background:#84bde3; color:white;" onclick="saveManualStat()">手動寫入紀錄</button>
+            </div>
+            <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeStatsModal()">關閉</button>
+        </div>
+    </div>
+
+    <div class="modal" id="eventDetailModal" style="z-index: 20;">
+        <div class="modal-content">
+            <h3 id="eventModalTitle">新增行程</h3>
+            <div class="input-group">
+                <label>行程標題 <span style="color:red">*</span></label>
+                <input type="text" id="eventTitle" placeholder="例如: 墾丁三日遊">
+            </div>
+            <div class="input-group">
+                <label>重複設定</label>
+                <div id="repeatDisplayBtn" class="repeat-display-btn" onclick="openRepeatModal()">不重複</div>
+            </div>
+            <div class="input-group">
+                <label>行程呈現顏色</label>
+                <div class="color-picker-options" id="colorPickerContainer">
+                    <div class="color-dot selected" data-color="blue" style="background: #84bde3;">蕎</div>
+                    <div class="color-dot" data-color="pink" style="background: #ff9ebb;"></div>
+                    <div class="color-dot" data-color="green" style="background: #7fd9b2;"></div>
+                    <div class="color-dot" data-color="purple" style="background: #c3b3ef;">芷</div>
+                    <div class="color-dot" data-color="yellow" style="background: #fcd372;"></div>
+                    <div class="color-dot" data-color="orange" style="background: #ffa67c;"></div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>開始時間</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="date" id="eventStartDate" onchange="syncRepeatSummary()">
+                    <input type="time" id="eventStartTime">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>結束時間</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="date" id="eventEndDate">
+                    <input type="time" id="eventEndTime">
+                </div>
+            </div>
+            <button id="deleteEventBtn" style="display:none; width:100%; background:#ffefef; color:#ff6b6b; border:1px solid #ffcccc; padding:8px; border-radius:8px; font-weight:bold; margin-top:5px;" onclick="deleteCurrentEvent()">刪除此行程</button>
+            <div class="btn-row">
+                <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeEventDetailModal()">返回</button>
+                <button class="btn" style="background:linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color:white;" onclick="saveEventDetail()">確認儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="repeatModal" style="z-index: 30;">
+        <div class="modal-content" style="max-width: 300px;">
+            <h3 style="margin-bottom:15px; color:#444;">重複設定</h3>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <button class="btn rep-tab active" id="tab-year" style="background:#f1f1f1; color:#666; padding:6px;" onclick="setRepType('year')">年</button>
+                <button class="btn rep-tab" id="tab-month" style="background:#f1f1f1; color:#666; padding:6px;" onclick="setRepType('month')">月</button>
+                <button class="btn rep-tab" id="tab-week" style="background:#f1f1f1; color:#666; padding:6px;" onclick="setRepType('week')">週</button>
+                <button class="btn rep-tab" id="tab-day" style="background:#f1f1f1; color:#666; padding:6px;" onclick="setRepType('day')">日</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <label style="font-size:14px; font-weight:bold; color:#555;">頻率</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="number" id="repInterval" value="1" min="1" onchange="updateRepSummary()" style="width:50px; text-align:center; padding:4px; border-radius:4px; border:1px solid #ccc;">
+                    <span id="repUnitText" style="color:#555; font-weight:bold;">年</span>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <label style="font-size:14px; font-weight:bold; color:#555;">開始</label>
+                <div id="repStartText" style="color:#5b9bd5; font-weight:bold; font-size:13px;"></div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:14px; font-weight:bold; color:#555; display:block; margin-bottom:6px;">結束</label>
+                <div style="display:flex; gap:15px; margin-left:10px;">
+                    <label style="font-size:13px;"><input type="radio" name="repEndType" value="none" checked onchange="updateRepSummary()"> 沒有</label>
+                    <label style="font-size:13px;"><input type="radio" name="repEndType" value="specific" onchange="updateRepSummary()"> 指定</label>
+                </div>
+            </div>
+            <div id="repEndDateContainer" style="display:none; margin-bottom:15px; padding-left:10px;">
+                <input type="date" id="repEndDate" onchange="updateRepSummary()" style="padding:6px; border-radius:6px; border:1px solid #ccc; width:90%;">
+            </div>
+            <div style="background:#f8f9fa; border-radius:8px; padding:8px; border-left:4px solid #5b9bd5;">
+                <span style="font-size:11px; color:#888;">概要</span>
+                <div id="repSummaryText" style="font-weight:bold; color:#3e6e96; margin-top:2px; font-size:13px;"></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn" style="background:#ffeaea; color:#ff6b6b; padding:8px; font-size:13px;" onclick="clearRepeatSetting()">清除</button>
+                <button class="btn" style="background:#5b9bd5; color:white; padding:8px; font-size:13px;" onclick="saveRepeatSetting()">設定完成</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // 34 週班表資料庫
@@ -156,19 +286,22 @@
             ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"], ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],
             ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"],
             ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"],
-            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"], ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"],
+            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"],
             ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"],
-            ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], ["D'OFF", "D", "D", "D", "D", "OFF", "OFF"],
             ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"],
-            ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
-            ["D", "D", "D", "D", "D", "D4", "OFF"], ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
+            ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
         ];
 
+        // 週期顏色陣列，供四週輪替使用
+        const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
+
         const colorStyles = {
-            blue: { bg: 'rgba(91, 155, 213, 0.2)', text: '#3e6e96', border: '#84bde3' },
+            blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
             pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
             green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
             purple: { bg: 'rgba(195, 179, 239, 0.25)', text: '#5c439c', border: '#c3b3ef' },
@@ -176,57 +309,144 @@
             orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' }
         };
 
-        let currentDate = new Date();
-        let selectedDateString = "";
-        let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
-        let globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats')) || { hours: [], annualLeave: [] };
-
         function parseDateLocal(dateStr) { let p = dateStr.split('-'); return new Date(p[0], p[1]-1, p[2]); }
         function formatDateLocal(d) { return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`; }
 
         function getAutoShift(y, m, d) {
             let target = new Date(y, m, d);
-            let dayW = target.getDay();
+            let dayW = target.getDay(); 
             let diff = dayW === 0 ? -6 : 1 - dayW;
             let targetMon = new Date(y, m, d + diff);
             let ref = new Date(2026, 6, 6); 
             let weeksDiff = Math.floor(Math.round((targetMon - ref) / 864e5) / 7);
             let idx = (13 + weeksDiff) % 34;
-            if (idx < 0) idx += 34;
+            if (idx < 0) idx += 34; 
             return { shift: shiftPatterns[idx][dayW === 0 ? 6 : dayW - 1], weekNumber: idx + 1 };
         }
 
         function getCycleInfo(y, m, d) {
             let target = new Date(y, m, d, 12);
-            let ref = new Date(2026, 5, 8, 12); 
-            let days = Math.floor((target - ref) / 864e5);
-            let cycleIdx = Math.floor(days / 28);
-            return { isEven: Math.abs(cycleIdx) % 2 === 0 };
+            let ref = new Date(2026, 5, 8, 12); // June 8, 2026 (Monday)
+            let daysDiff = Math.floor((target - ref) / 864e5);
+            let cycleIdx = Math.floor(daysDiff / 28);
+            let dayInCycle = daysDiff % 28;
+            if (dayInCycle < 0) dayInCycle += 28;
+            
+            // 判斷是否位於 28天 的邊界
+            let isTop = dayInCycle < 7;
+            let isBottom = dayInCycle >= 21;
+            let isLeft = (target.getDay() === 1);
+            let isRight = (target.getDay() === 0);
+            
+            return { 
+                idx: Math.abs(cycleIdx), 
+                isTop: isTop, 
+                isBottom: isBottom, 
+                isLeft: isLeft, 
+                isRight: isRight 
+            };
         }
 
-        // 修改：多重標籤優化，解決 12-8 空格問題
+        let currentDate = new Date();
+        let selectedDateString = "";
+        let selectedEventColor = "blue";
+        let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+        
+        let calendarData = {};
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar4')) || {}; } catch(e) {}
+        let globalStats = { hours: [], annualLeave: [] };
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats4')) || { hours: [], annualLeave: [] }; } catch(e) {}
+        let currentStatType = 'hours';
+
+        function updateStatsDisplay() {
+            document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
+        }
+
+        function getAllBaseEvents() {
+            let all = []; let seen = new Set();
+            for (let k in calendarData) {
+                if (calendarData[k].events) {
+                    calendarData[k].events.forEach(e => { if(!seen.has(e.id)){ seen.add(e.id); all.push(e); } });
+                }
+            }
+            return all;
+        }
+
+        function getExpandedEvents(vStart, vEnd) {
+            let allBase = getAllBaseEvents();
+            let expanded = [];
+            allBase.forEach(ev => {
+                if (!ev.repeat || ev.repeat.type === 'none') {
+                    let eD = ev.endDate || ev.startDate;
+                    if (ev.startDate <= vEnd && eD >= vStart) expanded.push({...ev, instanceId: ev.id});
+                } else {
+                    let currS = parseDateLocal(ev.startDate);
+                    let baseE = parseDateLocal(ev.endDate || ev.startDate);
+                    let dur = baseE - currS; 
+                    let maxE = ev.repeat.endType === 'specific' ? ev.repeat.endDate : '2099-12-31';
+                    let safe = 0;
+                    while(true) {
+                        let iStart = formatDateLocal(currS);
+                        let iEnd = formatDateLocal(new Date(currS.getTime() + dur));
+                        if (iStart > maxE || iStart > vEnd) break;
+                        if (iEnd >= vStart && iStart <= vEnd) expanded.push({...ev, instanceId: ev.id+'_'+safe, startDate: iStart, endDate: iEnd});
+                        
+                        if (ev.repeat.type === 'year') currS.setFullYear(currS.getFullYear() + ev.repeat.interval);
+                        else if (ev.repeat.type === 'month') currS.setMonth(currS.getMonth() + ev.repeat.interval);
+                        else if (ev.repeat.type === 'week') currS.setDate(currS.getDate() + ev.repeat.interval * 7);
+                        else if (ev.repeat.type === 'day') currS.setDate(currS.getDate() + ev.repeat.interval);
+                        else break;
+                        
+                        safe++; if(safe>1000) break;
+                    }
+                }
+            });
+            return expanded;
+        }
+
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.addEventListener('click', function() {
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedEventColor = this.getAttribute('data-color');
+            });
+        });
+
+        function selectColorInPicker(c) {
+            selectedEventColor = c || 'blue';
+            document.querySelectorAll('.color-dot').forEach(d => {
+                if (d.getAttribute('data-color') === selectedEventColor) d.classList.add('selected');
+                else d.classList.remove('selected');
+            });
+        }
+
+        function goToday() { currentDate = new Date(); renderCalendar(); }
+        function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
+
+        // 多重標籤切割與單行化渲染邏輯
         function generateShiftBadges(finalShift) {
             if (!finalShift) return "";
             let html = '<div class="shift-badge-wrap">';
-            // 邏輯改進：先尋找特定完整的詞彙(12-8 X)，再處理其他的
             let text = finalShift.trim();
             let tokens = [];
             
-            // 抓取 12-8 格式
+            // 抓取 12-8 特殊格式，防止下方出現孤立數字
             let m128 = text.match(/12-8\s\d+/g);
             if(m128) {
                 m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); });
             }
-            // 抓取剩餘單詞
             text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
 
             tokens.forEach(p => {
                 let s = p.toUpperCase();
-                if (s === "例休") html += `<div class="shift-badge" style="background:#ff9ebb; color:white;">${p}</div>`;
-                else if (s === "國假") html += `<div class="shift-badge" style="background:#ffa67c; color:white;">${p}</div>`;
+                if (s === "例休") html += `<div class="shift-badge" style="background:#ff9ebb; color:white; border:none;">${p}</div>`;
+                else if (s === "國假") html += `<div class="shift-badge" style="background:#ffa67c; color:white; border:none;">${p}</div>`;
                 else if (s.includes("OFF")) html += `<div class="shift-badge shift-off">${p}</div>`;
                 else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
-                    html += `<div class="shift-num-tag">${p}</div>`;
+                    let color = s.includes("-") ? "#5b9bd5" : "#d9534f";
+                    if(s.startsWith("年休")) color = "#5ece9d";
+                    html += `<div class="shift-num-tag" style="color:${color};">${p}</div>`;
                 } else if (s.startsWith("D")) html += `<div class="shift-badge shift-d">${p}</div>`;
                 else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) html += `<div class="shift-badge shift-green">${p}</div>`;
                 else html += `<div class="shift-badge shift-default">${p}</div>`;
@@ -236,98 +456,393 @@
         }
 
         function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
-            const hBal = globalStats.hours.reduce((s, i) => s + i.amount, 0);
-            const aBal = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('hdrHours').innerText = hBal;
-            document.getElementById('hdrAL').innerText = aBal;
-
-            const calendarEl = document.getElementById('calendar');
-            calendarEl.innerHTML = "";
-            let firstDay = new Date(year, month, 1).getDay();
-            firstDay = firstDay === 0 ? 6 : firstDay - 1;
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            const realToday = new Date();
-            const isThisMonth = (realToday.getFullYear() === year && realToday.getMonth() === month);
-
-            for (let i = 0; i < firstDay; i++) calendarEl.innerHTML += `<div class="day empty"></div>`;
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-                const dayW = new Date(year, month, i).getDay();
-                const savedData = calendarData[dateKey] || {};
-                const autoInfo = getAutoShift(year, month, i);
-                const cycleInfo = getCycleInfo(year, month, i);
+            try {
+                updateStatsDisplay(); 
                 
-                let finalShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
-                let shiftHtml = generateShiftBadges(finalShift);
-                let dateColorClass = (dayW === 0) ? "sun-text" : (dayW === 6 ? "sat-text" : "");
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                document.getElementById('monthYear').innerText = `${year}年 ${month + 1}月`;
+                const calendarEl = document.getElementById('calendar');
+                calendarEl.innerHTML = "";
 
-                // 號碼班圈圈
-                let badgeHtml = (dayW === 1) ? `<div class="badge-container"><div class="week-badge">${autoInfo.weekNumber}</div></div>` : "";
-                
-                // 行程標籤 (精簡版)
-                let eventsHtml = "";
-                // 此處簡化行程渲染邏輯，實際應用可由 getExpandedEvents 取得
-                
-                let cycleClass = cycleInfo.isEven ? "cycle-even" : "cycle-odd";
-                let todayClass = (isThisMonth && i === realToday.getDate()) ? "today-highlight" : "";
+                let firstDay = new Date(year, month, 1).getDay();
+                firstDay = firstDay === 0 ? 6 : firstDay - 1;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-                calendarEl.innerHTML += `
-                    <div class="day ${cycleClass} ${todayClass}" onclick="openModal('${dateKey}', '${year}年${month+1}月${i}日')">
-                        <div class="day-header">
-                            <div class="date-box ${dateColorClass}">${i}${badgeHtml}</div>
-                            ${shiftHtml}
-                        </div>
-                        <div class="event-area">${eventsHtml}</div>
-                    </div>
-                `;
+                const realToday = new Date();
+                const isThisMonth = (realToday.getFullYear() === year && realToday.getMonth() === month);
+
+                let calendarSlots = [];
+                
+                // 1. 填補上個月的尾巴
+                let prevMonthLastDate = new Date(year, month, 0).getDate();
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    let d = prevMonthLastDate - i;
+                    let m = month - 1; let y = year;
+                    if(m < 0) { m = 11; y--; }
+                    calendarSlots.push({ type: 'other', date: d, dateKey: `${y}-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`, dayOfWeek: new Date(y, m, d).getDay() });
+                }
+                
+                // 2. 填補這個月
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                    calendarSlots.push({ type: 'current', date: i, dateKey: dateKey, dayOfWeek: new Date(year, month, i).getDay() });
+                }
+
+                // 3. 填補下個月的開頭 (確保行事曆共有 42 格)
+                let rem = 42 - calendarSlots.length;
+                for (let i = 1; i <= rem; i++) {
+                    let m = month + 1; let y = year;
+                    if(m > 11) { m = 0; y++; }
+                    calendarSlots.push({ type: 'other', date: i, dateKey: `${y}-${(m+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`, dayOfWeek: new Date(y, m, i).getDay() });
+                }
+
+                let viewStartStr = calendarSlots[0].dateKey;
+                let viewEndStr = calendarSlots[calendarSlots.length - 1].dateKey;
+                let expandedEvents = getExpandedEvents(viewStartStr, viewEndStr);
+
+                let weeks = [];
+                for (let i = 0; i < calendarSlots.length; i += 7) weeks.push(calendarSlots.slice(i, i + 7));
+
+                weeks.forEach(week => {
+                    let wStart = week[0].dateKey;
+                    let wEnd = week[6].dateKey;
+
+                    let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
+
+                    wEvents.sort((a, b) => {
+                        let lenA = new Date(a.endDate).getTime() - new Date(a.startDate).getTime();
+                        let lenB = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
+                        if (isNaN(lenA)) lenA = 0; if (isNaN(lenB)) lenB = 0;
+                        return lenB - lenA || (a.id || "").localeCompare(b.id || "");
+                    });
+
+                    let tracks = []; 
+                    wEvents.forEach(ev => {
+                        let assigned = false;
+                        let trackIdx = 0;
+                        while (!assigned) {
+                            if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
+                            let conflict = false;
+                            for (let dIdx = 0; dIdx < 7; dIdx++) {
+                                let currKey = week[dIdx].dateKey;
+                                if (currKey >= ev.startDate && currKey <= ev.endDate && tracks[trackIdx][dIdx] !== null) { conflict = true; break; }
+                            }
+                            if (!conflict) {
+                                for (let dIdx = 0; dIdx < 7; dIdx++) {
+                                    let currKey = week[dIdx].dateKey;
+                                    if (currKey >= ev.startDate && currKey <= ev.endDate) { tracks[trackIdx][dIdx] = ev; }
+                                }
+                                assigned = true;
+                            } else {
+                                trackIdx++;
+                            }
+                        }
+                    });
+                    week.tracks = tracks; 
+                });
+
+                weeks.forEach(week => {
+                    week.forEach((slot, dIdx) => {
+                        const dateKey = slot.dateKey;
+                        const i = slot.date;
+                        const dayOfWeek = slot.dayOfWeek;
+                        const parts = dateKey.split('-');
+                        const y = parseInt(parts[0]), m = parseInt(parts[1])-1, d = parseInt(parts[2]);
+                        
+                        let dateClass = "date-box";
+                        if (dayOfWeek === 0) dateClass += " sun-text";
+                        if (dayOfWeek === 6) dateClass += " sat-text";
+
+                        const savedData = calendarData[dateKey] || {};
+                        const autoInfo = getAutoShift(y, m, d);
+                        const cycleInfo = getCycleInfo(y, m, d);
+                        
+                        let finalShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+                        let isManual = savedData.shift !== undefined;
+                        let shiftHtml = generateShiftBadges(finalShift);
+
+                        let tracksHtml = "";
+                        if (week.tracks && week.tracks.length > 0) {
+                            week.tracks.forEach(trackLine => {
+                                const ev = trackLine[dIdx];
+                                if (ev) {
+                                    let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].instanceId === ev.instanceId);
+                                    let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].instanceId === ev.instanceId);
+                                    let globalLeft = (ev.startDate < dateKey);
+                                    let globalRight = (ev.endDate > dateKey);
+
+                                    let marginStyle = "";
+                                    let radiusStyle = "border-radius: 2px;";
+
+                                    if (hasRight) { marginStyle += "margin-right: -4px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 2px 0 0 2px;"; }
+                                    if (hasLeft) { radiusStyle = "border-radius: 0 2px 2px 0;"; }
+                                    if (hasLeft && hasRight) { marginStyle += "margin-right: -4px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 0;"; }
+                                    if (dIdx === 0 && globalLeft) { radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 2px 2px 0;"; }
+                                    if (dIdx === 6 && globalRight) { radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 2px 0 0 2px;"; }
+
+                                    const cStyle = colorStyles[ev.color] || colorStyles['blue'];
+                                    let showText = !hasLeft; 
+
+                                    tracksHtml += `
+                                        <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
+                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+                                        </div>
+                                    `;
+                                } else {
+                                    tracksHtml += `<div style="height: 14px; pointer-events: none;"></div>`;
+                                }
+                            });
+                        }
+                        
+                        let dotIndicator = isManual && finalShift !== "" ? `<span class="manual-dot"></span>` : ``;
+                        
+                        // 黃金佈局：日期和號碼班組合成左側小直行
+                        let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
+                        
+                        // 動態計算四週期粗方框樣式
+                        let bColor = cycleBorderColors[cycleInfo.idx % 4];
+                        let inlineStyle = "";
+                        if (cycleInfo.isTop) inlineStyle += `border-top: 2.5px solid ${bColor}; `;
+                        if (cycleInfo.isBottom) inlineStyle += `border-bottom: 2.5px solid ${bColor}; `;
+                        if (cycleInfo.isLeft) inlineStyle += `border-left: 2.5px solid ${bColor}; `;
+                        if (cycleInfo.isRight) inlineStyle += `border-right: 2.5px solid ${bColor}; `;
+                        
+                        let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
+                        let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
+
+                        calendarEl.innerHTML += `
+                            <div class="day ${todayHighlightClass} ${otherMonthClass}" style="${inlineStyle}" onclick="openModal('${dateKey}', '${y}年${m+1}月${d}日')">
+                                ${dotIndicator}
+                                <div class="day-header">
+                                    <div class="date-col">
+                                        <span class="${dateClass}">${d}</span>
+                                        ${weekBadge}
+                                    </div>
+                                    ${shiftHtml}
+                                </div>
+                                <div class="event-area">${tracksHtml}</div>
+                            </div>
+                        `;
+                    });
+                });
+            } catch (error) { console.error("渲染過程發生錯誤:", error); }
+        }
+
+        function openModal(dateKey, displayDate) {
+            selectedDateString = dateKey;
+            document.getElementById('modalTitle').innerText = displayDate;
+            const parts = selectedDateString.split('-');
+            const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+            
+            const savedData = calendarData[dateKey] || {};
+            document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+            
+            let historyStr = "";
+            if (savedData.shiftHistory && savedData.shiftHistory.length > 0) {
+                historyStr = `<span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(變更紀錄: ${savedData.shiftHistory.join(' → ')})</span>`;
             }
+            document.getElementById('shiftLabel').innerHTML = `班別 ${historyStr}`;
+
+            renderEventListInModal();
+            document.getElementById('editModal').style.display = 'flex';
         }
 
-        // --- 核心功能函數 ---
-        function goToday() { currentDate = new Date(); renderCalendar(); }
-        function changeMonth(s) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth()+s); renderCalendar(); }
-        function openModal(k, d) { 
-            selectedDateString = k; 
-            document.getElementById('modalTitle').innerText = d;
-            let saved = calendarData[k] || {};
-            document.getElementById('shiftInput').value = saved.shift || getAutoShift(currentDate.getFullYear(), currentDate.getMonth(), parseInt(k.split('-')[2])).shift;
-            document.getElementById('editModal').style.display='flex'; 
-        }
-        function closeModal() { document.getElementById('editModal').style.display='none'; }
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
         function setShift(v) { document.getElementById('shiftInput').value = v; }
-        function toggleTag(t) {
+
+        function toggleTag(tag) {
             let input = document.getElementById('shiftInput');
             let parts = input.value.split(/\s+/).filter(Boolean);
-            if(parts.includes(t)) parts = parts.filter(p => p !== t);
-            else parts.push(t);
+            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
+            else parts.push(tag);
             input.value = parts.join(' ');
         }
+
         function handleQuickStat(act) {
             let val = prompt(`請輸入 ${act} 數量:`);
             if(!val) return;
             let num = parseFloat(val);
+            if(isNaN(num)) return;
             let type = (act === '年休') ? 'annualLeave' : 'hours';
             let sign = (act === '加班') ? 1 : -1;
-            globalStats[type].push({ id: Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
-            let input = document.getElementById('shiftInput');
-            input.value += ` ${act==='年休'?'年休':''}${sign>0?'+':'-'}${Math.abs(num)}`;
+            
+            globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
+            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
             updateStatsDisplay();
+            
+            let input = document.getElementById('shiftInput');
+            let parts = input.value.split(/\s+/).filter(Boolean);
+            parts.push(`${act==='年休'?'年休':''}${sign>0?'+':'-'}${Math.abs(num)}`);
+            input.value = parts.join(' ');
         }
+
         function saveShiftOnly() {
-            if(!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
-            calendarData[selectedDateString].shift = document.getElementById('shiftInput').value.trim();
-            localStorage.setItem('myCustomCalendar3', JSON.stringify(calendarData));
+            let shiftVal = document.getElementById('shiftInput').value.trim();
+            let parts = selectedDateString.split('-');
+            let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+
+            if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
+            let savedData = calendarData[selectedDateString];
+            let currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+
+            if (!savedData.shiftHistory) savedData.shiftHistory = [];
+
+            if (shiftVal === "" || shiftVal === autoInfo.shift) {
+                if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
+                delete savedData.shift;
+            } else {
+                if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
+                savedData.shift = shiftVal;
+            }
+
+            cleanUpEmptyDate(selectedDateString);
+            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
             closeModal(); renderCalendar();
         }
-        function updateStatsDisplay() {
-            document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
+
+        // --- 結餘明細 ---
+        function openStatsModal(t) {
+            currentStatType = t;
+            document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
+            document.getElementById('statDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('statAmount').value = ""; document.getElementById('statDesc').value = "";
+            renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
+        }
+
+        function renderStatsList() {
+            let data = globalStats[currentStatType] || [];
+            data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+            document.getElementById('statsModalBalance').innerText = data.reduce((s, i) => s + i.amount, 0);
+            let html = "";
+            data.forEach(item => {
+                let isPos = item.amount >= 0;
+                html += `
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
+                        <div><div style="font-size:13px; font-weight:bold;">${item.desc}</div><div style="font-size:11px; color:#999;">${item.date}</div></div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:bold;">${isPos?'+':''}${item.amount}</span>
+                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer;">X</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px;'>目前無紀錄</div>";
+        }
+
+        function saveManualStat() {
+            let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
+            if(!d || isNaN(a)) return;
+            globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
+            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
+            updateStatsDisplay(); renderStatsList();
+        }
+
+        function deleteStat(id) {
+            globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
+            localStorage.setItem('myCustomCalendarStats4', JSON.stringify(globalStats));
+            updateStatsDisplay(); renderStatsList();
+        }
+        function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
+
+        // --- 行程功能 ---
+        function renderEventListInModal() {
+            let ex = getExpandedEvents(selectedDateString, selectedDateString);
+            let html = "";
+            ex.forEach(ev => {
+                let rep = (ev.repeat && ev.repeat.type !== 'none') ? " 🔁" : "";
+                html += `
+                    <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
+                        <div><strong style="color:#444; font-size:14px;">${ev.title || "未命名"}${rep}</strong><div style="font-size:11px; color:#888;">${ev.startDate} ~ ${ev.endDate || ev.startDate}</div></div>
+                        <span style="color:#a28cdb;">✎</span>
+                    </div>`;
+            });
+            document.getElementById('existingEventsList').innerHTML = html || "<div style='text-align:center; font-size:12px; color:#aaa; padding:5px;'>無排定行程</div>";
+        }
+
+        function openEventDetailModal(id = null) {
+            currentEditingEventId = id; tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+            document.getElementById('eventTitle').value = ""; document.getElementById('eventStartDate').value = selectedDateString;
+            document.getElementById('eventEndDate').value = selectedDateString;
+            if (id) {
+                document.getElementById('deleteEventBtn').style.display = "block";
+                let ev = getAllBaseEvents().find(e => e.id === id);
+                if (ev) {
+                    document.getElementById('eventTitle').value = ev.title; document.getElementById('eventStartDate').value = ev.startDate;
+                    document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
+                    selectColorInPicker(ev.color);
+                    if (ev.repeat) tempRepeatSetting = JSON.parse(JSON.stringify(ev.repeat));
+                }
+            } else {
+                document.getElementById('deleteEventBtn').style.display = "none";
+                selectColorInPicker('blue');
+            }
+            if(tempRepeatSetting.type !== 'none') {
+                setRepType(tempRepeatSetting.type); document.getElementById('repInterval').value = tempRepeatSetting.interval;
+                if(tempRepeatSetting.endType === 'specific') { document.getElementsByName('repEndType')[1].checked = true; document.getElementById('repEndDate').value = tempRepeatSetting.endDate; }
+                else document.getElementsByName('repEndType')[0].checked = true;
+            } else { setRepType('year'); tempRepeatSetting.type = 'none'; }
+            syncRepeatSummary(); updateRepeatDisplayBtn();
+            document.getElementById('eventDetailModal').style.display = 'flex';
+        }
+
+        function closeEventDetailModal() { document.getElementById('eventDetailModal').style.display = 'none'; }
+
+        function saveEventDetail() {
+            let t = document.getElementById('eventTitle').value.trim(), sD = document.getElementById('eventStartDate').value, eD = document.getElementById('eventEndDate').value;
+            if (!t) return alert("請填寫標題！"); if (sD > eD) return alert("結束不能早於開始！");
+            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting };
+            if (currentEditingEventId) { for (let k in calendarData) if (calendarData[k].events) calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); }
+            if (!calendarData[sD]) calendarData[sD] = { events: [] };
+            if (!calendarData[sD].events) calendarData[sD].events = [];
+            calendarData[sD].events.push(evObj);
+            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            renderEventListInModal(); renderCalendar(); closeEventDetailModal();
+        }
+
+        function deleteCurrentEvent() {
+            if (!confirm("確定刪除此行程？(含所有重複)")) return;
+            for (let k in calendarData) if (calendarData[k].events) { calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); cleanUpEmptyDate(k); }
+            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            renderEventListInModal(); renderCalendar(); closeEventDetailModal();
+        }
+
+        // --- 重複設定子視窗 ---
+        function openRepeatModal() { syncRepeatSummary(); document.getElementById('repeatModal').style.display = 'flex'; }
+        function closeRepeatModal() { document.getElementById('repeatModal').style.display = 'none'; }
+        function setRepType(t) { tempRepeatSetting.type = t; document.querySelectorAll('.rep-tab').forEach(el => el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); updateRepSummary(); }
+        function clearRepeatSetting() { tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' }; updateRepeatDisplayBtn(); closeRepeatModal(); }
+        function saveRepeatSetting() { updateRepSummary(); updateRepeatDisplayBtn(); closeRepeatModal(); }
+        
+        function syncRepeatSummary() {
+            let p = document.getElementById('eventStartDate').value.split('-');
+            if(p.length === 3) document.getElementById('repStartText').innerText = `${p[0]}年 ${parseInt(p[1])}月 ${parseInt(p[2])}日`;
+            updateRepSummary();
+        }
+        function updateRepSummary() {
+            tempRepeatSetting.interval = parseInt(document.getElementById('repInterval').value) || 1;
+            let radios = document.getElementsByName('repEndType');
+            for(let r of radios) if(r.checked) tempRepeatSetting.endType = r.value;
+            if (tempRepeatSetting.endType === 'specific') { document.getElementById('repEndDateContainer').style.display = 'block'; tempRepeatSetting.endDate = document.getElementById('repEndDate').value; }
+            else document.getElementById('repEndDateContainer').style.display = 'none';
+
+            if (tempRepeatSetting.type === 'none') { document.getElementById('repSummaryText').innerText = "不重複"; return; }
+            let p = document.getElementById('eventStartDate').value.split('-');
+            let unit = {'year':'年','month':'月','week':'週','day':'天'}[tempRepeatSetting.type];
+            let sum = `每 ${tempRepeatSetting.interval} ${unit}`;
+            if (tempRepeatSetting.type === 'year') sum += `的 ${parseInt(p[1])}月${parseInt(p[2])}日`;
+            else if (tempRepeatSetting.type === 'month') sum += `的 ${parseInt(p[2])}日`;
+            if (tempRepeatSetting.endType === 'specific' && tempRepeatSetting.endDate) sum += `，至 ${tempRepeatSetting.endDate}`;
+            document.getElementById('repSummaryText').innerText = sum;
+        }
+        function updateRepeatDisplayBtn() {
+            let btn = document.getElementById('repeatDisplayBtn');
+            if (tempRepeatSetting.type === 'none') { btn.innerText = "不重複"; btn.style.color = "#444"; btn.style.border = "1px solid #ddd"; }
+            else { btn.innerText = "🔁 " + document.getElementById('repSummaryText').innerText; btn.style.color = "#5b9bd5"; btn.style.border = "1.5px solid #5b9bd5"; }
+        }
+
+        function cleanUpEmptyDate(k) {
+            let d = calendarData[k];
+            if (d && d.shift === undefined && (!d.events || d.events.length === 0) && (!d.shiftHistory || d.shiftHistory.length === 0)) delete calendarData[k];
         }
 
         renderCalendar();
