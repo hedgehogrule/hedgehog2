@@ -16,57 +16,56 @@
             --cycle-b-border: rgba(153, 201, 255, 0.5);
         }
         
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 20px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0 0 15px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; user-select: none; color: #444; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 10px; }
-        .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 5px 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 6px; }
+        .header button { background: none; border: none; font-size: 20px; color: #777; cursor: pointer; padding: 5px 10px; }
         
-        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .header-center { display: flex; align-items: center; gap: 12px; }
-        .header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #555; letter-spacing: 1px; }
-        .today-btn { font-size: 14px !important; background: #ffffff !important; color: #ff6b81 !important; border: 2px solid #ff6b81 !important; border-radius: 8px !important; padding: 4px 10px !important; font-weight: bold; box-shadow: 0 2px 5px rgba(255,107,129,0.2); transition: all 0.1s; }
+        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .header-center { display: flex; align-items: center; gap: 10px; }
+        .header h2 { margin: 0; font-size: 20px; font-weight: bold; color: #555; letter-spacing: 1px; }
+        .today-btn { font-size: 13px !important; background: #ffffff !important; color: #ff6b81 !important; border: 2px solid #ff6b81 !important; border-radius: 8px !important; padding: 3px 8px !important; font-weight: bold; box-shadow: 0 2px 5px rgba(255,107,129,0.2); transition: all 0.1s; }
         .today-btn:active { transform: scale(0.9); background: #fff0f2 !important; }
         
-        /* 首頁統計結餘小方框 */
-        .header-stats { display: flex; gap: 10px; }
-        .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.1s; }
-        .stat-box span { font-size: 15px; color: #444; }
+        .header-stats { display: flex; gap: 8px; }
+        .stat-box { background: #fff; border: 1px solid #dcd0ff; border-radius: 8px; padding: 3px 8px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.1s; }
+        .stat-box span { font-size: 14px; color: #444; }
         .stat-box:active { transform: scale(0.95); background: #f8f9fa; }
         
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 12px; margin: 0 8px 8px 8px; color: #666; text-align: center; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .weekdays div { padding: 8px 0; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.6); border-radius: 10px; margin: 0 4px 4px 4px; color: #666; text-align: center; font-size: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .weekdays div { padding: 6px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 8px; }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 0 4px; }
         
-        .day { backdrop-filter: blur(3px); min-height: 110px; padding: 5px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; }
+        .day { backdrop-filter: blur(3px); min-height: 80px; padding: 3px 4px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); box-sizing: border-box; }
         .day:active { transform: scale(0.96); background: rgba(255, 255, 255, 1) !important; }
         .day.empty { background: transparent; box-shadow: none; border: none; cursor: default; }
         
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
-        .day.today-highlight { border: 3px solid #ff4757 !important; box-shadow: inset 0 0 8px rgba(255,71,87,0.15), 0 4px 12px rgba(255,71,87,0.3) !important; position: relative; z-index: 1; }
+        .day.today-highlight { border: 2px solid #ff4757 !important; box-shadow: inset 0 0 6px rgba(255,71,87,0.15), 0 3px 10px rgba(255,71,87,0.3) !important; position: relative; z-index: 1; }
         
-        .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
+        .day-header { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3px; margin-bottom: 2px; width: 100%; flex-wrap: wrap; }
         
-        .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; flex-shrink: 0; }
-        .manual-dot { width: 6px; height: 6px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 3px; }
+        .date-box { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; flex-shrink: 0; }
+        .manual-dot { width: 5px; height: 5px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 2px; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        .badge-container { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
-        .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
-        .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 3px rgba(255,107,129,0.3); }
+        .badge-container { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; margin-bottom: 2px; }
+        .week-badge { font-size: 8px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 4px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
+        .cycle-start-badge { font-size: 8px; background: #ff6b81; color: white; border-radius: 4px; padding: 1px 3px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 2px rgba(255,107,129,0.3); }
         
-        .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 6px; flex-grow: 1; min-width: 42px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; }
-        .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 6px; }
-        .shift-green { background: #5ece9d; color: white; border: none; border-radius: 6px; }
-        .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
+        .shift-badge { font-size: 9px; font-weight: bold; text-align: center; padding: 2px 4px; border-radius: 4px; min-width: 24px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 8px; }
+        .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; }
+        .shift-green { background: #5ece9d; color: white; border: none; }
+        .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; }
         
-        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; margin-left: -5px; margin-right: -5px; width: calc(100% + 10px); }
-        .event-item { font-size: 10px; padding: 3px 5px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; }
+        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 2px; margin-left: -4px; margin-right: -4px; width: calc(100% + 8px); }
+        .event-item { font-size: 9px; padding: 2px 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 16px; min-height: 16px; line-height: 12px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
@@ -75,56 +74,64 @@
         .color-dot.selected { border-color: #555; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: rgba(255, 255, 255, 0.98); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 440px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; color: #444; text-align: center; }
-        .modal-subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .modal-subtitle { text-align: center; font-size: 11px; color: #888; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: bold; color: #666; }
-        .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: bold; color: #666; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fafafa; }
         .input-group input:focus { outline: none; border-color: #b6a4e3; background: white; }
         
-        /* 班別輸入列排版 (換行支援) */
         .shift-input-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-        .shift-action-btn { background: #f8f9fa; border: 1px solid #ccd0d5; border-radius: 8px; padding: 10px 6px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.1s; }
+        .shift-action-btn { background: #f8f9fa; border: 1px solid #ccd0d5; border-radius: 8px; padding: 8px 6px; font-size: 11px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.1s; }
         .shift-action-btn:active { transform: scale(0.95); }
         .btn-ot { color: #d9534f; border-color: #f5c6cb; background: #fdf1f2; }
         .btn-take { color: #5b9bd5; border-color: #b8daff; background: #eef5ff; }
         .btn-al { color: #5ece9d; border-color: #c3e6cb; background: #eafaf1; }
 
-        /* 彩色圈圈按鈕專用 */
-        .circle-btn { width: 34px; height: 34px; border-radius: 50%; border: none; font-size: 11px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); padding: 0; letter-spacing: -0.5px; transition: transform 0.1s; }
+        .circle-btn { width: 32px; height: 32px; border-radius: 50%; border: none; font-size: 10px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); padding: 0; letter-spacing: -0.5px; transition: transform 0.1s; }
         .circle-btn:active { transform: scale(0.9); }
         .bg-pink { background: #ff9ebb; }
         .bg-orange { background: #ffa67c; }
 
-        .row-inputs { display: flex; gap: 10px; }
+        .row-inputs { display: flex; gap: 8px; }
         
-        .quick-section { margin-top: 12px; border-top: 1px dashed #eee; padding-top: 8px; }
+        .quick-section { margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; }
         .quick-section:first-of-type { border-top: none; padding-top: 0; }
         .section-title { font-size: 11px; color: #999; font-weight: bold; margin-bottom: 6px; padding-left: 2px; }
-        .quick-options { display: flex; flex-wrap: wrap; gap: 6px; }
-        .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: bold; color: #555; cursor: pointer; transition: all 0.1s; }
+        .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
+        .quick-btn { background: white; border: 1px solid #ccd0d5; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: bold; color: #555; cursor: pointer; transition: all 0.1s; }
         .quick-btn:active { transform: scale(0.9); background: #f0f0f0; }
         .quick-btn-green { border-color: #5ece9d; color: #3ba377; }
         .quick-btn-off { border-color: #b6a4e3; color: #8d77c4; background: #fdfbff; }
         .quick-btn-clear { border-color: #ff6b6b; color: #ff6b6b; background: #fff5f5; }
         
-        .event-list-container { margin-top: 15px; border-top: 2px solid #eee; padding-top: 15px; }
-        .existing-events { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-        .edit-event-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border-left: 4px solid #a28cdb; cursor: pointer; }
+        .event-list-container { margin-top: 12px; border-top: 2px solid #eee; padding-top: 12px; }
+        .existing-events { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+        .edit-event-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 6px 10px; border-radius: 8px; border-left: 4px solid #a28cdb; cursor: pointer; }
         
-        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; }
+        .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
         .btn-cancel { background: #f1f1f1; color: #666; }
         .btn-save { background: linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color: white; }
-        .btn-add { background: #fff; color: #a28cdb; border: 2px dashed #a28cdb; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
-        .btn-danger { background: #ffefef; color: #ff6b6b; border: 1px solid #ffcccc; margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-add { background: #fff; color: #a28cdb; border: 2px dashed #a28cdb; width: 100%; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 13px; }
+        .btn-danger { background: #ffefef; color: #ff6b6b; border: 1px solid #ffcccc; margin-top: 12px; width: 100%; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        .photo-preview-box { width: 100%; height: 120px; border-radius: 10px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 10px; position: relative; cursor: pointer; }
+        .photo-preview-box { width: 100%; height: 100px; border-radius: 8px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 8px; position: relative; cursor: pointer; }
         .photo-preview-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
-        .photo-placeholder { color: #999; font-size: 13px; pointer-events: none; }
-        .remove-photo-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 12px; cursor: pointer; display: none; }
+        .photo-placeholder { color: #999; font-size: 12px; pointer-events: none; }
+        .remove-photo-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; cursor: pointer; display: none; }
+
+        /* 重複設定專屬樣式 */
+        .repeat-display-btn { width: 100%; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .repeat-display-btn:active { background: #f8f9fa; }
+        .repeat-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .rep-tab { flex: 1; padding: 8px; background: #f1f1f1; border: 1px solid #ddd; border-radius: 6px; font-weight: bold; color: #666; cursor: pointer; }
+        .rep-tab.active { background: #5b9bd5; color: white; border-color: #5b9bd5; }
+        .repeat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
+        .repeat-row label { margin-bottom: 0; font-size: 14px; color: #555; }
+        .repeat-summary { background: #f8f9fa; border-radius: 8px; padding: 10px; border-left: 4px solid #5b9bd5; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -158,12 +165,12 @@
             <div class="input-group">
                 <label id="shiftLabel">班別</label>
                 <div class="shift-input-row">
-                    <input type="text" id="shiftInput" placeholder="請點選快捷鍵" style="flex: 1; min-width: 100px;">
+                    <input type="text" id="shiftInput" placeholder="請點選快捷鍵" style="flex: 1; min-width: 80px;">
                     <button class="shift-action-btn btn-ot" onclick="handleQuickStat('加班')">加班</button>
                     <button class="shift-action-btn btn-take" onclick="handleQuickStat('拿時間')">拿時間</button>
                     <button class="shift-action-btn btn-al" onclick="handleQuickStat('年休')">年休</button>
-                    <button class="circle-btn bg-pink" onclick="setShift('例休')">例休</button>
-                    <button class="circle-btn bg-orange" onclick="setShift('國假')">國假</button>
+                    <button class="circle-btn bg-pink" onclick="toggleTag('例休')">例休</button>
+                    <button class="circle-btn bg-orange" onclick="toggleTag('國假')">國假</button>
                 </div>
                 
                 <div class="quick-section">
@@ -211,13 +218,13 @@
                         <button class="quick-btn quick-btn-off" onclick="setShift('D\'OFF')">D'OFF</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('OFF.B')">OFF.B</button>
                         <button class="quick-btn" onclick="setShift('9-5訪')">9-5訪</button>
-                        <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置班別</button>
+                        <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置清空</button>
                     </div>
                 </div>
             </div>
             
             <div class="event-list-container">
-                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">包含此日的行程與記事</label>
+                <label style="display:block; font-size:12px; font-weight:bold; color:#666; margin-bottom:6px;">包含此日的行程與記事</label>
                 <div id="existingEventsList" class="existing-events"></div>
                 <button class="btn-add" onclick="openEventDetailModal()">+ 新增獨立行程</button>
             </div>
@@ -233,17 +240,14 @@
         <div class="modal-content">
             <h3 id="statsModalTitle">明細紀錄</h3>
             <div style="text-align:center; margin-bottom:10px; font-weight:bold; color:#555;">目前結餘: <span id="statsModalBalance" style="font-size:24px; color:#a28cdb; margin-left:5px;">0</span></div>
-            
-            <div class="stats-list" id="statsList" style="max-height: 40vh; overflow-y: auto; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-bottom: 15px; background: #fafafa;">
-                </div>
-            
+            <div class="stats-list" id="statsList" style="max-height: 40vh; overflow-y: auto; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-bottom: 15px; background: #fafafa;"></div>
             <div style="border-top: 1px dashed #ccc; padding-top: 15px;">
-                <label style="font-size: 13px; font-weight: bold; color: #888;">手動新增 / 校正紀錄</label>
+                <label style="font-size: 12px; font-weight: bold; color: #888;">手動新增 / 校正紀錄</label>
                 <div class="row-inputs" style="margin-top: 8px;">
                     <input type="date" id="statDate" style="flex:1;">
                     <input type="number" id="statAmount" placeholder="數量 (+ 加 / - 減)" style="flex:1;">
                 </div>
-                <input type="text" id="statDesc" placeholder="備註 (如: 系統配發、年度特休)" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-top:8px; margin-bottom:10px; box-sizing:border-box;">
+                <input type="text" id="statDesc" placeholder="備註 (如: 系統配發、年度特休)" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; margin-top:8px; margin-bottom:10px; box-sizing:border-box;">
                 <button class="btn-save" style="width:100%; padding: 10px;" onclick="saveManualStat()">手動寫入紀錄</button>
             </div>
             <button class="btn btn-cancel" style="width:100%; margin-top:12px;" onclick="closeStatsModal()">關閉明細</button>
@@ -257,6 +261,11 @@
             <div class="input-group">
                 <label>行程標題 <span style="color:red">*</span></label>
                 <input type="text" id="eventTitle" placeholder="例如: 墾丁三日遊、洗車">
+            </div>
+
+            <div class="input-group">
+                <label>重複設定</label>
+                <div id="repeatDisplayBtn" class="repeat-display-btn" onclick="openRepeatModal()">不重複</div>
             </div>
 
             <div class="input-group">
@@ -274,7 +283,7 @@
             <div class="input-group">
                 <label>開始時間</label>
                 <div class="row-inputs">
-                    <input type="date" id="eventStartDate">
+                    <input type="date" id="eventStartDate" onchange="syncRepeatSummary()">
                     <input type="time" id="eventStartTime">
                 </div>
             </div>
@@ -297,11 +306,59 @@
                 </div>
             </div>
 
-            <button id="deleteEventBtn" class="btn-danger" style="display:none;" onclick="deleteCurrentEvent()">刪除此行程</button>
+            <button id="deleteEventBtn" class="btn-danger" style="display:none;" onclick="deleteCurrentEvent()">刪除此行程 (包含所有重複)</button>
 
             <div class="btn-row">
                 <button class="btn btn-cancel" onclick="closeEventDetailModal()">返回</button>
                 <button class="btn btn-save" onclick="saveEventDetail()">確認儲存行程</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="repeatModal" style="z-index: 30;">
+        <div class="modal-content" style="max-width: 320px;">
+            <h3 style="margin-bottom:15px; color:#444;">重複設定</h3>
+            
+            <div class="repeat-tabs">
+                <button class="rep-tab active" id="tab-year" onclick="setRepType('year')">年</button>
+                <button class="rep-tab" id="tab-month" onclick="setRepType('month')">月</button>
+                <button class="rep-tab" id="tab-week" onclick="setRepType('week')">週</button>
+                <button class="rep-tab" id="tab-day" onclick="setRepType('day')">日</button>
+            </div>
+
+            <div class="repeat-row">
+                <label>頻率</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="number" id="repInterval" value="1" min="1" onchange="updateRepSummary()" style="width:60px; text-align:center; padding:5px; border-radius:6px; border:1px solid #ccc;">
+                    <span id="repUnitText" style="color:#555; font-weight:bold;">年</span>
+                </div>
+            </div>
+
+            <div class="repeat-row" style="margin-top:10px;">
+                <label>開始</label>
+                <div id="repStartText" style="color:#5b9bd5; font-weight:bold;"></div>
+            </div>
+
+            <div class="repeat-row" style="margin-top:10px; flex-direction:column; align-items:flex-start; gap:8px;">
+                <label style="width:100%;">結束</label>
+                <div style="display:flex; gap:15px; width:100%; margin-left:10px;">
+                    <label style="display:flex; align-items:center; gap:5px; margin:0;"><input type="radio" name="repEndType" value="none" checked onchange="updateRepSummary()"> 沒有</label>
+                    <label style="display:flex; align-items:center; gap:5px; margin:0;"><input type="radio" name="repEndType" value="specific" onchange="updateRepSummary()"> 指定</label>
+                </div>
+            </div>
+            <div id="repEndDateContainer" style="display:none; margin-top:5px; padding-left: 20px;">
+                <input type="date" id="repEndDate" onchange="updateRepSummary()" style="padding:6px; border-radius:6px; border:1px solid #ccc;">
+            </div>
+
+            <div class="repeat-summary">
+                <span style="font-size:12px; color:#888;">概要預覽</span>
+                <div id="repSummaryText" style="font-weight:bold; color:#3e6e96; margin-top:5px; font-size:14px;"></div>
+            </div>
+
+            <div class="btn-row" style="margin-top:20px;">
+                <button class="btn" style="background:#fff; border:1px solid #ddd; color:#666; padding:10px;" onclick="closeRepeatModal()">取消</button>
+                <button class="btn" style="background:#ffeaea; color:#ff6b6b; padding:10px;" onclick="clearRepeatSetting()">清除設定</button>
+                <button class="btn" style="background:#5b9bd5; color:white; padding:10px;" onclick="saveRepeatSetting()">設定</button>
             </div>
         </div>
     </div>
@@ -336,6 +393,18 @@
             orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' }
         };
 
+        // 安全的本地日期解析 (防止時區跳日)
+        function parseDateLocal(dateStr) {
+            let parts = dateStr.split('-');
+            return new Date(parts[0], parts[1]-1, parts[2]);
+        }
+        function formatDateLocal(d) {
+            let y = d.getFullYear();
+            let m = (d.getMonth() + 1).toString().padStart(2, '0');
+            let day = d.getDate().toString().padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function getAutoShift(year, month, date) {
             const targetDate = new Date(year, month, date);
             const dayOfWeek = targetDate.getDay(); 
@@ -364,6 +433,8 @@
         let selectedDateString = "";
         let selectedEventColor = "blue";
         
+        let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+        
         let calendarData = {};
         try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; } catch(e) { calendarData = {}; }
 
@@ -378,7 +449,8 @@
             document.getElementById('hdrAL').innerText = aBal;
         }
 
-        function getAllEvents() {
+        // 修改：取出全域原始事件
+        function getAllBaseEvents() {
             let all = [];
             let seenIds = new Set();
             for (let key in calendarData) {
@@ -392,6 +464,59 @@
                 }
             }
             return all;
+        }
+
+        // 核心突破：動態展開重複行程的虛擬實體 (Virtual Instances)
+        function getExpandedEvents(viewStartStr, viewEndStr) {
+            let allBase = getAllBaseEvents();
+            let expanded = [];
+            
+            allBase.forEach(ev => {
+                if (!ev.repeat || ev.repeat.type === 'none') {
+                    // 一般無重複行程
+                    let endD = ev.endDate || ev.startDate;
+                    if (ev.startDate <= viewEndStr && endD >= viewStartStr) {
+                        expanded.push({...ev, instanceId: ev.id});
+                    }
+                } else {
+                    // 展開重複行程
+                    let currStart = parseDateLocal(ev.startDate);
+                    let baseEnd = parseDateLocal(ev.endDate || ev.startDate);
+                    let duration = baseEnd.getTime() - currStart.getTime(); 
+                    
+                    let maxEndStr = ev.repeat.endType === 'specific' ? ev.repeat.endDate : '2099-12-31';
+
+                    let failsafe = 0;
+                    while(true) {
+                        let instanceStartStr = formatDateLocal(currStart);
+                        let instanceEndObj = new Date(currStart.getTime() + duration);
+                        let instanceEndStr = formatDateLocal(instanceEndObj);
+
+                        if (instanceStartStr > maxEndStr) break;
+                        if (instanceStartStr > viewEndStr) break;
+
+                        if (instanceEndStr >= viewStartStr && instanceStartStr <= viewEndStr) {
+                            expanded.push({
+                                ...ev,
+                                instanceId: ev.id + '_' + failsafe, // 使用 index 做連續性判斷
+                                startDate: instanceStartStr,
+                                endDate: instanceEndStr
+                            });
+                        }
+
+                        // 推進時間
+                        if (ev.repeat.type === 'year') currStart.setFullYear(currStart.getFullYear() + ev.repeat.interval);
+                        else if (ev.repeat.type === 'month') currStart.setMonth(currStart.getMonth() + ev.repeat.interval);
+                        else if (ev.repeat.type === 'week') currStart.setDate(currStart.getDate() + ev.repeat.interval * 7);
+                        else if (ev.repeat.type === 'day') currStart.setDate(currStart.getDate() + ev.repeat.interval);
+                        else break;
+                        
+                        failsafe++;
+                        if (failsafe > 2000) break; // 防止無限迴圈
+                    }
+                }
+            });
+            return expanded;
         }
 
         document.querySelectorAll('.color-dot').forEach(dot => {
@@ -410,20 +535,33 @@
             });
         }
 
-        function goToday() {
-            currentDate = new Date();
-            renderCalendar();
-        }
+        function goToday() { currentDate = new Date(); renderCalendar(); }
+        function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
 
-        function changeMonth(step) {
-            currentDate.setDate(1); 
-            currentDate.setMonth(currentDate.getMonth() + step);
-            renderCalendar();
+        function generateShiftBadges(finalShift) {
+            if (!finalShift) return "";
+            let html = "";
+            let parts = finalShift.trim().split(/\s+/).filter(Boolean);
+            
+            parts.forEach(p => {
+                let s = p.toUpperCase();
+                if (s === "例休") { html += `<div class="shift-badge" style="background:#ff9ebb; color:white; border:none; border-radius:10px;">${p}</div>`; }
+                else if (s === "國假") { html += `<div class="shift-badge" style="background:#ffa67c; color:white; border:none; border-radius:10px;">${p}</div>`; }
+                else if (s.includes("OFF")) { html += `<div class="shift-badge shift-off">${p}</div>`; }
+                else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
+                    let color = s.includes("-") ? "#5b9bd5" : "#d9534f";
+                    if(s.startsWith("年休")) color = "#5ece9d";
+                    html += `<div class="shift-badge" style="background:none; box-shadow:none; color:${color}; font-weight:bold; padding:0 1px; min-width:auto; font-size:11px;">${p}</div>`;
+                } else if (s.startsWith("D")) { html += `<div class="shift-badge shift-d">${p}</div>`; }
+                else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { html += `<div class="shift-badge shift-green">${p}</div>`; }
+                else { html += `<div class="shift-badge shift-default">${p}</div>`; }
+            });
+            return html;
         }
 
         function renderCalendar() {
             try {
-                updateStatsDisplay();
+                updateStatsDisplay(); 
                 
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
@@ -440,20 +578,18 @@
                 const todayDateNum = realToday.getDate();
 
                 let calendarSlots = [];
-                for (let i = 0; i < firstDay; i++) {
-                    calendarSlots.push({ type: 'empty' });
-                }
+                for (let i = 0; i < firstDay; i++) calendarSlots.push({ type: 'empty' });
                 for (let i = 1; i <= daysInMonth; i++) {
                     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
                     calendarSlots.push({ type: 'day', date: i, dateKey: dateKey, dayOfWeek: new Date(year, month, i).getDay() });
                 }
 
-                let weeks = [];
-                for (let i = 0; i < calendarSlots.length; i += 7) {
-                    weeks.push(calendarSlots.slice(i, i + 7));
-                }
+                let viewStartStr = calendarSlots.find(s => s.type==='day').dateKey;
+                let viewEndStr = calendarSlots[calendarSlots.length - 1].dateKey;
+                let expandedEvents = getExpandedEvents(viewStartStr, viewEndStr);
 
-                const allEvents = getAllEvents();
+                let weeks = [];
+                for (let i = 0; i < calendarSlots.length; i += 7) weeks.push(calendarSlots.slice(i, i + 7));
 
                 weeks.forEach(week => {
                     let dayRealObj = week.filter(d => d.type === 'day');
@@ -461,11 +597,11 @@
                     let wStart = dayRealObj[0].dateKey;
                     let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
 
-                    let wEvents = allEvents.filter(ev => ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart);
+                    let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
 
                     wEvents.sort((a, b) => {
-                        let lenA = new Date(a.endDate || a.startDate).getTime() - new Date(a.startDate).getTime();
-                        let lenB = new Date(b.endDate || b.startDate).getTime() - new Date(b.startDate).getTime();
+                        let lenA = new Date(a.endDate).getTime() - new Date(a.startDate).getTime();
+                        let lenB = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
                         if (isNaN(lenA)) lenA = 0;
                         if (isNaN(lenB)) lenB = 0;
                         return lenB - lenA || (a.id || "").localeCompare(b.id || "");
@@ -481,15 +617,14 @@
                             for (let dIdx = 0; dIdx < 7; dIdx++) {
                                 if (week[dIdx].type === 'day') {
                                     let currKey = week[dIdx].dateKey;
-                                    let isCovered = (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate));
-                                    if (isCovered && tracks[trackIdx][dIdx] !== null) { conflict = true; break; }
+                                    if (currKey >= ev.startDate && currKey <= ev.endDate && tracks[trackIdx][dIdx] !== null) { conflict = true; break; }
                                 }
                             }
                             if (!conflict) {
                                 for (let dIdx = 0; dIdx < 7; dIdx++) {
                                     if (week[dIdx].type === 'day') {
                                         let currKey = week[dIdx].dateKey;
-                                        if (currKey >= ev.startDate && currKey <= (ev.endDate || ev.startDate)) { tracks[trackIdx][dIdx] = ev; }
+                                        if (currKey >= ev.startDate && currKey <= ev.endDate) { tracks[trackIdx][dIdx] = ev; }
                                     }
                                 }
                                 assigned = true;
@@ -503,10 +638,7 @@
 
                 weeks.forEach(week => {
                     week.forEach((slot, dIdx) => {
-                        if (slot.type === 'empty') {
-                            calendarEl.innerHTML += `<div class="day empty"></div>`;
-                            return;
-                        }
+                        if (slot.type === 'empty') { calendarEl.innerHTML += `<div class="day empty"></div>`; return; }
 
                         const dateKey = slot.dateKey;
                         const i = slot.date;
@@ -522,28 +654,19 @@
                         
                         let finalShift = (savedData && savedData.shift !== undefined) ? savedData.shift : autoInfo.shift;
                         let isManual = (savedData && savedData.shift !== undefined);
-                        let shiftHtml = "";
-
-                        if (finalShift) {
-                            const s = finalShift.trim().toUpperCase();
-                            // 加入例休與國假的彩色圓角膠囊呈現
-                            if (s.includes("OFF")) shiftHtml = `<div class="shift-badge shift-off">${finalShift}</div>`;
-                            else if (s.includes("例休")) shiftHtml = `<div class="shift-badge" style="background:#ff9ebb; color:white; border:none; border-radius:14px;">${finalShift}</div>`;
-                            else if (s.includes("國假")) shiftHtml = `<div class="shift-badge" style="background:#ffa67c; color:white; border:none; border-radius:14px;">${finalShift}</div>`;
-                            else if (s.startsWith("D")) shiftHtml = `<div class="shift-badge shift-d">${finalShift}</div>`;
-                            else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) shiftHtml = `<div class="shift-badge shift-green">${finalShift}</div>`;
-                            else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
-                        }
+                        
+                        let shiftHtml = generateShiftBadges(finalShift);
 
                         let tracksHtml = "";
                         if (week.tracks && week.tracks.length > 0) {
                             week.tracks.forEach(trackLine => {
                                 const ev = trackLine[dIdx];
                                 if (ev) {
-                                    let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
-                                    let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
+                                    // 必須使用 instanceId 才能確保跨週連貫計算正確
+                                    let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].instanceId === ev.instanceId);
+                                    let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].instanceId === ev.instanceId);
                                     let globalLeft = (ev.startDate < dateKey);
-                                    let globalRight = ((ev.endDate || ev.startDate) > dateKey);
+                                    let globalRight = (ev.endDate > dateKey);
 
                                     let marginStyle = "";
                                     let radiusStyle = "border-radius: 4px;";
@@ -558,12 +681,12 @@
                                     let showText = !hasLeft; 
 
                                     tracksHtml += `
-                                        <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: 22px; min-height: 22px;">
-                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名行程"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+                                        <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
+                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
                                         </div>
                                     `;
                                 } else {
-                                    tracksHtml += `<div style="height: 22px; pointer-events: none;"></div>`;
+                                    tracksHtml += `<div style="height: 16px; pointer-events: none;"></div>`;
                                 }
                             });
                         }
@@ -588,11 +711,10 @@
                         `;
                     });
                 });
-            } catch (error) {
-                console.error("渲染過程發生錯誤:", error);
-            }
+            } catch (error) { console.error("渲染過程發生錯誤:", error); }
         }
 
+        // --- 主視窗 ---
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
@@ -615,57 +737,41 @@
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+        function setShift(value) { document.getElementById('shiftInput').value = value; }
+
+        function toggleTag(tag) {
+            let shiftInput = document.getElementById('shiftInput');
+            let parts = shiftInput.value.trim().split(/\s+/).filter(Boolean);
+            if (parts.includes(tag)) parts = parts.filter(p => p !== tag);
+            else parts.push(tag);
+            shiftInput.value = parts.join(' ');
         }
 
-        function setShift(value) {
-            document.getElementById('shiftInput').value = value;
-        }
-
-        // 精簡數字寫入邏輯
         function handleQuickStat(action) {
             let type = (action === '年休') ? 'annualLeave' : 'hours';
             let unit = (action === '年休') ? '天/時' : '小時';
-            let sign = (action === '加班') ? 1 : -1;
+            let sign = (action === '加班') ? 1 : -1; 
 
-            let val = prompt(`請輸入「${action}」的數量 (${unit})：\n(輸入數字即可，系統會自動轉換為加或減)`);
+            let val = prompt(`請輸入「${action}」的數量 (${unit})：\n(直接輸入數字即可)`);
             if(val === null || val.trim() === '') return;
-
             let num = parseFloat(val);
-            if(isNaN(num)) {
-                alert("請輸入有效的數字！");
-                return;
-            }
+            if(isNaN(num)) { alert("請輸入有效的數字！"); return; }
 
-            let finalAmount = Math.abs(num) * sign;
-
-            globalStats[type].push({
-                id: "st_" + Date.now(),
-                date: selectedDateString,
-                desc: action,
-                amount: finalAmount
-            });
+            globalStats[type].push({ id: "st_" + Date.now(), date: selectedDateString, desc: action, amount: Math.abs(num) * sign });
             localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
             updateStatsDisplay();
 
             let shiftInput = document.getElementById('shiftInput');
-            shiftInput.value = shiftInput.value.trim();
+            let parts = shiftInput.value.trim().split(/\s+/).filter(Boolean);
             
-            // 加入數字標籤 (例: +2.5 / -1)
             let appendStr = "";
-            if (action === '加班') {
-                appendStr = `+${Math.abs(num)}`;
-            } else if (action === '拿時間') {
-                appendStr = `-${Math.abs(num)}`;
-            } else if (action === '年休') {
-                appendStr = `年休-${Math.abs(num)}`;
-            }
+            if (action === '加班') appendStr = `+${Math.abs(num)}`;
+            else if (action === '拿時間') appendStr = `-${Math.abs(num)}`;
+            else if (action === '年休') appendStr = `年休-${Math.abs(num)}`;
 
-            if(shiftInput.value.length > 0) {
-                shiftInput.value += ' ';
-            }
-            shiftInput.value += appendStr;
+            parts.push(appendStr);
+            shiftInput.value = parts.join(' ');
         }
 
         function saveShiftOnly() {
@@ -674,21 +780,16 @@
             const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
 
             if (!calendarData[selectedDateString]) calendarData[selectedDateString] = { events: [] };
-            
             const savedData = calendarData[selectedDateString];
             const currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
 
             if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
-                if (currentDisplayShift !== autoInfo.shift) {
-                    savedData.shiftHistory.push(currentDisplayShift);
-                }
+                if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
                 delete savedData.shift;
             } else {
-                if (currentDisplayShift !== shiftVal) {
-                    savedData.shiftHistory.push(currentDisplayShift);
-                }
+                if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
                 savedData.shift = shiftVal;
             }
 
@@ -698,13 +799,13 @@
             renderCalendar();
         }
 
+        // --- 結餘明細 Modal ---
         function openStatsModal(type) {
             currentStatType = type;
             document.getElementById('statsModalTitle').innerText = type === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
             document.getElementById('statDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('statAmount').value = "";
             document.getElementById('statDesc').value = "";
-            
             renderStatsList();
             document.getElementById('statsModal').style.display = 'flex';
         }
@@ -712,17 +813,11 @@
         function renderStatsList() {
             let listEl = document.getElementById('statsList');
             let data = globalStats[currentStatType] || [];
-            
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
-
             let balance = data.reduce((sum, item) => sum + item.amount, 0);
             document.getElementById('statsModalBalance').innerText = balance;
-
             listEl.innerHTML = "";
-            if(data.length === 0) {
-                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px;'>目前無紀錄</div>";
-                return;
-            }
+            if(data.length === 0) { listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px;'>目前無紀錄</div>"; return; }
 
             data.forEach(item => {
                 let isPos = item.amount >= 0;
@@ -747,51 +842,128 @@
             let date = document.getElementById('statDate').value;
             let amount = parseFloat(document.getElementById('statAmount').value);
             let desc = document.getElementById('statDesc').value.trim() || "手動調整";
+            if(!date || isNaN(amount)) { alert("請填寫完整的日期與數量！"); return; }
 
-            if(!date || isNaN(amount)) {
-                alert("請填寫完整的日期與數量！");
-                return;
-            }
-
-            globalStats[currentStatType].push({
-                id: "st_" + Date.now(),
-                date: date,
-                desc: desc,
-                amount: amount
-            });
-
+            globalStats[currentStatType].push({ id: "st_" + Date.now(), date: date, desc: desc, amount: amount });
             localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            renderStatsList();
-
-            document.getElementById('statAmount').value = "";
-            document.getElementById('statDesc').value = "";
+            updateStatsDisplay(); renderStatsList();
+            document.getElementById('statAmount').value = ""; document.getElementById('statDesc').value = "";
         }
 
         function deleteStat(id) {
             if(!confirm("確定要刪除這筆紀錄嗎？這將影響總結餘。")) return;
             globalStats[currentStatType] = globalStats[currentStatType].filter(item => item.id !== id);
             localStorage.setItem('myCustomCalendarStats', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            renderStatsList();
+            updateStatsDisplay(); renderStatsList();
+        }
+        function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
+
+
+        // --- 重複設定邏輯 (新功能) ---
+        function openRepeatModal() {
+            syncRepeatSummary(); // 確保日期有更新
+            document.getElementById('repeatModal').style.display = 'flex';
+        }
+        
+        function closeRepeatModal() {
+            document.getElementById('repeatModal').style.display = 'none';
         }
 
-        function closeStatsModal() {
-            document.getElementById('statsModal').style.display = 'none';
+        function setRepType(type) {
+            tempRepeatSetting.type = type;
+            document.querySelectorAll('.rep-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + type).classList.add('active');
+            
+            const unitMap = { 'year':'年', 'month':'月', 'week':'週', 'day':'日' };
+            document.getElementById('repUnitText').innerText = unitMap[type];
+            updateRepSummary();
         }
 
+        function clearRepeatSetting() {
+            tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+            updateRepeatDisplayBtn();
+            closeRepeatModal();
+        }
+
+        function saveRepeatSetting() {
+            updateRepSummary(); // 強制更新抓取最新值
+            updateRepeatDisplayBtn();
+            closeRepeatModal();
+        }
+
+        function syncRepeatSummary() {
+            const startStr = document.getElementById('eventStartDate').value;
+            let parts = startStr.split('-');
+            if(parts.length === 3) {
+                document.getElementById('repStartText').innerText = `${parts[0]}年 ${parseInt(parts[1])}月 ${parseInt(parts[2])}日`;
+            }
+            updateRepSummary();
+        }
+
+        function updateRepSummary() {
+            tempRepeatSetting.interval = parseInt(document.getElementById('repInterval').value) || 1;
+            
+            let endRadios = document.getElementsByName('repEndType');
+            for(let r of endRadios) { if(r.checked) tempRepeatSetting.endType = r.value; }
+            
+            if (tempRepeatSetting.endType === 'specific') {
+                document.getElementById('repEndDateContainer').style.display = 'block';
+                tempRepeatSetting.endDate = document.getElementById('repEndDate').value;
+            } else {
+                document.getElementById('repEndDateContainer').style.display = 'none';
+            }
+
+            if (tempRepeatSetting.type === 'none') {
+                document.getElementById('repSummaryText').innerText = "不重複";
+                return;
+            }
+
+            const startStr = document.getElementById('eventStartDate').value;
+            if(!startStr) return;
+            let parts = startStr.split('-');
+            let unitMap = { 'year':'年', 'month':'月', 'week':'週', 'day':'天' };
+            let unitStr = unitMap[tempRepeatSetting.type];
+            
+            let summary = `每 ${tempRepeatSetting.interval} ${unitStr}`;
+            
+            if (tempRepeatSetting.type === 'year') summary += `的 ${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+            else if (tempRepeatSetting.type === 'month') summary += `的 ${parseInt(parts[2])}日`;
+            
+            if (tempRepeatSetting.endType === 'specific' && tempRepeatSetting.endDate) {
+                let eParts = tempRepeatSetting.endDate.split('-');
+                summary += `，直到 ${eParts[0]}年${parseInt(eParts[1])}月${parseInt(eParts[2])}日`;
+            }
+            
+            document.getElementById('repSummaryText').innerText = summary;
+        }
+
+        function updateRepeatDisplayBtn() {
+            let btn = document.getElementById('repeatDisplayBtn');
+            if (tempRepeatSetting.type === 'none') {
+                btn.innerText = "不重複";
+                btn.style.color = "#444";
+                btn.style.border = "1px solid #ddd";
+            } else {
+                updateRepSummary();
+                btn.innerText = "🔁 " + document.getElementById('repSummaryText').innerText;
+                btn.style.color = "#5b9bd5";
+                btn.style.border = "2px solid #5b9bd5";
+            }
+        }
+
+        // --- 獨立行程 Modal ---
         function renderEventListInModal() {
             const listEl = document.getElementById('existingEventsList');
             listEl.innerHTML = "";
-            const allEvents = getAllEvents();
-            const filtered = allEvents.filter(ev => selectedDateString >= ev.startDate && selectedDateString <= (ev.endDate || ev.startDate));
+            let expandedEvents = getExpandedEvents(selectedDateString, selectedDateString);
             
-            if (filtered.length > 0) {
-                filtered.forEach(ev => {
+            if (expandedEvents.length > 0) {
+                expandedEvents.forEach(ev => {
+                    let repIcon = (ev.repeat && ev.repeat.type !== 'none') ? " 🔁" : "";
                     listEl.innerHTML += `
                         <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
                             <div>
-                                <strong style="color:#444; font-size:14px;">${ev.title || "未命名行程"}</strong>
+                                <strong style="color:#444; font-size:14px;">${ev.title || "未命名"}${repIcon}</strong>
                                 <div style="font-size:11px; color:#888;">期間：${ev.startDate} ~ ${ev.endDate || ev.startDate}</div>
                             </div>
                             <span style="color:#a28cdb; font-size:18px;">✎</span>
@@ -816,12 +988,15 @@
             document.getElementById('eventEndDate').value = selectedDateString;
             document.getElementById('eventEndTime').value = "";
             resetPhotoPreview();
+            
+            // 重置重複設定
+            tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
 
             if (eventId) {
                 document.getElementById('eventModalTitle').innerText = "編輯行程資訊";
                 document.getElementById('deleteEventBtn').style.display = "block";
                 
-                const all = getAllEvents();
+                const all = getAllBaseEvents();
                 const ev = all.find(e => e.id === eventId);
                 if (ev) {
                     document.getElementById('eventTitle').value = ev.title;
@@ -830,6 +1005,9 @@
                     document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
                     document.getElementById('eventEndTime').value = ev.endTime || "";
                     selectColorInPicker(ev.color);
+                    
+                    if (ev.repeat) tempRepeatSetting = JSON.parse(JSON.stringify(ev.repeat));
+
                     if (ev.photoUrl) {
                         tempPhotoBase64 = ev.photoUrl;
                         showPhotoPreview(ev.photoUrl);
@@ -841,35 +1019,43 @@
                 selectColorInPicker('blue'); 
             }
 
+            // 初始化重複設定的 UI
+            if(tempRepeatSetting.type !== 'none') {
+                setRepType(tempRepeatSetting.type);
+                document.getElementById('repInterval').value = tempRepeatSetting.interval;
+                if(tempRepeatSetting.endType === 'specific') {
+                    document.getElementsByName('repEndType')[1].checked = true;
+                    document.getElementById('repEndDate').value = tempRepeatSetting.endDate;
+                } else {
+                    document.getElementsByName('repEndType')[0].checked = true;
+                }
+            } else {
+                setRepType('year'); // 預設底底給年，但不啟用
+                tempRepeatSetting.type = 'none'; 
+            }
+            
+            syncRepeatSummary();
+            updateRepeatDisplayBtn();
+
             document.getElementById('eventDetailModal').style.display = 'flex';
         }
 
-        function closeEventDetailModal() {
-            document.getElementById('eventDetailModal').style.display = 'none';
-        }
+        function closeEventDetailModal() { document.getElementById('eventDetailModal').style.display = 'none'; }
 
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 500; 
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
+                    let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
                     tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
                     showPhotoPreview(tempPhotoBase64);
                 };
@@ -881,8 +1067,7 @@
         function showPhotoPreview(src) {
             document.getElementById('photoPlaceholder').style.display = 'none';
             const imgEl = document.getElementById('eventPhotoPreview');
-            imgEl.src = src;
-            imgEl.style.display = 'block';
+            imgEl.src = src; imgEl.style.display = 'block';
             document.getElementById('removePhotoBtn').style.display = 'block';
         }
 
@@ -895,25 +1080,16 @@
             document.getElementById('eventPhotoInput').value = "";
         }
 
-        function removePhoto(e) {
-            e.stopPropagation();
-            resetPhotoPreview();
-        }
+        function removePhoto(e) { e.stopPropagation(); resetPhotoPreview(); }
 
         function saveEventDetail() {
             const title = document.getElementById('eventTitle').value.trim();
-            if (!title) {
-                alert("請填寫行程標題！");
-                return;
-            }
+            if (!title) { alert("請填寫行程標題！"); return; }
 
             const startD = document.getElementById('eventStartDate').value;
             const endD = document.getElementById('eventEndDate').value;
 
-            if (startD > endD) {
-                alert("結束日期不能早於開始日期！");
-                return;
-            }
+            if (startD > endD) { alert("結束日期不能早於開始日期！"); return; }
 
             const eventObj = {
                 id: currentEditingEventId || ("ev_" + Date.now().toString()),
@@ -923,9 +1099,11 @@
                 startTime: document.getElementById('eventStartTime').value,
                 endDate: endD,
                 endTime: document.getElementById('eventEndTime').value,
+                repeat: tempRepeatSetting, // 存入重複設定
                 photoUrl: tempPhotoBase64
             };
 
+            // 清理舊有的基底事件
             if (currentEditingEventId) {
                 for (let key in calendarData) {
                     if (calendarData[key].events) {
@@ -945,7 +1123,7 @@
         }
 
         function deleteCurrentEvent() {
-            if (!confirm("確定要刪除這個行程嗎？")) return;
+            if (!confirm("確定要刪除此行程嗎？(若是重複行程，將會刪除所有系列紀錄！)")) return;
             for (let key in calendarData) {
                 if (calendarData[key].events) {
                     calendarData[key].events = calendarData[key].events.filter(e => e.id !== currentEditingEventId);
