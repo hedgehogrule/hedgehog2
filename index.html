@@ -38,23 +38,30 @@
         /* 放大行事曆區域 */
         .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
         
-        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; transition: 0.1s; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
-        .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
+        
+        /* 美化「今天」的標示：粉嫩發光圓角 */
+        .day.today-highlight { 
+            background: linear-gradient(135deg, #ffffff 0%, #fff0f5 100%) !important; 
+            border: 2px solid #ffb6c1 !important; 
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.8) !important; 
+            z-index: 2; 
+        }
         
         /* 第一行：日期 + 附加資訊 */
         .day-row-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 2px; }
         .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 12px; }
         
-        /* 日期字體縮小至 11.5px，確保加班時數完整顯示 */
+        /* 日期字體縮小至 11.5px */
         .date-box { font-size: 11.5px; font-weight: 800; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        /* 班別與標籤：改用標準字體 */
+        /* 班別與標籤 */
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
-        
         .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
         .shift-num-tag { font-size: 9.5px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 12px; letter-spacing: -0.2px; }
         .special-badge { font-size: 8px; font-weight: bold; padding: 1px 3px; border-radius: 6px; color: white; line-height: 11px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
@@ -99,6 +106,10 @@
         .quick-btn-off { background: #b6a4e3; color: #ffffff; border: 1.5px solid #b6a4e3; }
         .quick-btn-clear { background: #fff5f5; color: #ff6b6b; border: 1.5px solid #ffcccc; }
         
+        /* 快捷記事 Icon 按鈕 */
+        .icon-btn { background: #f8f9fa; border: 1.5px solid #eee; border-radius: 12px; padding: 6px 10px; font-size: 18px; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: center; align-items: center; }
+        .icon-btn.active { background: #ffe0f0; border-color: #ff9ebb; transform: scale(1.1); box-shadow: 0 2px 5px rgba(255,158,187,0.3); }
+
         .color-picker-options { display: flex; gap: 8px; margin-top: 4px; }
         .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 800; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.6); font-family: inherit; }
         .color-dot.selected { border-color: #555; box-shadow: 0 0 8px rgba(0,0,0,0.3); transform: scale(1.1); }
@@ -119,7 +130,8 @@
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">年休 <span id="hdrAL">0</span></div>
-                <div class="stat-box night-fee" onclick="openNightFeeModal()">夜班費 $<span id="hdrNightFee">0</span></div>
+                <!-- 🌙 加入可愛的月亮 Icon -->
+                <div class="stat-box night-fee" onclick="openNightFeeModal()">🌙 夜班 $<span id="hdrNightFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
@@ -197,7 +209,19 @@
                 </div>
             </div>
             
-            <div style="margin-top: 15px; border-top: 2.5px solid #eee; padding-top: 15px;">
+            <!-- 🌟 新增：日常快捷記事 Icon 區塊 -->
+            <div style="margin-top: 15px; border-top: 2.5px solid #eee; padding-top: 10px;">
+                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:6px;">日常紀錄 (點擊切換)</label>
+                <div id="quickIconsWrap" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom: 15px;">
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '🩸')" title="MC來">🩸</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '💊')" title="吃藥">💊</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '💩')" title="嗯嗯">💩</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '🏋️‍♀️')" title="運動">🏋️‍♀️</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '🍰')" title="大餐">🍰</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '✈️')" title="出遊">✈️</button>
+                    <button type="button" class="icon-btn" onclick="toggleQuickIcon(this, '💸')" title="花錢">💸</button>
+                </div>
+                
                 <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">包含此日的行程與記事</label>
                 <div id="existingEventsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
                 <button style="width:100%; border:2.5px dashed #a28cdb; padding:10px; border-radius:10px; color:#a28cdb; background:#fff; font-weight:bold; font-family:inherit; font-size:14px;" onclick="openEventDetailModal()">+ 新增獨立行程</button>
@@ -210,6 +234,7 @@
         </div>
     </div>
 
+    <!-- 其餘 Modal 保持不變 (QuickStat, Stats, NightFee, EventDetail, Repeat) -->
     <div class="modal" id="quickStatModal" style="z-index: 40;">
         <div class="modal-content" style="max-width: 280px;">
             <h3 id="quickStatTitle" style="margin-bottom: 15px;">輸入數量</h3>
@@ -405,8 +430,20 @@
         let selectedEventColor = "blue";
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
+        // 🌟 新增：用來暫存當前正在編輯日期的 Icon 陣列
+        let currentSelectedIcons = [];
+        
+        // 🚨 Bug 修復：統一使用 myDreamCalendar_Data 作為存取名稱
+        const CALENDAR_STORAGE_KEY = 'myDreamCalendar_Data';
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar6')) || {}; } catch(e) {}
+        
+        try { 
+            // 嘗試讀取新的統一 Key，如果沒有，就去撈你之前存在 'myCustomCalendar6' 或是 'myCustomCalendar4' 的資料過來繼承
+            calendarData = JSON.parse(localStorage.getItem(CALENDAR_STORAGE_KEY)) || 
+                           JSON.parse(localStorage.getItem('myCustomCalendar6')) || 
+                           JSON.parse(localStorage.getItem('myCustomCalendar4')) || {}; 
+        } catch(e) {}
+        
         let globalStats = { hours: [], annualLeave: [] };
         try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats6')) || { hours: [], annualLeave: [] }; } catch(e) {}
         let currentStatType = 'hours';
@@ -567,10 +604,13 @@
                 let weeks = [];
                 for (let i = 0; i < calendarSlots.length; i += 7) weeks.push(calendarSlots.slice(i, i + 7));
 
+                let monthlyNightFee = 0;
+                currentMonthNightFees = [];
+
                 weeks.forEach(week => {
+                    
                     let wStart = week[0].dateKey;
                     let wEnd = week[6].dateKey;
-
                     let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
 
                     wEvents.sort((a, b) => {
@@ -601,12 +641,7 @@
                         }
                     });
                     week.tracks = tracks; 
-                });
 
-                let monthlyNightFee = 0;
-                currentMonthNightFees = [];
-
-                weeks.forEach(week => {
                     week.forEach((slot, dIdx) => {
                         const dateKey = slot.dateKey;
                         const i = slot.date;
@@ -622,8 +657,12 @@
                         const autoInfo = getAutoShift(y, m, d);
                         const cycleInfo = getCycleInfo(y, m, d);
                         
+                        // 🌟 取出存檔的快捷 Icons
+                        const dayIcons = savedData.icons || [];
+                        let iconsHtml = dayIcons.length > 0 ? `<div style="font-size:10px; margin-left:3px; display:inline-block; letter-spacing:-1px;">${dayIcons.join('')}</div>` : '';
+                        
                         let finalShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
-                        let isManual = savedData.shift !== undefined;
+                        let isManual = savedData.shift !== undefined || dayIcons.length > 0;
                         
                         if (slot.type === 'current' && finalShift) {
                             let tokens = finalShift.trim().split(/\s+/);
@@ -677,7 +716,7 @@
                             });
                         }
                         
-                        let dotIndicator = isManual && finalShift !== "" ? `<div class="manual-dot"></div>` : ``;
+                        let dotIndicator = isManual && (finalShift !== "" || dayIcons.length > 0) ? `<div class="manual-dot"></div>` : ``;
                         let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
                         
                         let bColor = cycleBorderColors[cycleInfo.idx % 4];
@@ -699,7 +738,9 @@
                             <div class="day ${todayHighlightClass} ${otherMonthClass}" style="${inlineStyle}" onclick="openModal('${dateKey}', '${y}年${m+1}月${d}日')">
                                 ${dotIndicator}
                                 <div class="day-row-1">
-                                    <div class="date-col"><span class="${dateClass}">${d}</span></div>
+                                    <div class="date-col" style="flex-direction:row; align-items:baseline;">
+                                        <span class="${dateClass}">${d}</span>${iconsHtml}
+                                    </div>
                                     ${htmlObj.topHtml}
                                 </div>
                                 ${row2Html}
@@ -729,8 +770,30 @@
             }
             document.getElementById('shiftLabel').innerHTML = `班別 ${historyStr}`;
 
+            // 🌟 處理快捷 Icons 回填
+            currentSelectedIcons = savedData.icons ? [...savedData.icons] : [];
+            document.querySelectorAll('#quickIconsWrap .icon-btn').forEach(btn => {
+                let emoji = btn.innerText;
+                if (currentSelectedIcons.includes(emoji)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
             renderEventListInModal();
             document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // 🌟 新增：切換選擇 Emoji
+        function toggleQuickIcon(btn, emoji) {
+            if (currentSelectedIcons.includes(emoji)) {
+                currentSelectedIcons = currentSelectedIcons.filter(e => e !== emoji);
+                btn.classList.remove('active');
+            } else {
+                currentSelectedIcons.push(emoji);
+                btn.classList.add('active');
+            }
         }
 
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
@@ -816,9 +879,15 @@
                 if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
                 savedData.shift = shiftVal;
             }
+            
+            // 🌟 儲存快捷 Icons
+            savedData.icons = [...currentSelectedIcons];
 
             cleanUpEmptyDate(selectedDateString);
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            
+            // 🚨 統一儲存為新的 Key
+            localStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(calendarData));
+            
             closeModal(); renderCalendar();
         }
 
@@ -896,7 +965,7 @@
             ex.forEach(ev => {
                 let rep = (ev.repeat && ev.repeat.type !== 'none') ? " 🔁" : "";
                 html += `
-                    <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
+                    <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')" style="cursor:pointer; border: 1px solid #eee; padding: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                         <div><strong style="color:#444; font-size:15px; font-weight:900;">${ev.title || "未命名"}${rep}</strong><div style="font-size:12px; color:#888; font-weight:700;">${ev.startDate} ~ ${ev.endDate || ev.startDate}</div></div>
                         <span style="color:#a28cdb; font-size:18px;">✎</span>
                     </div>`;
@@ -940,14 +1009,20 @@
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            
+            // 🚨 統一儲存為新的 Key
+            localStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(calendarData));
+            
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
         function deleteCurrentEvent() {
             if (!confirm("確定刪除此行程？(含所有重複)")) return;
             for (let k in calendarData) if (calendarData[k].events) { calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); cleanUpEmptyDate(k); }
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            
+            // 🚨 統一儲存為新的 Key
+            localStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(calendarData));
+            
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
@@ -986,7 +1061,10 @@
 
         function cleanUpEmptyDate(k) {
             let d = calendarData[k];
-            if (d && d.shift === undefined && (!d.events || d.events.length === 0) && (!d.shiftHistory || d.shiftHistory.length === 0)) delete calendarData[k];
+            // 包含檢查 icons 是否為空
+            if (d && d.shift === undefined && (!d.events || d.events.length === 0) && (!d.shiftHistory || d.shiftHistory.length === 0) && (!d.icons || d.icons.length === 0)) {
+                delete calendarData[k];
+            }
         }
 
         renderCalendar();
