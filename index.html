@@ -29,29 +29,35 @@
         
         .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 8px; }
         
-        .day { backdrop-filter: blur(3px); min-height: 100px; padding: 4px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; }
+        .day { backdrop-filter: blur(3px); min-height: 100px; padding: 5px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box; }
         .day:active { transform: scale(0.96); background: rgba(255, 255, 255, 1) !important; }
         .day.empty { background: transparent; box-shadow: none; border: none; cursor: default; }
         
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
-        .date-number { font-size: 13px; font-weight: bold; margin-bottom: 4px; margin-left: 2px; color: #666; display: flex; justify-content: space-between; align-items: center; }
+        /* 調整日期與班別水平排列的容器 */
+        .day-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        
+        .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; }
         .manual-dot { width: 6px; height: 6px; background-color: #ff6b6b; border-radius: 50%; display: inline-block; margin-left: 4px; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        .badge-container { display: flex; gap: 3px; align-items: center; }
+        .badge-container { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
         .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
         .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 3px rgba(255,107,129,0.3); }
         
-        .shift-badge { font-size: 11px; font-weight: bold; text-align: center; padding: 3px 6px; margin: 2px auto 4px auto; width: 95%; max-width: 68px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; box-shadow: 0 2px 4px rgba(182, 164, 227, 0.4); max-width: fit-content; padding: 2px 9px; }
-        .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 8px; }
-        .shift-green { background: #5ece9d; color: white; border: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(94, 206, 157, 0.3); }
-        .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 8px; }
+        /* 班別標籤調整為適應水平版面 */
+        .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 4px; max-width: 65%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; padding: 2px 6px; }
+        .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 6px; }
+        .shift-green { background: #5ece9d; color: white; border: none; border-radius: 6px; }
+        .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
         
-        .event-item { font-size: 11px; background: rgba(91, 155, 213, 0.1); border-left: 3px solid #84bde3; padding: 3px 5px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3e6e96; border-radius: 0 4px 4px 0; }
+        /* 行程記事區塊調整 */
+        .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 3px; }
+        .event-item { font-size: 10px; background: rgba(91, 155, 213, 0.15); border-left: 3px solid #84bde3; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3e6e96; border-radius: 0 4px 4px 0; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 210, 230, 0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 10; }
         .modal-content { background: rgba(255, 255, 255, 0.95); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(100,80,120,0.2); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.5); max-height: 88vh; overflow-y: auto; }
@@ -166,7 +172,6 @@
     </div>
 
     <script>
-        // --- 最新版：真實的 34 週班表資料庫 (8-4 1自動轉D1, 8-4 2轉D2) ---
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"],     // 01
             ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],  // 02
@@ -210,7 +215,6 @@
             const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             const targetMonday = new Date(year, month, date + diffToMonday, 0, 0, 0);
             
-            // 基準日不變：2026-07-06 對應第 14 週 (索引 13)
             const refDate = new Date(2026, 6, 6, 0, 0, 0); 
             const refWeekIdx = 13; 
             
@@ -218,7 +222,6 @@
             const daysDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
             const weeksDiff = Math.floor(daysDiff / 7);
             
-            // ★ 修改為 34 週循環
             let currentWeekIdx = (refWeekIdx + weeksDiff) % 34;
             if (currentWeekIdx < 0) currentWeekIdx += 34; 
             
@@ -271,7 +274,7 @@
                 const dateKey = `${year}-${month + 1}-${i}`;
                 const dayOfWeek = new Date(year, month, i).getDay();
                 
-                let dateClass = "date-number";
+                let dateClass = "date-box";
                 if (dayOfWeek === 0) dateClass += " sun-text";
                 if (dayOfWeek === 6) dateClass += " sat-text";
 
@@ -318,14 +321,18 @@
 
                 calendarEl.innerHTML += `
                     <div class="day ${cycleClass}" onclick="openModal('${dateKey}', '${year}年${month + 1}月${i}日', ${year}, ${month}, ${i})">
-                        <div class="${dateClass}">
-                            <div style="display:flex; align-items:center;">
+                        <div class="day-header">
+                            <div class="${dateClass}">
                                 <span>${i}</span>${dotIndicator}
                             </div>
-                            <div class="badge-container">${badgesHtml}</div>
+                            ${shiftHtml}
                         </div>
-                        ${shiftHtml}
-                        ${eventHtml}
+                        
+                        ${badgesHtml ? `<div class="badge-container">${badgesHtml}</div>` : ''}
+                        
+                        <div class="event-area">
+                            ${eventHtml}
+                        </div>
                     </div>
                 `;
             }
