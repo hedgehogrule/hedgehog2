@@ -57,8 +57,6 @@
         
         .event-item { font-size: 10px; padding: 3px 5px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .event-item-time { font-size: 8px; opacity: 0.8; }
-        .event-item-img { width: 100%; height: 35px; object-fit: cover; border-radius: 4px; margin-top: 2px; }
         
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
         .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
@@ -125,7 +123,7 @@
             <div class="modal-subtitle" id="modalSubtitle"></div>
             
             <div class="input-group">
-                <label>班別</label>
+                <label id="shiftLabel">班別</label>
                 <input type="text" id="shiftInput" placeholder="請點選下方快捷鍵填入">
                 
                 <div class="quick-section">
@@ -488,19 +486,17 @@
                                 }
 
                                 const cStyle = colorStyles[ev.color || 'blue'];
-                                let imgHtml = ev.photoUrl ? `<img src="${ev.photoUrl}" class="event-item-img">` : "";
-                                
                                 let showText = !hasLeft; 
 
+                                // 移除了照片顯示，高度統一設為 22px
                                 tracksHtml += `
-                                    <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: ${ev.photoUrl ? 'auto' : '22px'}; min-height:22px;">
+                                    <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle} height: 22px; min-height: 22px;">
                                         ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
-                                        ${(showText && imgHtml) ? imgHtml : ''}
                                     </div>
                                 `;
                             } else {
-                                let trackHasPhoto = trackLine.some(e => e && e.photoUrl);
-                                tracksHtml += `<div style="height: ${trackHasPhoto ? '61px' : '22px'}; pointer-events: none;"></div>`;
+                                // 空白軌道高度也固定為 22px 確保對齊
+                                tracksHtml += `<div style="height: 22px; pointer-events: none;"></div>`;
                             }
                         });
                     }
@@ -542,6 +538,13 @@
             const savedData = calendarData[dateKey] || {};
             document.getElementById('shiftInput').value = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
             
+            // 顯示前次班別紀錄
+            if (savedData.prevShift) {
+                document.getElementById('shiftLabel').innerHTML = `班別 <span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(前次紀錄: ${savedData.prevShift})</span>`;
+            } else {
+                document.getElementById('shiftLabel').innerHTML = `班別`;
+            }
+
             renderEventListInModal();
             document.getElementById('editModal').style.display = 'flex';
         }
@@ -560,11 +563,22 @@
             const autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
 
             if (!calendarData[selectedDateString]) calendarData[selectedDateString] = { events: [] };
+            
+            const savedData = calendarData[selectedDateString];
+            const currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
-                delete calendarData[selectedDateString].shift;
+                // 如果是變回預設班，且之前有改過，就記錄原本被改的班
+                if (savedData.shift !== undefined && savedData.shift !== autoInfo.shift) {
+                    savedData.prevShift = savedData.shift;
+                }
+                delete savedData.shift;
             } else {
-                calendarData[selectedDateString].shift = shiftVal;
+                // 如果設定為新班別，且跟目前顯示的不一樣，紀錄被換掉的班
+                if (currentDisplayShift !== shiftVal) {
+                    savedData.prevShift = currentDisplayShift;
+                }
+                savedData.shift = shiftVal;
             }
 
             cleanUpEmptyDate(selectedDateString);
@@ -753,7 +767,8 @@
 
         function cleanUpEmptyDate(dateKey) {
             const data = calendarData[dateKey];
-            if (data && data.shift === undefined && (!data.events || data.events.length === 0)) {
+            // 如果沒有手動班表、沒有行程、也沒有前次班別紀錄，就清空該日期的資料以節省空間
+            if (data && data.shift === undefined && (!data.events || data.events.length === 0) && data.prevShift === undefined) {
                 delete calendarData[dateKey];
             }
         }
