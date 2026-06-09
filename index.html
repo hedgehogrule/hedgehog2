@@ -36,7 +36,6 @@
         .day.cycle-even { background: var(--cycle-a-bg); border: 1px solid var(--cycle-a-border); }
         .day.cycle-odd { background: var(--cycle-b-bg); border: 1px solid var(--cycle-b-border); }
         
-        /* 調整：班別直接緊接在日期右邊，且拉長呈現空間 */
         .day-header { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%; }
         
         .date-box { font-size: 13px; font-weight: bold; color: #666; display: flex; align-items: center; flex-shrink: 0; }
@@ -48,29 +47,24 @@
         .week-badge { font-size: 9px; background: linear-gradient(135deg, #ffffff 0%, #e6d9ff 100%); color: #7a6baf; border: 1px solid #dcd0ff; border-radius: 6px; padding: 1px 3px; white-space: nowrap; font-weight: bold; }
         .cycle-start-badge { font-size: 9px; background: #ff6b81; color: white; border-radius: 6px; padding: 1px 4px; white-space: nowrap; font-weight: bold; box-shadow: 0 1px 3px rgba(255,107,129,0.3); }
         
-        /* 班別標籤：長度調整為兩倍寬，滿版延伸 */
         .shift-badge { font-size: 10px; font-weight: bold; text-align: center; padding: 2px 6px; flex-grow: 1; min-width: 42px; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .shift-off { background: #b6a4e3; color: white; border: none; border-radius: 14px; }
         .shift-d { background: #ffffff; color: #444444; border: 1px solid #ccd0d5; border-radius: 6px; }
         .shift-green { background: #5ece9d; color: white; border: none; border-radius: 6px; }
         .shift-default { background: #e9ecef; color: #555555; border: 1px solid #dee2e6; border-radius: 6px; }
         
-        /* 行程呈現區塊：左右外距縮緊以利跨格連續方框填滿間隙 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 4px; margin-left: -5px; margin-right: -5px; width: calc(100% + 10px); }
         
-        /* 獨立行程方框樣式 */
         .event-item { font-size: 10px; padding: 3px 5px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .event-item-time { font-size: 8px; opacity: 0.8; }
         .event-item-img { width: 100%; height: 35px; object-fit: cover; border-radius: 4px; margin-top: 2px; }
         
-        /* 顏色選擇器圓點樣式 */
         .color-picker-options { display: flex; gap: 10px; margin-top: 6px; }
         .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
         .color-dot:active { transform: scale(0.9); }
         .color-dot.selected { border-color: #444; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
         
-        /* Modal 共用樣式 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 20px 15px; width: 92%; max-width: 440px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; color: #444; text-align: center; }
@@ -146,6 +140,11 @@
                         <button class="quick-btn" onclick="setShift('D6')">D6</button>
                         <button class="quick-btn" onclick="setShift('D7')">D7</button>
                         <button class="quick-btn" onclick="setShift('D8')">D8</button>
+                        <button class="quick-btn" onclick="setShift('D9')">D9</button>
+                        <button class="quick-btn" onclick="setShift('D10')">D10</button>
+                        <button class="quick-btn" onclick="setShift('D11')">D11</button>
+                        <button class="quick-btn" onclick="setShift('D12')">D12</button>
+                        <button class="quick-btn" onclick="setShift('D13')">D13</button>
                         <button class="quick-btn" onclick="setShift('DB1')">DB1</button>
                     </div>
                 </div>
@@ -155,9 +154,15 @@
                     <div class="quick-options">
                         <button class="quick-btn quick-btn-green" onclick="setShift('12-8 1')">12-8 1</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('12-8 2')">12-8 2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 3')">12-8 3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 4')">12-8 4</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 5')">12-8 5</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('E1')">E1</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('E2')">E2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E3')">E3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E4')">E4</button>
                         <button class="quick-btn quick-btn-green" onclick="setShift('N1')">N1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('N2')">N2</button>
                     </div>
                 </div>
 
@@ -166,6 +171,7 @@
                     <div class="quick-options">
                         <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('D\'OFF')">D'OFF</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('OFF.B')">OFF.B</button>
                         <button class="quick-btn" onclick="setShift('9-5訪')">9-5訪</button>
                         <button class="quick-btn quick-btn-clear" onclick="setShift('')">重置班別</button>
                     </div>
@@ -262,7 +268,6 @@
             ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
         ];
 
-        // 6款色系色碼對照表
         const colorStyles = {
             blue: { bg: 'rgba(91, 155, 213, 0.2)', text: '#3e6e96', border: '#84bde3' },
             pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
@@ -301,7 +306,6 @@
         let selectedEventColor = "blue";
         let calendarData = JSON.parse(localStorage.getItem('myCustomCalendar3')) || {}; 
 
-        // 提取系統中不重複的所有獨立行程
         function getAllEvents() {
             let all = [];
             let seenIds = new Set();
@@ -318,7 +322,6 @@
             return all;
         }
 
-        // 綁定選色圓點點擊事件
         document.querySelectorAll('.color-dot').forEach(dot => {
             dot.addEventListener('click', function() {
                 document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
@@ -335,7 +338,6 @@
             });
         }
 
-        // --- 核心算圖渲染邏輯：將單月格子切分出週行，進行水平跨格排軌 ---
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -347,7 +349,6 @@
             firstDay = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            // 建立日曆總格子陣列
             let calendarSlots = [];
             for (let i = 0; i < firstDay; i++) {
                 calendarSlots.push({ type: 'empty' });
@@ -362,7 +363,6 @@
                 });
             }
 
-            // 將格子切成「週列」(每列7天) 用於計算水平軌道線
             let weeks = [];
             for (let i = 0; i < calendarSlots.length; i += 7) {
                 weeks.push(calendarSlots.slice(i, i + 7));
@@ -370,33 +370,29 @@
 
             const allEvents = getAllEvents();
 
-            // 週軌道演算法核心：計算每一週行程的上下對齊高度
             weeks.forEach(week => {
                 let dayRealObj = week.filter(d => d.type === 'day');
                 if (dayRealObj.length === 0) return;
                 let wStart = dayRealObj[0].dateKey;
                 let wEnd = dayRealObj[dayRealObj.length - 1].dateKey;
 
-                // 篩選與這週有交集的行程
                 let wEvents = allEvents.filter(ev => {
                     return ev.startDate <= wEnd && (ev.endDate || ev.startDate) >= wStart;
                 });
 
-                // 長行程優先排在上方軌道
                 wEvents.sort((a, b) => {
                     let lenA = new Date(a.endDate) - new Date(a.startDate);
                     let lenB = new Date(b.endDate) - new Date(b.startDate);
                     return lenB - lenA || a.id.localeCompare(b.id);
                 });
 
-                let tracks = []; // 存放各層軌道的分配狀況
+                let tracks = []; 
                 wEvents.forEach(ev => {
                     let assigned = false;
                     let trackIdx = 0;
                     while (!assigned) {
                         if (!tracks[trackIdx]) tracks[trackIdx] = Array(7).fill(null);
                         
-                        // 檢查該軌道這幾天是否被佔用
                         let conflict = false;
                         for (let dIdx = 0; dIdx < 7; dIdx++) {
                             if (week[dIdx].type === 'day') {
@@ -424,10 +420,9 @@
                         }
                     }
                 });
-                week.tracks = tracks; // 將這週算好的軌道資料存回 week 物件
+                week.tracks = tracks; 
             });
 
-            // 開始生成 HTML 畫面
             weeks.forEach(week => {
                 week.forEach((slot, dIdx) => {
                     if (slot.type === 'empty') {
@@ -459,24 +454,20 @@
                         else shiftHtml = `<div class="shift-badge shift-default">${finalShift}</div>`;
                     }
 
-                    // 渲染該格子的所有軌道行程
                     let tracksHtml = "";
                     if (week.tracks && week.tracks.length > 0) {
                         week.tracks.forEach(trackLine => {
                             const ev = trackLine[dIdx];
                             if (ev) {
-                                // 判斷本地週內連續性 (用於計算跨格方框連接)
                                 let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].id === ev.id);
                                 let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].id === ev.id);
                                 
-                                // 判斷全域跨週連續性 (用於週邊界壓平圓角)
                                 let globalLeft = (ev.startDate < dateKey);
                                 let globalRight = ((ev.endDate || ev.startDate) > dateKey);
 
                                 let marginStyle = "";
                                 let radiusStyle = "border-radius: 4px;";
 
-                                // 關鍵 CSS 技術：利用負外距 (Negative Margin) 自動填滿格子的 Grid Gap 縫隙，達成連貫方框
                                 if (hasRight) {
                                     marginStyle += "margin-right: -7px; position: relative; z-index: 2;";
                                     radiusStyle = "border-radius: 4px 0 0 4px;";
@@ -489,7 +480,6 @@
                                     radiusStyle = "border-radius: 0;";
                                 }
 
-                                // 處理邊界
                                 if (dIdx === 0 && globalLeft) {
                                     radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 4px 4px 0;";
                                 }
@@ -500,7 +490,6 @@
                                 const cStyle = colorStyles[ev.color || 'blue'];
                                 let imgHtml = ev.photoUrl ? `<img src="${ev.photoUrl}" class="event-item-img">` : "";
                                 
-                                // 後續天數只呈現色塊線條，不重覆顯示字體，乾淨清晰
                                 let showText = !hasLeft; 
 
                                 tracksHtml += `
@@ -510,7 +499,6 @@
                                     </div>
                                 `;
                             } else {
-                                // 空白軌道：置入透明佔位符，確保隔壁天同一條行程在水平線上能對齊
                                 let trackHasPhoto = trackLine.some(e => e && e.photoUrl);
                                 tracksHtml += `<div style="height: ${trackHasPhoto ? '61px' : '22px'}; pointer-events: none;"></div>`;
                             }
@@ -543,7 +531,6 @@
             renderCalendar();
         }
 
-        // --- 主彈出視窗：修改班表及列表檢視 ---
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
@@ -586,7 +573,6 @@
             renderCalendar();
         }
 
-        // 行程列表優化：凡包含此日期的多天行程，皆會呈現在編輯清單內
         function renderEventListInModal() {
             const listEl = document.getElementById('existingEventsList');
             listEl.innerHTML = "";
@@ -610,7 +596,6 @@
             }
         }
 
-        // --- 獨立行程詳細規格設定視窗 (開始日、結束日、顏色選取、相片) ---
         let currentEditingEventId = null;
         let tempPhotoBase64 = "";
 
@@ -646,7 +631,7 @@
             } else {
                 document.getElementById('eventModalTitle').innerText = "新增獨立行程";
                 document.getElementById('deleteEventBtn').style.display = "none";
-                selectColorInPicker('blue'); // 預設藍色
+                selectColorInPicker('blue'); 
             }
 
             document.getElementById('eventDetailModal').style.display = 'flex';
@@ -723,7 +708,6 @@
                 return;
             }
 
-            // 封裝行程物件
             const eventObj = {
                 id: currentEditingEventId || (Date.now().toString() + Math.random().toString(36).substr(2, 5)),
                 title: title,
@@ -735,7 +719,6 @@
                 photoUrl: tempPhotoBase64
             };
 
-            // 全域資料清理與更新
             if (currentEditingEventId) {
                 for (let key in calendarData) {
                     if (calendarData[key].events) {
@@ -744,7 +727,6 @@
                 }
             }
 
-            // 一律將主要實體儲存在其開始日期的節點下
             if (!calendarData[startD]) calendarData[startD] = { events: [] };
             if (!calendarData[startD].events) calendarData[startD].events = [];
             calendarData[startD].events.push(eventObj);
