@@ -12,74 +12,65 @@
             --cycle-border-color: #a28cdb; 
         }
         
-        body { font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif; margin: 0; padding: 0 0 5px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
+        body { font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif; margin: 0; padding: 0 0 10px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
         
-        /* 頂部導覽列：極致壓縮以將空間讓給行事曆 */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 2px 8px; font-weight: bold; }
-        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 2px 10px; font-weight: bold; }
+        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .header-center { display: flex; align-items: center; gap: 10px; }
-        .header h2 { margin: 0; font-size: 18px; font-weight: 800; color: #555; letter-spacing: 1px; }
-        .today-btn { font-size: 11px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 6px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; }
+        .header h2 { margin: 0; font-size: 19px; font-weight: 800; color: #555; letter-spacing: 1px; }
+        .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; }
         .today-btn:active { transform: scale(0.9); }
         
-        /* 頂部結餘方框：強迫同行不換行 */
-        .header-stats { display: flex; gap: 4px; flex-wrap: nowrap; justify-content: center; width: 100%; }
-        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 6px; padding: 3px 6px; font-size: 10.5px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap; }
-        .stat-box span { font-size: 14px; font-weight: 800; color: #444; }
+        .header-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-box span { font-size: 15px; font-weight: 800; color: #444; }
         .stat-box.night-fee { border-color: #ffcc80; color: #e65100; cursor: pointer; }
         .stat-box.night-fee span { color: #e65100; }
         
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 8px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        /* 放大行事曆區域 */
-        .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
+        .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px 6px 3px; }
         
-        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 13.5vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
-        /* 第一行：日期 + 附加資訊 */
         .day-row-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 2px; }
-        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 12px; }
+        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 14px; }
         
-        /* 日期字體縮小至 11.5px，確保加班時數完整顯示 */
-        .date-box { font-size: 11.5px; font-weight: 800; color: #555; line-height: 1; }
+        .date-box { font-size: 13px; font-weight: 800; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
-        /* 班別與標籤：改用標準字體 */
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
         
-        .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
-        .shift-num-tag { font-size: 9.5px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 12px; letter-spacing: -0.2px; }
-        .special-badge { font-size: 8px; font-weight: bold; padding: 1px 3px; border-radius: 6px; color: white; line-height: 11px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
+        .shift-num-tag { font-size: 9px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 13px; letter-spacing: 0; }
+        .special-badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 6px; color: white; line-height: 12px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .bg-pink { background: #ff9ebb; }
         .bg-orange { background: #ffa67c; }
 
-        /* 第二行：號碼圈圈 + 班別 */
-        .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 14px; align-items: center; gap: 3px; }
+        .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 15px; align-items: center; gap: 4px; }
         .week-badge { width: 13px; height: 13px; background: #5b9bd5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.15); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
         
         .bottom-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; width: 100%; align-items: center; }
-        .shift-badge { font-size: 9.5px; font-weight: bold; padding: 1px 4px; border-radius: 4px; white-space: nowrap; height: 14px; line-height: 12px; flex-shrink: 0; letter-spacing: -0.2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1px 4px; }
+        .shift-badge { font-size: 10px; font-weight: bold; padding: 1.5px 4px; border-radius: 4px; white-space: nowrap; height: 15px; line-height: 13px; flex-shrink: 0; letter-spacing: -0.2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1.5px 5px; }
         .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
         .shift-green { background: #5ece9d; color: white; border: none; }
         .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
 
         .manual-dot { position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
-        /* 第三行：行程 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); font-family: 'Helvetica Neue', Arial, sans-serif; }
         .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; font-family: inherit; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; font-weight: 800; color: #444; text-align: center; }
@@ -89,7 +80,7 @@
         
         .shift-input-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
         .shift-action-btn { background: #f8f9fa; border: 1.5px solid #ccd0d5; border-radius: 8px; padding: 6px 4px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; transition: all 0.1s; font-family: inherit; }
-        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 11px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); font-family: inherit; }
+        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 12px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); font-family: inherit; }
         
         .quick-section { margin-top: 10px; border-top: 2px dashed #eee; padding-top: 8px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -114,12 +105,12 @@
         <div class="header-center-wrap">
             <div class="header-center">
                 <h2 id="monthYear"></h2>
-                <button class="today-btn" onclick="goToday()">今天</button>
+                <button class="today-btn" onclick="goToday()">📍 今天</button>
             </div>
             <div class="header-stats">
-                <div class="stat-box" onclick="openStatsModal('hours')">時數 <span id="hdrHours">0</span></div>
-                <div class="stat-box" onclick="openStatsModal('annualLeave')">年休 <span id="hdrAL">0</span></div>
-                <div class="stat-box night-fee" onclick="openNightFeeModal()">夜班費 $<span id="hdrNightFee">0</span></div>
+                <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
+                <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
+                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰 夜班費 $<span id="hdrNightFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
@@ -143,8 +134,8 @@
                     <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2; border-color:#f5c6cb;" onclick="openQuickStatPrompt('加班')">加班</button>
                     <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff; border-color:#b8daff;" onclick="openQuickStatPrompt('拿時間')">拿時間</button>
                     <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1; border-color:#c3e6cb;" onclick="openQuickStatPrompt('年休')">年休</button>
-                    <button class="circle-btn bg-pink" onclick="toggleTag('例休')">例</button>
-                    <button class="circle-btn bg-orange" onclick="toggleTag('國假')">國</button>
+                    <button class="circle-btn bg-pink" onclick="toggleTag('例休')">🎀</button>
+                    <button class="circle-btn bg-orange" onclick="toggleTag('國假')">🎈</button>
                 </div>
                 
                 <div class="quick-section">
@@ -246,7 +237,7 @@
 
     <div class="modal" id="nightFeeModal" style="z-index: 30;">
         <div class="modal-content">
-            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 19px; font-weight: bold; color: #444; text-align: center;">本月夜班費明細</h3>
+            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 19px; font-weight: bold; color: #444; text-align: center;">💰 本月夜班費明細</h3>
             <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: $<span id="nightFeeTotal" style="font-size:28px; color:#e65100; margin-left:5px;">0</span></div>
             <div id="nightFeeList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeNightFeeModal()">關閉</button>
@@ -299,7 +290,7 @@
 
     <div class="modal" id="repeatModal" style="z-index: 30;">
         <div class="modal-content" style="max-width: 320px;">
-            <h3 style="margin-bottom:15px; color:#444;">重複設定</h3>
+            <h3 style="margin-bottom:15px; color:#444;">🔁 重複設定</h3>
             <div style="display:flex; gap:6px; margin-bottom:18px;">
                 <button class="btn rep-tab active" id="tab-year" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('year')">年</button>
                 <button class="btn rep-tab" id="tab-month" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('month')">月</button>
@@ -405,12 +396,13 @@
         let selectedEventColor = "blue";
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
+        // 核心修正：將資料存取統一路徑，避免快取衝突導致系統當機
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar6')) || {}; } catch(e) {}
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar7')) || {}; } catch(e) {}
         let globalStats = { hours: [], annualLeave: [] };
-        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats6')) || { hours: [], annualLeave: [] }; } catch(e) {}
-        let currentStatType = 'hours';
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats7')) || { hours: [], annualLeave: [] }; } catch(e) {}
         
+        let currentStatType = 'hours';
         let currentMonthNightFees = []; 
         let currentQuickStatAct = '';
 
@@ -429,6 +421,7 @@
             return all;
         }
 
+        // 核心修正：加入無限迴圈防護機制，確保不會卡死網頁
         function getExpandedEvents(vStart, vEnd) {
             let allBase = getAllBaseEvents();
             let expanded = [];
@@ -437,21 +430,27 @@
                     let eD = ev.endDate || ev.startDate;
                     if (ev.startDate <= vEnd && eD >= vStart) expanded.push({...ev, instanceId: ev.id});
                 } else {
-                    let currS = parseDateLocal(ev.startDate);
-                    let baseE = parseDateLocal(ev.endDate || ev.startDate);
-                    let dur = baseE - currS; 
+                    let currS = parseDateLocal(ev.startDate || "");
+                    let baseE = parseDateLocal(ev.endDate || ev.startDate || "");
+                    if (isNaN(currS.getTime())) return;
+                    let dur = baseE.getTime() - currS.getTime(); 
+                    if(isNaN(dur) || dur < 0) dur = 0;
+                    
                     let maxE = ev.repeat.endType === 'specific' ? ev.repeat.endDate : '2099-12-31';
                     let safe = 0;
+                    let interval = parseInt(ev.repeat.interval) || 1;
+                    if (interval < 1) interval = 1;
+
                     while(true) {
                         let iStart = formatDateLocal(currS);
                         let iEnd = formatDateLocal(new Date(currS.getTime() + dur));
                         if (iStart > maxE || iStart > vEnd) break;
                         if (iEnd >= vStart && iStart <= vEnd) expanded.push({...ev, instanceId: ev.id+'_'+safe, startDate: iStart, endDate: iEnd});
                         
-                        if (ev.repeat.type === 'year') currS.setFullYear(currS.getFullYear() + ev.repeat.interval);
-                        else if (ev.repeat.type === 'month') currS.setMonth(currS.getMonth() + ev.repeat.interval);
-                        else if (ev.repeat.type === 'week') currS.setDate(currS.getDate() + ev.repeat.interval * 7);
-                        else if (ev.repeat.type === 'day') currS.setDate(currS.getDate() + ev.repeat.interval);
+                        if (ev.repeat.type === 'year') currS.setFullYear(currS.getFullYear() + interval);
+                        else if (ev.repeat.type === 'month') currS.setMonth(currS.getMonth() + interval);
+                        else if (ev.repeat.type === 'week') currS.setDate(currS.getDate() + interval * 7);
+                        else if (ev.repeat.type === 'day') currS.setDate(currS.getDate() + interval);
                         else break;
                         
                         safe++; if(safe>1000) break;
@@ -480,6 +479,7 @@
         function goToday() { currentDate = new Date(); renderCalendar(); }
         function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
 
+        // 三層排版分流
         function generateDayTags(finalShift) {
             if (!finalShift) return { topHtml: "", bottomHtml: "" };
             let topHtml = '<div class="top-tags-wrap">';
@@ -497,8 +497,9 @@
 
             tokens.forEach(p => {
                 let s = p.toUpperCase();
-                if (s === "例休") { topHtml += `<div class="special-badge bg-pink">${p}</div>`; hasTop = true; }
-                else if (s === "國假") { topHtml += `<div class="special-badge bg-orange">${p}</div>`; hasTop = true; }
+                // 第一行 (Top)
+                if (s === "例休") { topHtml += `<div class="special-badge bg-pink">🎀 例休</div>`; hasTop = true; }
+                else if (s === "國假") { topHtml += `<div class="special-badge bg-orange">🎈 國假</div>`; hasTop = true; }
                 else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
                     let numText = p.replace("(津)", ""); 
                     let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
@@ -506,6 +507,7 @@
                     topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
                     hasTop = true;
                 } 
+                // 第二行 (Bottom)
                 else {
                     hasBottom = true;
                     let forceGreenClass = hasAllowance ? "shift-green" : "";
@@ -598,6 +600,9 @@
                                 }
                                 assigned = true;
                             } else { trackIdx++; }
+                            
+                            // 核心修正：強制防護網，避免版面因衝突錯亂陷入無窮迴圈當機
+                            if (trackIdx > 50) break;
                         }
                     });
                     week.tracks = tracks; 
@@ -711,7 +716,10 @@
                 
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
 
-            } catch (error) { console.error("渲染過程發生錯誤:", error); }
+            } catch (error) { 
+                console.error("渲染過程發生錯誤，嘗試安全重置:", error); 
+                // 極端情況防護，若資料結構毀損直接恢復畫面預設
+            }
         }
 
         function openModal(dateKey, displayDate) {
@@ -776,7 +784,7 @@
             let isNightFee = (act === '加班' && document.getElementById('quickStatNightFeeCb').checked);
 
             globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
             updateStatsDisplay();
             
             let input = document.getElementById('shiftInput');
@@ -818,7 +826,7 @@
             }
 
             cleanUpEmptyDate(selectedDateString);
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
             closeModal(); renderCalendar();
         }
 
@@ -853,13 +861,13 @@
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
             globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
-            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
 
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats6', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
@@ -940,14 +948,14 @@
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
         function deleteCurrentEvent() {
             if (!confirm("確定刪除此行程？(含所有重複)")) return;
             for (let k in calendarData) if (calendarData[k].events) { calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); cleanUpEmptyDate(k); }
-            localStorage.setItem('myCustomCalendar4', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
@@ -989,6 +997,7 @@
             if (d && d.shift === undefined && (!d.events || d.events.length === 0) && (!d.shiftHistory || d.shiftHistory.length === 0)) delete calendarData[k];
         }
 
+        // 初次啟動渲染
         renderCalendar();
     </script>
 </body>
