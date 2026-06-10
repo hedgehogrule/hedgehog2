@@ -521,7 +521,7 @@
             tokens.forEach(p => {
                 let s = p.toUpperCase();
                 if (s === "例休") { topHtml += `<div class="special-badge bg-pink">🎀 例休</div>`; hasTop = true; }
-                else if (s === "國假") { topHtml += `<div class="special-badge bg-orange">🎈 國假</div>`; hasTop = true; }
+                else if (s === "國假") { topHtml += `<div class="week-badge" style="background:#ffa67c;">國</div>`; hasTop = true; }
                 else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
                     let numText = p.replace("(津)", ""); 
                     let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
