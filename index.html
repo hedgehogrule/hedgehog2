@@ -12,75 +12,81 @@
             --cycle-border-color: #a28cdb; 
         }
         
-        body { font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif; margin: 0; padding: 0 0 10px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
+        body { font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif; margin: 0; padding: 0 0 5px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 2px 10px; font-weight: bold; }
-        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        /* 頂部導覽列 */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .header button { background: none; border: none; font-size: 22px; color: #777; cursor: pointer; padding: 2px 8px; font-weight: bold; }
+        .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
         .header-center { display: flex; align-items: center; gap: 10px; }
-        .header h2 { margin: 0; font-size: 19px; font-weight: 800; color: #555; letter-spacing: 1px; }
-        .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; }
+        .header h2 { margin: 0; font-size: 18px; font-weight: 800; color: #555; letter-spacing: 1px; }
+        .today-btn { font-size: 11px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 2px 6px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; }
         .today-btn:active { transform: scale(0.9); }
         
-        .header-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-box span { font-size: 15px; font-weight: 800; color: #444; }
+        /* 頂部結餘方框 */
+        .header-stats { display: flex; gap: 4px; flex-wrap: nowrap; justify-content: center; width: 100%; }
+        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 6px; padding: 3px 5px; font-size: 10px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; gap: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap; }
+        .stat-box span { font-size: 13px; font-weight: 800; color: #444; }
         .stat-box.night-fee { border-color: #ffcc80; color: #e65100; cursor: pointer; }
         .stat-box.night-fee span { color: #e65100; }
         
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 8px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px 6px 3px; }
+        /* 放大行事曆區域 */
+        .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
         
-        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 13.5vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
+        /* 第一行排版 */
         .day-row-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 2px; }
-        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 14px; }
-        
-        .date-box { font-size: 13px; font-weight: 800; color: #555; line-height: 1; }
+        .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 12px; }
+        .date-box { font-size: 11px; font-weight: 800; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
         
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
         
-        .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
-        .shift-num-tag { font-size: 9px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 13px; letter-spacing: 0; }
-        .special-badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 6px; color: white; line-height: 12px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
+        .shift-num-tag { font-size: 9.5px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 12px; letter-spacing: -0.2px; }
+        .special-badge { font-size: 8px; font-weight: bold; padding: 1px 3px; border-radius: 6px; color: white; line-height: 11px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .bg-pink { background: #ff9ebb; }
         .bg-orange { background: #ffa67c; }
 
-        .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 15px; align-items: center; gap: 4px; }
+        /* 第二行排版 */
+        .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 14px; align-items: center; gap: 3px; }
         .week-badge { width: 13px; height: 13px; background: #5b9bd5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.15); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
         
         .bottom-tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; width: 100%; align-items: center; }
-        .shift-badge { font-size: 10px; font-weight: bold; padding: 1.5px 4px; border-radius: 4px; white-space: nowrap; height: 15px; line-height: 13px; flex-shrink: 0; letter-spacing: -0.2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1.5px 5px; }
+        .shift-badge { font-size: 9.5px; font-weight: bold; padding: 1px 4px; border-radius: 4px; white-space: nowrap; height: 14px; line-height: 12px; flex-shrink: 0; letter-spacing: -0.2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .shift-off { background: #b6a4e3; color: white; border-radius: 6px; padding: 1px 4px; }
         .shift-d { background: #ffffff; color: #444444; border: 0.5px solid #ccc; }
         .shift-green { background: #5ece9d; color: white; border: none; }
         .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
 
         .manual-dot { position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
+        /* 第三行：行程 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); font-family: 'Helvetica Neue', Arial, sans-serif; }
         .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* Modal 彈出視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 10; font-family: inherit; }
         .modal-content { background: rgba(255, 255, 255, 0.98); padding: 15px; width: 92%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; font-weight: 800; color: #444; text-align: center; }
+        .modal h3 { margin-top: 0; margin-bottom: 5px; font-size: 18px; color: #444; text-align: center; }
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 13px; margin-bottom: 4px; font-weight: bold; color: #666; }
         .input-group input, .input-group select { width: 100%; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fafafa; font-family: inherit; }
         
         .shift-input-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
         .shift-action-btn { background: #f8f9fa; border: 1.5px solid #ccd0d5; border-radius: 8px; padding: 6px 4px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; transition: all 0.1s; font-family: inherit; }
-        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 12px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); font-family: inherit; }
+        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 11px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); font-family: inherit; }
         
         .quick-section { margin-top: 10px; border-top: 2px dashed #eee; padding-top: 8px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -96,6 +102,21 @@
 
         .btn-row { display: flex; gap: 8px; margin-top: 12px; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; font-family: inherit; }
+        
+        /* 調整：縮小重複按鈕樣式，使其適合並排 */
+        .repeat-display-btn { padding: 8px 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 12px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: inherit; white-space: nowrap; height: 38px; box-sizing: border-box; }
+        
+        /* 照片上傳樣式 */
+        .photo-preview-box { width: 100%; height: 100px; border-radius: 8px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 8px; position: relative; cursor: pointer; }
+        .photo-preview-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        .photo-placeholder { color: #999; font-size: 12px; pointer-events: none; }
+        .remove-photo-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; cursor: pointer; display: none; z-index: 5; }
+        .repeat-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .rep-tab { flex: 1; padding: 8px; background: #f1f1f1; border: 1px solid #ddd; border-radius: 6px; font-weight: bold; color: #666; cursor: pointer; }
+        .rep-tab.active { background: #5b9bd5; color: white; border-color: #5b9bd5; }
+        .repeat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
+        .repeat-row label { margin-bottom: 0; font-size: 14px; color: #555; }
+        .repeat-summary { background: #f8f9fa; border-radius: 8px; padding: 10px; border-left: 4px solid #5b9bd5; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -247,14 +268,17 @@
     <div class="modal" id="eventDetailModal" style="z-index: 20;">
         <div class="modal-content">
             <h3 id="eventModalTitle">新增行程</h3>
-            <div class="input-group">
-                <label>行程標題 <span style="color:red">*</span></label>
-                <input type="text" id="eventTitle" placeholder="例如: 墾丁三日遊">
+            
+            <div class="input-group" style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label>行程標題 <span style="color:red">*</span></label>
+                    <input type="text" id="eventTitle" placeholder="例如: 墾丁三日遊">
+                </div>
+                <div style="flex-shrink: 0;">
+                    <button id="repeatDisplayBtn" class="repeat-display-btn" onclick="openRepeatModal()">不重複</button>
+                </div>
             </div>
-            <div class="input-group">
-                <label>重複設定</label>
-                <div id="repeatDisplayBtn" style="width: 100%; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 10px; font-size: 14px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: inherit;" onclick="openRepeatModal()">不重複</div>
-            </div>
+
             <div class="input-group">
                 <label>行程呈現顏色</label>
                 <div class="color-picker-options" id="colorPickerContainer">
@@ -280,6 +304,17 @@
                     <input type="time" id="eventEndTime">
                 </div>
             </div>
+            
+            <div class="input-group">
+                <label>附上照片 (點擊框框上傳)</label>
+                <input type="file" id="eventPhotoInput" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
+                <div class="photo-preview-box" onclick="document.getElementById('eventPhotoInput').click()">
+                    <span class="photo-placeholder" id="photoPlaceholder">+ 點擊上傳照片</span>
+                    <img id="eventPhotoPreview" src="">
+                    <button class="remove-photo-btn" id="removePhotoBtn" onclick="removePhoto(event)">X</button>
+                </div>
+            </div>
+
             <button id="deleteEventBtn" style="display:none; width:100%; background:#ffefef; color:#ff6b6b; border:2px solid #ffcccc; padding:10px; border-radius:10px; font-weight:bold; font-family:inherit; font-size:14px; margin-top:5px;" onclick="deleteCurrentEvent()">刪除此行程</button>
             <div class="btn-row">
                 <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeEventDetailModal()">返回</button>
@@ -291,25 +326,25 @@
     <div class="modal" id="repeatModal" style="z-index: 30;">
         <div class="modal-content" style="max-width: 320px;">
             <h3 style="margin-bottom:15px; color:#444;">🔁 重複設定</h3>
-            <div style="display:flex; gap:6px; margin-bottom:18px;">
-                <button class="btn rep-tab active" id="tab-year" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('year')">年</button>
-                <button class="btn rep-tab" id="tab-month" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('month')">月</button>
-                <button class="btn rep-tab" id="tab-week" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('week')">週</button>
-                <button class="btn rep-tab" id="tab-day" style="background:#f1f1f1; color:#666; padding:8px;" onclick="setRepType('day')">日</button>
+            <div class="repeat-tabs">
+                <button class="rep-tab active" id="tab-year" onclick="setRepType('year')">年</button>
+                <button class="rep-tab" id="tab-month" onclick="setRepType('month')">月</button>
+                <button class="rep-tab" id="tab-week" onclick="setRepType('week')">週</button>
+                <button class="rep-tab" id="tab-day" onclick="setRepType('day')">日</button>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <label style="font-size:15px; font-weight:bold; color:#555;">頻率</label>
+            <div class="repeat-row">
+                <label>頻率</label>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input type="number" id="repInterval" value="1" min="1" onchange="updateRepSummary()" style="width:60px; text-align:center; font-size:15px; font-weight:bold;">
                     <span id="repUnitText" style="color:#555; font-weight:bold; font-size:15px;">年</span>
                 </div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <label style="font-size:15px; font-weight:bold; color:#555;">開始</label>
+            <div class="repeat-row">
+                <label>開始</label>
                 <div id="repStartText" style="color:#5b9bd5; font-weight:bold; font-size:14px;"></div>
             </div>
-            <div style="margin-bottom:15px;">
-                <label style="font-size:15px; font-weight:bold; color:#555; display:block; margin-bottom:8px;">結束</label>
+            <div class="repeat-row">
+                <label>結束</label>
                 <div style="display:flex; gap:18px; margin-left:10px;">
                     <label style="font-size:14px; font-weight:bold;"><input type="radio" name="repEndType" value="none" checked onchange="updateRepSummary()"> 沒有</label>
                     <label style="font-size:14px; font-weight:bold;"><input type="radio" name="repEndType" value="specific" onchange="updateRepSummary()"> 指定</label>
@@ -318,7 +353,7 @@
             <div id="repEndDateContainer" style="display:none; margin-bottom:15px; padding-left:10px;">
                 <input type="date" id="repEndDate" onchange="updateRepSummary()" style="width:95%;">
             </div>
-            <div style="background:#f8f9fa; border-radius:10px; padding:12px; border-left:4px solid #5b9bd5;">
+            <div class="repeat-summary">
                 <span style="font-size:12px; color:#888; font-weight:bold;">概要</span>
                 <div id="repSummaryText" style="font-weight:bold; color:#3e6e96; margin-top:4px; font-size:14px;"></div>
             </div>
@@ -396,15 +431,15 @@
         let selectedEventColor = "blue";
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
-        // 核心修正：將資料存取統一路徑，避免快取衝突導致系統當機
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar7')) || {}; } catch(e) {}
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar8')) || {}; } catch(e) {}
         let globalStats = { hours: [], annualLeave: [] };
-        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats7')) || { hours: [], annualLeave: [] }; } catch(e) {}
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || { hours: [], annualLeave: [] }; } catch(e) {}
         
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
         let currentQuickStatAct = '';
+        let tempPhotoBase64 = "";
 
         function updateStatsDisplay() {
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
@@ -421,7 +456,6 @@
             return all;
         }
 
-        // 核心修正：加入無限迴圈防護機制，確保不會卡死網頁
         function getExpandedEvents(vStart, vEnd) {
             let allBase = getAllBaseEvents();
             let expanded = [];
@@ -460,26 +494,16 @@
             return expanded;
         }
 
-        document.querySelectorAll('.color-dot').forEach(dot => {
-            dot.addEventListener('click', function() {
-                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedEventColor = this.getAttribute('data-color');
-            });
-        });
+        function setShift(v) { document.getElementById('shiftInput').value = v; }
 
-        function selectColorInPicker(c) {
-            selectedEventColor = c || 'blue';
-            document.querySelectorAll('.color-dot').forEach(d => {
-                if (d.getAttribute('data-color') === selectedEventColor) d.classList.add('selected');
-                else d.classList.remove('selected');
-            });
+        function toggleTag(tag) {
+            let input = document.getElementById('shiftInput');
+            let parts = input.value.split(/\s+/).filter(Boolean);
+            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
+            else parts.push(tag);
+            input.value = parts.join(' ');
         }
 
-        function goToday() { currentDate = new Date(); renderCalendar(); }
-        function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
-
-        // 三層排版分流
         function generateDayTags(finalShift) {
             if (!finalShift) return { topHtml: "", bottomHtml: "" };
             let topHtml = '<div class="top-tags-wrap">';
@@ -497,7 +521,6 @@
 
             tokens.forEach(p => {
                 let s = p.toUpperCase();
-                // 第一行 (Top)
                 if (s === "例休") { topHtml += `<div class="special-badge bg-pink">🎀 例休</div>`; hasTop = true; }
                 else if (s === "國假") { topHtml += `<div class="special-badge bg-orange">🎈 國假</div>`; hasTop = true; }
                 else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
@@ -507,7 +530,6 @@
                     topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
                     hasTop = true;
                 } 
-                // 第二行 (Bottom)
                 else {
                     hasBottom = true;
                     let forceGreenClass = hasAllowance ? "shift-green" : "";
@@ -600,8 +622,6 @@
                                 }
                                 assigned = true;
                             } else { trackIdx++; }
-                            
-                            // 核心修正：強制防護網，避免版面因衝突錯亂陷入無窮迴圈當機
                             if (trackIdx > 50) break;
                         }
                     });
@@ -628,7 +648,6 @@
                         const cycleInfo = getCycleInfo(y, m, d);
                         
                         let finalShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
-                        let isManual = savedData.shift !== undefined;
                         
                         if (slot.type === 'current' && finalShift) {
                             let tokens = finalShift.trim().split(/\s+/);
@@ -639,7 +658,7 @@
                                 if (s.startsWith('12-8')) { dailyFee += 270; feeDescs.push(`${tok} ($270)`); }
                                 else if (s.startsWith('E')) { dailyFee += 560; feeDescs.push(`${tok} ($560)`); }
                                 else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
-                                else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
+                                else if (s.includes('(津)')) { dailyFee += 270; dailyFee; feeDescs.push(`加班津貼 ($270)`); }
                             });
                             if (dailyFee > 0) {
                                 monthlyNightFee += dailyFee;
@@ -682,7 +701,7 @@
                             });
                         }
                         
-                        let dotIndicator = isManual && finalShift !== "" ? `<div class="manual-dot"></div>` : ``;
+                        let dotIndicator = savedData.shift !== undefined && finalShift !== "" ? `<div class="manual-dot"></div>` : ``;
                         let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
                         
                         let bColor = cycleBorderColors[cycleInfo.idx % 4];
@@ -716,10 +735,7 @@
                 
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
 
-            } catch (error) { 
-                console.error("渲染過程發生錯誤，嘗試安全重置:", error); 
-                // 極端情況防護，若資料結構毀損直接恢復畫面預設
-            }
+            } catch (error) { console.error(error); }
         }
 
         function openModal(dateKey, displayDate) {
@@ -742,15 +758,6 @@
         }
 
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-        function setShift(v) { document.getElementById('shiftInput').value = v; }
-
-        function toggleTag(tag) {
-            let input = document.getElementById('shiftInput');
-            let parts = input.value.split(/\s+/).filter(Boolean);
-            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
-            else parts.push(tag);
-            input.value = parts.join(' ');
-        }
 
         function openQuickStatPrompt(act) {
             currentQuickStatAct = act;
@@ -773,10 +780,7 @@
         function confirmQuickStat() {
             let val = document.getElementById('quickStatAmount').value;
             let num = parseFloat(val);
-            if(isNaN(num)) {
-                alert("請輸入有效的數字！");
-                return;
-            }
+            if(isNaN(num)) { alert("請輸入有效的數字！"); return; }
 
             let act = currentQuickStatAct;
             let type = (act === '年休') ? 'annualLeave' : 'hours';
@@ -784,7 +788,7 @@
             let isNightFee = (act === '加班' && document.getElementById('quickStatNightFeeCb').checked);
 
             globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay();
             
             let input = document.getElementById('shiftInput');
@@ -825,8 +829,10 @@
                 savedData.shift = shiftVal;
             }
 
-            cleanUpEmptyDate(selectedDateString);
-            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
+            if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
+                delete calendarData[selectedDateString];
+            }
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             closeModal(); renderCalendar();
         }
 
@@ -861,13 +867,15 @@
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
             globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
-            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
 
+        document.getElementById('statsModal').querySelectorAll('.btn')[0].addEventListener('click', saveManualStat);
+
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats7', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
@@ -875,7 +883,6 @@
         function openNightFeeModal() {
             let listEl = document.getElementById('nightFeeList');
             let html = "";
-            
             currentMonthNightFees.sort((a, b) => new Date(a.date) - new Date(b.date));
             let total = currentMonthNightFees.reduce((s, i) => s + i.amount, 0);
             document.getElementById('nightFeeTotal').innerText = total;
@@ -916,6 +923,7 @@
             currentEditingEventId = id; tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
             document.getElementById('eventTitle').value = ""; document.getElementById('eventStartDate').value = selectedDateString;
             document.getElementById('eventEndDate').value = selectedDateString;
+            resetPhotoPreview();
             if (id) {
                 document.getElementById('deleteEventBtn').style.display = "block";
                 let ev = getAllBaseEvents().find(e => e.id === id);
@@ -924,6 +932,7 @@
                     document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
                     selectColorInPicker(ev.color);
                     if (ev.repeat) tempRepeatSetting = JSON.parse(JSON.stringify(ev.repeat));
+                    if (ev.photoUrl) { tempPhotoBase64 = ev.photoUrl; showPhotoPreview(ev.photoUrl); }
                 }
             } else {
                 document.getElementById('deleteEventBtn').style.display = "none";
@@ -940,22 +949,55 @@
 
         function closeEventDetailModal() { document.getElementById('eventDetailModal').style.display = 'none'; }
 
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500; 
+                    let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+                    showPhotoPreview(tempPhotoBase64);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPhotoPreview(src) {
+            document.getElementById('photoPlaceholder').style.display = 'none';
+            const imgEl = document.getElementById('eventPhotoPreview');
+            imgEl.src = src; imgEl.style.display = 'block';
+            document.getElementById('removePhotoBtn').style.display = 'block';
+        }
+
+        function resetPhotoPreview() {
+            tempPhotoBase64 = "";
+            document.getElementById('photoPlaceholder').style.display = 'block';
+            document.getElementById('eventPhotoPreview').style.display = 'none';
+            document.getElementById('eventPhotoPreview').src = "";
+            document.getElementById('removePhotoBtn').style.display = 'none';
+            document.getElementById('eventPhotoInput').value = "";
+        }
+
+        function removePhoto(e) { e.stopPropagation(); resetPhotoPreview(); }
+
         function saveEventDetail() {
             let t = document.getElementById('eventTitle').value.trim(), sD = document.getElementById('eventStartDate').value, eD = document.getElementById('eventEndDate').value;
             if (!t) return alert("請填寫標題！"); if (sD > eD) return alert("結束不能早於開始！");
-            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting };
+            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64 };
             if (currentEditingEventId) { for (let k in calendarData) if (calendarData[k].events) calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); }
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
-            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
-            renderEventListInModal(); renderCalendar(); closeEventDetailModal();
-        }
-
-        function deleteCurrentEvent() {
-            if (!confirm("確定刪除此行程？(含所有重複)")) return;
-            for (let k in calendarData) if (calendarData[k].events) { calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); cleanUpEmptyDate(k); }
-            localStorage.setItem('myCustomCalendar7', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
@@ -992,12 +1034,6 @@
             else { btn.innerText = "🔁 " + document.getElementById('repSummaryText').innerText; btn.style.color = "#5b9bd5"; btn.style.border = "2px solid #5b9bd5"; }
         }
 
-        function cleanUpEmptyDate(k) {
-            let d = calendarData[k];
-            if (d && d.shift === undefined && (!d.events || d.events.length === 0) && (!d.shiftHistory || d.shiftHistory.length === 0)) delete calendarData[k];
-        }
-
-        // 初次啟動渲染
         renderCalendar();
     </script>
 </body>
