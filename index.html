@@ -1033,7 +1033,75 @@
             if (tempRepeatSetting.type === 'none') { btn.innerText = "不重複"; btn.style.color = "#444"; btn.style.border = "2px solid #ddd"; }
             else { btn.innerText = "🔁 " + document.getElementById('repSummaryText').innerText; btn.style.color = "#5b9bd5"; btn.style.border = "2px solid #5b9bd5"; }
         }
+// 1. 補上缺失的全域變數
+        let currentEditingEventId = null;
 
+        // 2. 補上切換月份與回到今天的函數
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        function goToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // 3. 補上行程顏色選擇器的邏輯
+        function selectColorInPicker(color) {
+            selectedEventColor = color || 'blue';
+            document.querySelectorAll('.color-dot').forEach(el => {
+                if (el.dataset.color === selectedEventColor) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+
+        // 綁定顏色圈圈的點擊事件
+        document.querySelectorAll('.color-dot').forEach(el => {
+            el.addEventListener('click', function() {
+                selectColorInPicker(this.dataset.color);
+            });
+        });
+
+        // 4. 補上刪除行程的函數
+        function deleteCurrentEvent() {
+            if (!confirm("確定要刪除這個行程嗎？")) return;
+            if (currentEditingEventId) {
+                // 找出該行程並從資料中移除
+                for (let k in calendarData) {
+                    if (calendarData[k].events) {
+                        calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId);
+                        
+                        // 如果該天清空了，且沒有班別紀錄，就刪除該天的資料節省空間
+                        if (calendarData[k].events.length === 0 && 
+                            calendarData[k].shift === undefined && 
+                            (!calendarData[k].shiftHistory || calendarData[k].shiftHistory.length === 0)) {
+                            delete calendarData[k];
+                        }
+                    }
+                }
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                renderEventListInModal();
+                renderCalendar();
+                closeEventDetailModal();
+            }
+        }
+
+        // 5. 優化：覆寫原本的 setRepType 函數，讓頻率單位文字(年/月/週/日)跟著動態改變
+        function setRepType(t) { 
+            tempRepeatSetting.type = t; 
+            document.querySelectorAll('.rep-tab').forEach(el => el.classList.remove('active')); 
+            document.getElementById('tab-'+t).classList.add('active'); 
+            
+            // 新增：同步更新單位文字
+            const unitMap = { 'year': '年', 'month': '月', 'week': '週', 'day': '天' };
+            document.getElementById('repUnitText').innerText = unitMap[t] || '年';
+            
+            updateRepSummary(); 
+        }
         renderCalendar();
     </script>
 </body>
