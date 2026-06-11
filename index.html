@@ -1090,6 +1090,54 @@
             
             updateRepSummary(); 
         }
+        // ================= 自動清理舊照片機制 =================
+        function autoCleanOldPhotos() {
+            const today = new Date();
+            const expireDays = 90; // 👈 這裡可以設定「幾天前」的照片要刪除（預設 90 天，約三個月）
+            let dataChanged = false;
+
+            for (let dateKey in calendarData) {
+                if (calendarData[dateKey].events) {
+                    calendarData[dateKey].events.forEach(ev => {
+                        // 如果這個行程有照片
+                        if (ev.photoUrl && ev.photoUrl !== "") {
+                            // 以行程的結束日期（或開始日期）來計算
+                            let targetDateStr = ev.endDate || ev.startDate;
+                            if (targetDateStr) {
+                                let eventDate = new Date(targetDateStr);
+                                
+                                // 計算行程日期與今天的相差天數
+                                let diffTime = today.getTime() - eventDate.getTime();
+                                let diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                                // 如果超過設定的天數，就自動清空照片字串
+                                if (diffDays > expireDays) {
+                                    ev.photoUrl = ""; 
+                                    dataChanged = true;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 如果有刪除到照片，就重新把瘦身後的資料存進 LocalStorage
+            if (dataChanged) {
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                console.log("🧹 已自動清理超過 " + expireDays + " 天的舊照片，釋放空間！");
+            }
+        }
+        // ===================================================
+        // ... (上面是你的各種設定與剛剛貼上的備份/清理函數)
+
+        // 1. 先執行自動清理舊照片 (打掃抽屜)
+        autoCleanOldPhotos();
+        
+        // 2. 再把畫面畫出來
+        renderCalendar();
+    </script>
+</body>
+</html>
         renderCalendar();
     </script>
 </body>
