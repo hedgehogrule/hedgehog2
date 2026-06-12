@@ -126,8 +126,40 @@
 
         /* 批次選取與先生休假專用樣式 */
         .batch-bar { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 100; align-items: center; gap: 15px; border: 2px solid #5b9bd5; backdrop-filter: blur(5px); }
-        .batch-selected { background: #eef5ff !important; outline: 3px solid #5b9bd5 !important; outline-offset: -3px; box-shadow: inset 0 0 15px rgba(91,155,213,0.3) !important; z-index: 2; }
-        .husband-off-bg { background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(132, 189, 227, 0.25) 100%) !important; }
+        .batch-selected { 
+    background: #eef5ff !important; 
+    outline: 3px solid #5b9bd5 !important; 
+    outline-offset: -3px; 
+    box-shadow: inset 0 0 15px rgba(91,155,213,0.3) !important; 
+    z-index: 2; 
+}
+
+/* 老公休假 - 紅色圓圈印章 */
+.husband-off-bg { 
+    background: rgba(255, 255, 255, 0.6) !important;
+    position: relative;
+}
+.husband-off-bg::after {
+    content: '休';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    border: 3px solid #ff6b81;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: #ff6b81;
+    pointer-events: none;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.9);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1;
+}
     </style>
 </head>
 <body>
@@ -138,7 +170,7 @@
             <div class="header-center">
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">📍 今天</button>
-                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">👨 批次排休</button>
+               <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">👨 老公排休</button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -156,10 +188,12 @@
     <div class="calendar" id="calendar"></div>
 
     <div class="batch-bar" id="batchBar">
-        <span style="font-weight:bold; color:#5b9bd5; font-size:14px; white-space:nowrap;">選取了 <span id="batchCount" style="font-size:18px;">0</span> 天</span>
-        <button class="btn" style="padding: 6px 16px; font-size: 13px; background: #f1f1f1; color: #666;" onclick="cancelBatchMode()">取消</button>
-        <button class="btn" style="padding: 6px 16px; font-size: 13px; background: #5b9bd5; color: white;" onclick="saveBatchHusbandOff()">套用休假</button>
-    </div>
+    <span style="font-weight:bold; color:#ff6b81; font-size:14px; white-space:nowrap;">👨 老公排休 | <span id="batchCount" style="font-size:18px;">0</span> 天</span>
+    <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #84bde3; color: white;" onclick="selectAllMonth()">全選整月</button>
+    <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #ff9ebb; color: white;" onclick="clearAllMonth()">清除全部</button>
+    <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #f1f1f1; color: #666;" onclick="cancelBatchMode()">取消</button>
+    <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #ff6b81; color: white;" onclick="saveBatchHusbandOff()">✓ 確認排休</button>
+</div>
 
     <div class="modal" id="editModal">
         <div class="modal-content">
@@ -452,21 +486,58 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        function toggleBatchMode() {
-            isBatchMode = true;
-            batchSelectedDates.clear();
-            document.getElementById('batchBar').style.display = 'flex';
-            document.getElementById('batchCount').innerText = '0';
-            renderCalendar();
+       function toggleBatchMode() {
+    if (isBatchMode) {
+        cancelBatchMode();
+        return;
+    }
+    isBatchMode = true;
+    batchSelectedDates.clear();
+    
+    // 自動載入已標記的休假日期
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+        if (calendarData[dateKey] && calendarData[dateKey].husbandOff) {
+            batchSelectedDates.add(dateKey);
         }
+    }
+    
+    document.getElementById('batchBar').style.display = 'flex';
+    document.getElementById('batchCount').innerText = batchSelectedDates.size;
+    renderCalendar();
+}
 
         function cancelBatchMode() {
-            isBatchMode = false;
-            batchSelectedDates.clear();
-            document.getElementById('batchBar').style.display = 'none';
-            renderCalendar();
-        }
+    isBatchMode = false;
+    batchSelectedDates.clear();
+    document.getElementById('batchBar').style.display = 'none';
+    renderCalendar();
+}
+// 全選整月
+function selectAllMonth() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    batchSelectedDates.clear();
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+        batchSelectedDates.add(dateKey);
+    }
+    document.getElementById('batchCount').innerText = batchSelectedDates.size;
+    renderCalendar();
+}
 
+// 清除全部選取
+function clearAllMonth() {
+    batchSelectedDates.clear();
+    document.getElementById('batchCount').innerText = '0';
+    renderCalendar();
+}
         function handleDayClick(dateKey, displayDate) {
             if (isBatchMode) {
                 if (batchSelectedDates.has(dateKey)) {
@@ -482,17 +553,44 @@
         }
 
         function saveBatchHusbandOff() {
-            batchSelectedDates.forEach(dateKey => {
-                if (!calendarData[dateKey]) calendarData[dateKey] = {};
-                calendarData[dateKey].husbandOff = !calendarData[dateKey].husbandOff;
-
-                if (!calendarData[dateKey].husbandOff && calendarData[dateKey].shift === undefined && (!calendarData[dateKey].events || calendarData[dateKey].events.length === 0)) {
+    if (batchSelectedDates.size === 0) {
+        alert('請至少選取一天！');
+        return;
+    }
+    
+    if (!confirm(`確定要將 ${batchSelectedDates.size} 天標記為老公休假日嗎？\n\n⚠️ 未選取的天數將會取消休假標記。`)) return;
+    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+        
+        if (batchSelectedDates.has(dateKey)) {
+            // 標記為休假
+            if (!calendarData[dateKey]) calendarData[dateKey] = {};
+            calendarData[dateKey].husbandOff = true;
+        } else {
+            // 取消休假標記
+            if (calendarData[dateKey]) {
+                calendarData[dateKey].husbandOff = false;
+                
+                if (!calendarData[dateKey].shift && 
+                    (!calendarData[dateKey].events || calendarData[dateKey].events.length === 0) &&
+                    (!calendarData[dateKey].shiftHistory || calendarData[dateKey].shiftHistory.length === 0)) {
                     delete calendarData[dateKey];
                 }
-            });
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-            cancelBatchMode();
+            }
         }
+    }
+    
+    localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+    
+    const count = batchSelectedDates.size;
+    cancelBatchMode();
+    alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
+}
 
         function updateStatsDisplay() {
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
