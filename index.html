@@ -1084,10 +1084,29 @@ function clearAllMonth() {
 
 
         function deleteStat(id) {
-            globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay(); renderStatsList();
+    // 找出要被刪除的紀錄
+    let target = globalStats[currentStatType].find(i => i.id === id);
+    
+    globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay(); renderStatsList();
+    
+    // 如果是年休紀錄，自動清除班表上的年休標記
+    if (currentStatType === 'annualLeave' && target && target.date) {
+        let dateKey = target.date;
+        if (calendarData[dateKey] && calendarData[dateKey].shift) {
+            // 移除班表中的「年休」或「年休-數字」
+            let parts = calendarData[dateKey].shift.split(/\s+/).filter(p => p !== '年休' && !p.startsWith('年休-'));
+            if (parts.length > 0) {
+                calendarData[dateKey].shift = parts.join(' ');
+            } else {
+                delete calendarData[dateKey].shift;
+            }
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            renderCalendar();
         }
+    }
+}
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
         function openNightFeeModal() {
