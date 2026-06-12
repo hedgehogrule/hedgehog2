@@ -761,23 +761,34 @@
                         if (cycleInfo.isLeft) inlineStyle += `border-left: 2.5px solid ${bColor}; `;
                         if (cycleInfo.isRight) inlineStyle += `border-right: 2.5px solid ${bColor}; `;
                         
-                        let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
-                        let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
+                       let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
+let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
 
-                        let row2Html = "";
-                        if (weekBadge || htmlObj.bottomHtml) {
-                            row2Html = `<div class="day-row-2">${weekBadge} ${htmlObj.bottomHtml}</div>`;
-                        }
+// 1. 新增：判斷是否在「批次選取模式」中被點選
+let batchSelClass = (isBatchMode && batchSelectedDates.has(dateKey)) ? "batch-selected" : "";
 
-                        calendarEl.innerHTML += `
-                            <div class="day ${todayHighlightClass} ${otherMonthClass}" style="${inlineStyle}" onclick="openModal('${dateKey}', '${y}年${m+1}月${d}日')">
-                                ${dotIndicator}
-                                <div class="day-row-1">
-                                    <div class="date-col"><span class="${dateClass}">${d}</span></div>
-                                    ${htmlObj.topHtml}
-                                </div>
-                                ${row2Html}
-                                <div class="event-area">${tracksHtml}</div>
+// 2. 新增：判斷這天是否已經存檔為「老公休假」，加上特製背景與標籤
+let husbandOffClass = savedData.husbandOff ? "husband-off-bg" : "";
+let husbandBadge = savedData.husbandOff ? `<div class="shift-badge" style="background:#84bde3; color:white; padding:1px 4px; border-radius:4px;">👨休</div>` : "";
+
+let row2Html = "";
+// 把 husbandBadge 加進第二排顯示
+if (weekBadge || htmlObj.bottomHtml || husbandBadge) {
+    row2Html = `<div class="day-row-2">${weekBadge} ${htmlObj.bottomHtml} ${husbandBadge}</div>`;
+}
+
+// 3. 修改：將 onclick 從 openModal 改為 handleDayClick，並把新的 Class 塞進去
+calendarEl.innerHTML += `
+    <div class="day ${todayHighlightClass} ${otherMonthClass} ${batchSelClass} ${husbandOffClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
+        ${dotIndicator}
+        <div class="day-row-1">
+            <div class="date-col"><span class="${dateClass}">${d}</span></div>
+            ${htmlObj.topHtml}
+        </div>
+        ${row2Html}
+        <div class="event-area">${tracksHtml}</div>
+    </div>
+`;
                             </div>
                         `;
                     });
