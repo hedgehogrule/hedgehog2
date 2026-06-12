@@ -1283,6 +1283,37 @@ function clearAllMonth() {
         }
 
         autoCleanOldPhotos();
+        // 滑動手勢切換月份
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    
+    calendarEl.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    calendarEl.addEventListener('touchend', function(e) {
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        
+        const diffX = touchEndX - touchStartX;
+        const diffY = touchEndY - touchStartY;
+        
+        // 水平滑動距離大於 50px，且大於垂直滑動距離
+        if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX > 0) {
+                // 往右滑 → 上個月
+                changeMonth(-1);
+            } else {
+                // 往左滑 → 下個月
+                changeMonth(1);
+            }
+        }
+    });
+});
         renderCalendar();
     </script>
 </body>
