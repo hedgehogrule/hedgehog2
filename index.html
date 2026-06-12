@@ -76,7 +76,7 @@
         .shift-green { background: #5ece9d; color: white; border: none; }
         .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
 
-        .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
+        .manual-dot { position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
         /* 第三行：行程 */
         .event-area { margin-top: auto; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); font-family: 'Helvetica Neue', Arial, sans-serif; }
@@ -123,9 +123,6 @@
         .repeat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .repeat-row label { margin-bottom: 0; font-size: 14px; color: #555; }
         .repeat-summary { background: #f8f9fa; border-radius: 8px; padding: 10px; border-left: 4px solid #5b9bd5; margin-top: 10px; }
-    .batch-bar { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 100; align-items: center; gap: 15px; border: 2px solid #5b9bd5; backdrop-filter: blur(5px); }
-        .batch-selected { background: #eef5ff !important; outline: 3px solid #5b9bd5 !important; outline-offset: -3px; box-shadow: inset 0 0 15px rgba(91,155,213,0.3) !important; z-index: 2; }
-        .husband-off-bg { background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(132, 189, 227, 0.25) 100%) !important; }
     </style>
 </head>
 <body>
@@ -136,7 +133,6 @@
             <div class="header-center">
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">📍 今天</button>
-                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">👨 批次排休</button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -152,11 +148,7 @@
     </div>
 
     <div class="calendar" id="calendar"></div>
-<div class="batch-bar" id="batchBar">
-        <span style="font-weight:bold; color:#5b9bd5; font-size:14px; white-space:nowrap;">選取了 <span id="batchCount" style="font-size:18px;">0</span> 天</span>
-        <button class="btn" style="padding: 6px 16px; font-size: 13px; background: #f1f1f1; color: #666;" onclick="cancelBatchMode()">取消</button>
-        <button class="btn" style="padding: 6px 16px; font-size: 13px; background: #5b9bd5; color: white;" onclick="saveBatchHusbandOff()">套用休假</button>
-    </div>
+
     <div class="modal" id="editModal">
         <div class="modal-content">
             <h3 id="modalTitle"></h3>
@@ -191,8 +183,6 @@
                         <button class="quick-btn quick-btn-d" onclick="setShift('D13')">D13</button>
                         <button class="quick-btn quick-btn-d" onclick="setShift('DB1')">DB1</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
-                        <button class="quick-btn quick-btn-off" onclick="setShift('例休')">例休</button>
-                        <button class="quick-btn quick-btn-off" onclick="setShift('年休')">年休</button>
                     </div>
                 </div>
 
@@ -290,8 +280,8 @@
                     <div class="color-dot" data-color="pink" style="background: #ff9ebb;"></div>
                     <div class="color-dot" data-color="green" style="background: #7fd9b2;">森</div>
                     <div class="color-dot" data-color="purple" style="background: #c3b3ef;">芷</div>
-                    <div class="color-dot" data-color="gray" style="background: #cccccc;">常</div>
-                    <div class="color-dot" data-color="orange" style="background: #ffa67c;">麻</div>
+                    <div class="color-dot" data-color="yellow" style="background: #fcd372;"></div>
+                    <div class="color-dot" data-color="orange" style="background: #ffa67c;"></div>
                     <div class="color-dot" data-color="transparent" style="background: #ffffff; border: 2px dashed #ccc; color: #888 !important; text-shadow: none;">透</div>
                 </div>
             </div>
@@ -366,54 +356,6 @@
     </div>
 
     <script>
-        let isBatchMode = false;
-        let batchSelectedDates = new Set();
-
-        function toggleBatchMode() {
-            isBatchMode = true;
-            batchSelectedDates.clear();
-            document.getElementById('batchBar').style.display = 'flex';
-            document.getElementById('batchCount').innerText = '0';
-            renderCalendar();
-        }
-
-        function cancelBatchMode() {
-            isBatchMode = false;
-            batchSelectedDates.clear();
-            document.getElementById('batchBar').style.display = 'none';
-            renderCalendar();
-        }
-
-        function handleDayClick(dateKey, displayDate) {
-            if (isBatchMode) {
-                // 如果在批次模式下，點擊只負責選取或取消選取
-                if (batchSelectedDates.has(dateKey)) {
-                    batchSelectedDates.delete(dateKey);
-                } else {
-                    batchSelectedDates.add(dateKey);
-                }
-                document.getElementById('batchCount').innerText = batchSelectedDates.size;
-                renderCalendar(); 
-                return;
-            }
-            // 如果不是批次模式，就正常打開原本的編輯視窗
-            openModal(dateKey, displayDate);
-        }
-
-        function saveBatchHusbandOff() {
-            batchSelectedDates.forEach(dateKey => {
-                if (!calendarData[dateKey]) calendarData[dateKey] = {};
-                // 反轉狀態：如果有休就取消，沒休就加上去
-                calendarData[dateKey].husbandOff = !calendarData[dateKey].husbandOff;
-
-                // 如果這天什麼都沒有了，就清理乾淨節省空間
-                if (!calendarData[dateKey].husbandOff && calendarData[dateKey].shift === undefined && (!calendarData[dateKey].events || calendarData[dateKey].events.length === 0)) {
-                    delete calendarData[dateKey];
-                }
-            });
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-            cancelBatchMode();
-        }
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
             ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
@@ -436,13 +378,12 @@
 
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
         const colorStyles = {
-           blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
+            blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
             pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
             green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
             purple: { bg: 'rgba(195, 179, 239, 0.25)', text: '#5c439c', border: '#c3b3ef' },
-            gray: { bg: 'rgba(204, 204, 204, 0.3)', text: '#555555', border: '#cccccc' },
-            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' },
-            transparent: { bg: 'transparent', text: '#666666', border: '#cccccc' }
+            yellow: { bg: 'rgba(252, 211, 114, 0.3)', text: '#704f02', border: '#fcd372' },
+            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' }
         };
 
         function parseDateLocal(dateStr) { let p = dateStr.split('-'); return new Date(p[0], p[1]-1, p[2]); }
