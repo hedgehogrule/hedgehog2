@@ -1029,7 +1029,6 @@ function clearAllMonth() {
             updateStatsDisplay(); renderStatsList();
         }
 
-        document.getElementById('statsModal').querySelectorAll('.btn')[0].addEventListener('click', saveManualStat);
 
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
