@@ -960,14 +960,12 @@ function clearAllMonth() {
 
     if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
-    // 檢查年休變動
     let newTokens = shiftVal.split(/\s+/).filter(Boolean);
     let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
     
     let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
     let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
 
-    // 只有純手打「年休」才自動扣，快捷鍵加的「年休-數字」不重複扣
     if (hasNewAnnualLeave && !hadOldAnnualLeave) {
         let isFromQuick = newTokens.some(t => t.startsWith('年休-'));
         if (!isFromQuick) {
@@ -990,7 +988,6 @@ function clearAllMonth() {
         localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
     }
 
-    // 原本的儲存邏輯
     if (shiftVal === "" || shiftVal === autoInfo.shift) {
         if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
         delete savedData.shift;
@@ -1007,7 +1004,6 @@ function clearAllMonth() {
     closeModal(); 
     renderCalendar();
 }
-
         function openStatsModal(t) {
             currentStatType = t;
             document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
@@ -1069,7 +1065,9 @@ function clearAllMonth() {
         function deleteStat(id) {
     globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
     localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay(); renderStatsList();
+    updateStatsDisplay(); 
+    renderStatsList();
+    renderCalendar();
 }
     }
 }
