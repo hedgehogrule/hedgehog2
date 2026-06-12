@@ -968,12 +968,31 @@ function clearAllMonth() {
     let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
 
     // 之前沒有年休，現在有 → 扣 1 天
+       let newTokens = shiftVal.split(/\s+/).filter(Boolean);
+    let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
+    
+    let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
+    let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
+
+    // 只有純手打「年休」才自動扣，快捷鍵加的「年休-數字」不重複扣
     if (hasNewAnnualLeave && !hadOldAnnualLeave) {
+        let isFromQuick = newTokens.some(t => t.startsWith('年休-'));
+        if (!isFromQuick) {
+            globalStats.annualLeave.push({
+                id: "st_" + Date.now(),
+                date: selectedDateString,
+                amount: -8,
+                desc: "年休 (排班自動扣除)"
+            });
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+        }
+    }
+    else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
         globalStats.annualLeave.push({
             id: "st_" + Date.now(),
             date: selectedDateString,
-            amount: -8,
-            desc: "年休 (排班自動扣除)"
+            amount: +8,
+            desc: "取消年休 (自動加回)"
         });
         localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
     }
