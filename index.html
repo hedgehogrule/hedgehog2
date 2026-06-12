@@ -380,12 +380,13 @@
 
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
         const colorStyles = {
-            blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
+           blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
             pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
             green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
             purple: { bg: 'rgba(195, 179, 239, 0.25)', text: '#5c439c', border: '#c3b3ef' },
-            yellow: { bg: 'rgba(252, 211, 114, 0.3)', text: '#704f02', border: '#fcd372' },
-            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' }
+            gray: { bg: 'rgba(252, 211, 114, 0.3)', text: '#704f02', border: '#fcd372' },
+            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' },
+            transparent: { bg: 'transparent', text: '#666666', border: '#cccccc' }
         };
 
         function parseDateLocal(dateStr) { let p = dateStr.split('-'); return new Date(p[0], p[1]-1, p[2]); }
