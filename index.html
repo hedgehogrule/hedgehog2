@@ -134,35 +134,15 @@
     z-index: 2; 
 }
 
-/* 老公休假 - 紅色圓圈印章 */
+/* 老公休假 - 紅色粗框線 */
 .husband-off-bg { 
-    background: rgba(255, 255, 255, 0.6) !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    outline: 3.5px solid #ff6b81 !important;
+    outline-offset: -5px;
+    border-radius: 10px;
     position: relative;
+    z-index: 1;
 }
-.husband-off-bg::after {
-    content: '休';
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 34px;
-    height: 34px;
-    border: 3px solid #ff6b81;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 900;
-    color: #ff6b81;
-    pointer-events: none;
-    z-index: 3;
-    background: rgba(255, 255, 255, 0.9);
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1;
-}
-    </style>
-</head>
-<body>
 
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
