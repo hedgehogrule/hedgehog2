@@ -949,30 +949,61 @@ function clearAllMonth() {
         }
 
         function saveShiftOnly() {
-            let shiftVal = document.getElementById('shiftInput').value.trim();
-            let parts = selectedDateString.split('-');
-            let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    let shiftVal = document.getElementById('shiftInput').value.trim();
+    let parts = selectedDateString.split('-');
+    let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
 
-            if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
-            let savedData = calendarData[selectedDateString];
-            let currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+    if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
+    let savedData = calendarData[selectedDateString];
+    let currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
 
-            if (!savedData.shiftHistory) savedData.shiftHistory = [];
+    if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
-            if (shiftVal === "" || shiftVal === autoInfo.shift) {
-                if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
-                delete savedData.shift;
-            } else {
-                if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
-                savedData.shift = shiftVal;
-            }
+    // 🆕 檢查新班表是否包含「年休」，自動扣年休餘額
+    let newTokens = shiftVal.split(/\s+/).filter(Boolean);
+    let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
+    
+    let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
+    let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
 
-            if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
-                delete calendarData[selectedDateString];
-            }
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-            closeModal(); renderCalendar();
-        }
+    // 之前沒有年休，現在有 → 扣 1 天
+    if (hasNewAnnualLeave && !hadOldAnnualLeave) {
+        globalStats.annualLeave.push({
+            id: "st_" + Date.now(),
+            date: selectedDateString,
+            amount: -1,
+            desc: "年休 (排班自動扣除)"
+        });
+        localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    }
+    // 之前有年休，現在沒有 → 加回 1 天
+    else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
+        globalStats.annualLeave.push({
+            id: "st_" + Date.now(),
+            date: selectedDateString,
+            amount: +1,
+            desc: "取消年休 (自動加回)"
+        });
+        localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    }
+
+    // 原本的儲存邏輯
+    if (shiftVal === "" || shiftVal === autoInfo.shift) {
+        if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
+        delete savedData.shift;
+    } else {
+        if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
+        savedData.shift = shiftVal;
+    }
+
+    if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
+        delete calendarData[selectedDateString];
+    }
+    localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+    updateStatsDisplay();
+    closeModal(); 
+    renderCalendar();
+}
 
         function openStatsModal(t) {
             currentStatType = t;
