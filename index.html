@@ -854,7 +854,7 @@ function clearAllMonth() {
 
                         let husbandOffClass = savedData.husbandOff ? "husband-off-bg" : "";
                         let batchClass = (isBatchMode && batchSelectedDates.has(dateKey)) ? "batch-selected" : "";
-                        let husbandIcon = savedData.husbandOff ? `<div style="font-size:10px; margin-top:-2px;">👨</div>` : ``;
+                       let husbandIcon = ``;
 
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass} ${husbandOffClass} ${batchClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
