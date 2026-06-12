@@ -656,7 +656,7 @@ function clearAllMonth() {
             tokens.forEach(p => {
                 let s = p.toUpperCase();
                 if (s === "例休") { topHtml += `<div class="special-badge bg-pink">🎀 例休</div>`; hasTop = true; }
-                    else if (s === "年休") { topHtml += `<div class="special-badge bg-pink">🌸 年休</div>`; hasTop = true; }
+                else if (s === "年休") { bottomHtml += `<div class="shift-badge shift-off">年休</div>`; hasBottom = true; }
                 else if (s === "國") { topHtml += `<div class="week-badge" style="background:#ffa67c;">國</div>`; hasTop = true; }
                 else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
                     let numText = p.replace("(津)", ""); 
