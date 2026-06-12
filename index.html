@@ -981,24 +981,46 @@ function clearAllMonth() {
         }
 
         function renderStatsList() {
-            let data = globalStats[currentStatType] || [];
-            data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
-            document.getElementById('statsModalBalance').innerText = data.reduce((s, i) => s + i.amount, 0);
-            let html = "";
-            data.forEach(item => {
-                let isPos = item.amount >= 0;
-                html += `
-                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
-                        <div><div style="font-size:14px; font-weight:900;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:16px;">${isPos?'+':''}${item.amount}</span>
-                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px;'>目前無紀錄</div>";
-        }
-
+    let data = globalStats[currentStatType] || [];
+    data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+    
+    let balance = data.reduce((s, i) => s + i.amount, 0);
+    document.getElementById('statsModalBalance').innerText = balance;
+    
+    // 反向計算：從最早到最新，算出每筆後的餘額
+    let sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+    let runningBalance = 0;
+    let balanceMap = {};
+    sortedAsc.forEach(item => {
+        runningBalance += item.amount;
+        balanceMap[item.id] = runningBalance;
+    });
+    
+    // 顯示時用反向（最新在前）
+    let html = "";
+    data.forEach(item => {
+        let isPos = item.amount >= 0;
+        let sign = isPos ? '+' : '';
+        let remain = balanceMap[item.id];
+        let remainColor = remain >= 0 ? '#3ba377' : '#ff6b6b';
+        
+        html += `
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
+                <div>
+                    <div style="font-size:14px; font-weight:900;">${item.desc}</div>
+                    <div style="font-size:12px; color:#999;">${item.date}</div>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="text-align:right;">
+                        <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:14px;">${sign}${item.amount}</span>
+                        <div style="font-size:11px; color:${remainColor}; font-weight:700;">剩餘 ${remain}</div>
+                    </div>
+                    <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
+                </div>
+            </div>`;
+    });
+    document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>目前無紀錄</div>";
+}
         function saveManualStat() {
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
