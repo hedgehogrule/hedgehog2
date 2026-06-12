@@ -45,7 +45,7 @@
         /* 放大行事曆區域 */
         .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
         
-        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 16vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
@@ -710,7 +710,7 @@ function clearAllMonth() {
                     calendarSlots.push({ type: 'current', date: i, dateKey: dateKey, dayOfWeek: new Date(year, month, i).getDay() });
                 }
 
-                let rem = 42 - calendarSlots.length;
+                let rem = 35 - calendarSlots.length;
                 for (let i = 1; i <= rem; i++) {
                     let m = month + 1; let y = year;
                     if(m > 11) { m = 0; y++; }
