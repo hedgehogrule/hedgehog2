@@ -146,7 +146,10 @@
     font-weight: 900;
     background: rgba(195, 179, 239, 0.15);
 }
-    
+   .event-item.completed {
+    opacity: 0.35 !important;
+    filter: grayscale(30%);
+} 
     </style>
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
@@ -335,7 +338,10 @@
                     <button class="remove-photo-btn" id="removePhotoBtn" onclick="removePhoto(event)">X</button>
                 </div>
             </div>
-
+<div class="input-group" style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
+    <label style="margin-bottom: 0; font-size: 14px; font-weight: bold; color: #666;">✅ 本月已完成</label>
+    <button id="completeToggleBtn" type="button" style="padding: 8px 16px; border-radius: 20px; border: 2px solid #5ece9d; background: #fff; color: #5ece9d; font-weight: bold; font-size: 14px; cursor: pointer; font-family: inherit;" onclick="toggleCompleteThisMonth()">標記完成</button>
+</div>
             <button id="deleteEventBtn" style="display:none; width:100%; background:#ffefef; color:#ff6b6b; border:2px solid #ffcccc; padding:10px; border-radius:10px; font-weight:bold; font-family:inherit; font-size:14px; margin-top:5px;" onclick="deleteCurrentEvent()">刪除此行程</button>
             <div class="btn-row">
                 <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeEventDetailModal()">返回</button>
@@ -678,7 +684,23 @@ function clearAllMonth() {
             bottomHtml += '</div>';
             return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
         }
+let tempCompletedMonths = [];
 
+function toggleCompleteThisMonth() {
+    let btn = document.getElementById('completeToggleBtn');
+    let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    let i = tempCompletedMonths.indexOf(cm);
+    if (i > -1) { tempCompletedMonths.splice(i, 1); btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+    else { tempCompletedMonths.push(cm); btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+}
+
+function updateCompleteButton() {
+    let btn = document.getElementById('completeToggleBtn');
+    if (!btn) return;
+    let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    if (tempCompletedMonths.includes(cm)) { btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+    else { btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+}
         function renderCalendar() {
             try {
                 updateStatsDisplay(); 
@@ -823,12 +845,15 @@ function clearAllMonth() {
 
                                     const cStyle = colorStyles[ev.color] || colorStyles['blue'];
                                     let showText = !hasLeft; 
+let monKey = year + '-' + (month + 1).toString().padStart(2, '0');
+let done = ev.completedMonths && ev.completedMonths.includes(monKey);
+let doneClass = done ? ' completed' : '';
 
-                                    tracksHtml += `
-                                        <div class="event-item" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
-                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
-                                        </div>
-                                    `;
+tracksHtml += `
+    <div class="event-item${doneClass}" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
+        ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+    </div>
+`;
                                 } else {
                                     tracksHtml += `<div style="height: 15px; pointer-events: none;"></div>`;
                                 }
@@ -1111,6 +1136,9 @@ function clearAllMonth() {
 
         function openEventDetailModal(id = null) {
             currentEditingEventId = id; tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+            tempCompletedMonths = [];
+if (ev && ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
+setTimeout(() => updateCompleteButton(), 100);
             document.getElementById('eventTitle').value = ""; document.getElementById('eventStartDate').value = selectedDateString;
             document.getElementById('eventEndDate').value = selectedDateString;
             resetPhotoPreview();
@@ -1182,7 +1210,7 @@ function clearAllMonth() {
         function saveEventDetail() {
             let t = document.getElementById('eventTitle').value.trim(), sD = document.getElementById('eventStartDate').value, eD = document.getElementById('eventEndDate').value;
             if (!t) return alert("請填寫標題！"); if (sD > eD) return alert("結束不能早於開始！");
-            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64 };
+            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64 };, completedMonths: tempCompletedMonths
             if (currentEditingEventId) { for (let k in calendarData) if (calendarData[k].events) calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); }
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
