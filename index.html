@@ -163,6 +163,12 @@
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">📍 今天</button>
                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
+                <div class="header-center">
+                <h2 id="monthYear"></h2>
+                <button class="today-btn" onclick="goToday()">📍 今天</button>
+               <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
+               <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">⚙️ 備份</button>
+            </div>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -396,7 +402,40 @@
             </div>
         </div>
     </div>
+<!-- （上面是原本「重複設定」視窗結尾的幾行） -->
+            <div class="btn-row">
+                <button class="btn" style="background:#ffeaea; color:#ff6b6b; font-size:14px;" onclick="clearRepeatSetting()">清除</button>
+                <button class="btn" style="background:#5b9bd5; color:white; font-size:14px;" onclick="saveRepeatSetting()">設定完成</button>
+            </div>
+        </div>
+    </div>
 
+   
+    <div class="modal" id="backupModal" style="z-index: 50;">
+        <div class="modal-content" style="max-width: 320px;">
+            <h3 style="margin-bottom: 15px; color:#444; text-align:center;">💾 資料備份與還原</h3>
+            <p style="font-size: 13px; color: #777; margin-bottom: 15px; text-align:center; line-height:1.5;">建議定期下載備份檔，<br>並妥善保存至雲端硬碟 (Google Drive / iCloud)。</p>
+            
+            <button class="btn" style="background:#84bde3; color:white; width: 100%; margin-bottom: 12px; font-size:16px;" onclick="exportData()">⬇️ 下載備份檔 (匯出)</button>
+            
+            <div style="border-top: 2px dashed #eee; margin: 15px 0;"></div>
+            
+            <label class="btn" style="background:#ff9ebb; color:white; width: 100%; display: block; box-sizing: border-box; cursor: pointer; text-align:center; font-size:16px;">
+                ⬆️ 讀取備份檔 (匯入)
+                <input type="file" id="importInput" accept=".json" style="display: none;" onchange="importData(event)">
+            </label>
+            
+            <div class="btn-row" style="margin-top: 20px;">
+                <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeBackupModal()">關閉</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        const shiftPatterns = [
+            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
     <script>
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
@@ -1413,6 +1452,91 @@
             autoCleanOldPhotos();
         });
         
+      // ======================= 備份與還原功能 =======================
+        function openBackupModal() { document.getElementById('backupModal').style.display = 'flex'; }
+        function closeBackupModal() { document.getElementById('backupModal').style.display = 'none'; }
+
+        // ⬇️ 匯出資料 (下載為 JSON)
+        async function exportData() {
+            try {
+                // 1. 先抓取文字資料
+                let backup = {
+                    calendar: localStorage.getItem('myCustomCalendar8'),
+                    stats: localStorage.getItem('myCustomCalendarStats8'),
+                    photos: {}
+                };
+                
+                // 2. 抓取藏在 localForage 裡的照片 (轉成 Base64 字串打包)
+                let keys = await localforage.keys();
+                for (let key of keys) {
+                    if (key.startsWith('photo_')) {
+                        let blob = await localforage.getItem(key);
+                        if (blob) {
+                            let base64 = await new Promise((resolve) => {
+                                let reader = new FileReader();
+                                reader.onloadend = () => resolve(reader.result);
+                                reader.readAsDataURL(blob);
+                            });
+                            backup.photos[key] = base64;
+                        }
+                    }
+                }
+                
+                // 3. 打包下載
+                let dataStr = JSON.stringify(backup);
+                let dataBlob = new Blob([dataStr], { type: 'application/json' });
+                let url = URL.createObjectURL(dataBlob);
+                
+                let a = document.createElement('a');
+                let dateStr = new Date().toISOString().slice(0,10);
+                a.download = `行事曆備份_${dateStr}.json`;
+                a.href = url;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert("✅ 備份檔下載成功！\n請記得將下載的檔案移動到 Google Drive 或 iCloud 保存喔！");
+            } catch (err) {
+                console.error(err);
+                alert("備份發生錯誤！請稍後再試。");
+            }
+        }
+
+        // ⬆️ 匯入資料 (從 JSON 還原)
+        async function importData(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            
+            if (!confirm("⚠️ 警告：還原資料將會【完全覆蓋】您目前的行事曆與照片！\n如果現在有新的行程，請先備份。\n\n確定要繼續還原嗎？")) {
+                event.target.value = ''; // 取消選擇
+                return;
+            }
+            
+            try {
+                let text = await file.text();
+                let backup = JSON.parse(text);
+                
+                // 1. 還原文字資料
+                if (backup.calendar) localStorage.setItem('myCustomCalendar8', backup.calendar);
+                if (backup.stats) localStorage.setItem('myCustomCalendarStats8', backup.stats);
+                
+                // 2. 還原照片資料 (將 Base64 轉回 Blob 存入實體空間)
+                if (backup.photos) {
+                    await localforage.clear(); // 先清空舊照片，避免產生佔用空間的孤兒檔案
+                    for (let key in backup.photos) {
+                        let base64 = backup.photos[key];
+                        let res = await fetch(base64);
+                        let blob = await res.blob();
+                        await localforage.setItem(key, blob);
+                    }
+                }
+                
+                alert("🎉 還原大成功！畫面將自動重新整理以載入新資料。");
+                location.reload(); // 重新整理畫面
+            } catch (err) {
+                console.error(err);
+                alert("還原失敗！備份檔可能已損毀或格式錯誤。");
+            }
+        }
+        // =========================================================
         renderCalendar();
     </script>
 </body>
