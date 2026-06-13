@@ -12,6 +12,9 @@
     <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=4">
     <link rel="shortcut icon" href="icon.png?v=4">
     <link rel="manifest" href="manifest.json?v=2">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Nunito:wght@700;900&display=swap');
         
@@ -151,6 +154,8 @@
     filter: grayscale(30%);
 } 
     </style>
+</head>
+<body>
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
         <div class="header-center-wrap">
@@ -292,16 +297,13 @@
         </div>
     </div>
 
-   <div class="modal" id="eventDetailModal" style="z-index: 20;">
+    <div class="modal" id="eventDetailModal" style="z-index: 20;">
         <div class="modal-content">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 id="eventModalTitle" style="margin: 0;">新增行程</h3>
                 <button id="completeToggleBtn" type="button" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #5ece9d; background: #fff; color: #5ece9d; font-weight: bold; font-size: 13px; cursor: pointer; font-family: inherit;" onclick="toggleCompleteThisMonth()">標記完成</button>
             </div>
-            
-            <div class="input-group" style="display: flex; gap: 8px; align-items: flex-end;">
-                ```
             
             <div class="input-group" style="display: flex; gap: 8px; align-items: flex-end;">
                 <div style="flex: 1;">
@@ -345,10 +347,7 @@
                     <button class="remove-photo-btn" id="removePhotoBtn" onclick="removePhoto(event)">X</button>
                 </div>
             </div>
-<div class="input-group" style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
-    
-    <button id="completeToggleBtn" type="button" style="padding: 8px 16px; border-radius: 20px; border: 2px solid #5ece9d; background: #fff; color: #5ece9d; font-weight: bold; font-size: 14px; cursor: pointer; font-family: inherit;" onclick="toggleCompleteThisMonth()">標記完成</button>
-</div>
+
             <button id="deleteEventBtn" style="display:none; width:100%; background:#ffefef; color:#ff6b6b; border:2px solid #ffcccc; padding:10px; border-radius:10px; font-weight:bold; font-family:inherit; font-size:14px; margin-top:5px;" onclick="deleteCurrentEvent()">刪除此行程</button>
             <div class="btn-row">
                 <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeEventDetailModal()">返回</button>
@@ -475,71 +474,67 @@
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
         let currentQuickStatAct = '';
-        let tempPhotoBase64 = "";
         let currentEditingEventId = null;
+
+        // ======== 照片儲存相關變數 (升級 localForage 版) ========
+        let tempPhotoBlob = null;        // 暫存準備上傳的圖片檔案
+        let tempPhotoPreviewUrl = "";    // 暫存圖片預覽網址
+        let currentEventPhotoKey = "";   // 紀錄這筆行程原本在 IndexedDB 的 Key
+        let photoStatus = "unchanged";   // 追蹤照片狀態: 'unchanged', 'added', 'removed'
 
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-       function toggleBatchMode() {
-    if (isBatchMode) {
-        cancelBatchMode();
-        return;
-    }
-    isBatchMode = true;
-    batchSelectedDates.clear();
-    
-    // 自動載入已標記的休假日期
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        if (calendarData[dateKey] && calendarData[dateKey].husbandOff) {
-            batchSelectedDates.add(dateKey);
-        }
-    }
-    
-    document.getElementById('batchBar').style.display = 'flex';
-    document.getElementById('batchCount').innerText = batchSelectedDates.size;
-    renderCalendar();
-}
-
-        function cancelBatchMode() {
-    isBatchMode = false;
-    batchSelectedDates.clear();
-    document.getElementById('batchBar').style.display = 'none';
-    renderCalendar();
-}
-// 全選整月
-function selectAllMonth() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    batchSelectedDates.clear();
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        batchSelectedDates.add(dateKey);
-    }
-    document.getElementById('batchCount').innerText = batchSelectedDates.size;
-    renderCalendar();
-}
-
-// 清除全部選取
-function clearAllMonth() {
-    batchSelectedDates.clear();
-    document.getElementById('batchCount').innerText = '0';
-    renderCalendar();
-}
-        function handleDayClick(dateKey, displayDate) {
-            if (isBatchMode) {
-                if (batchSelectedDates.has(dateKey)) {
-                    batchSelectedDates.delete(dateKey);
-                } else {
+        function toggleBatchMode() {
+            if (isBatchMode) { cancelBatchMode(); return; }
+            isBatchMode = true; batchSelectedDates.clear();
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                if (calendarData[dateKey] && calendarData[dateKey].husbandOff) {
                     batchSelectedDates.add(dateKey);
                 }
+            }
+            document.getElementById('batchBar').style.display = 'flex';
+            document.getElementById('batchCount').innerText = batchSelectedDates.size;
+            renderCalendar();
+        }
+
+        function cancelBatchMode() {
+            isBatchMode = false;
+            batchSelectedDates.clear();
+            document.getElementById('batchBar').style.display = 'none';
+            renderCalendar();
+        }
+
+        function selectAllMonth() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            batchSelectedDates.clear();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                batchSelectedDates.add(dateKey);
+            }
+            document.getElementById('batchCount').innerText = batchSelectedDates.size;
+            renderCalendar();
+        }
+
+        function clearAllMonth() {
+            batchSelectedDates.clear();
+            document.getElementById('batchCount').innerText = '0';
+            renderCalendar();
+        }
+
+        function handleDayClick(dateKey, displayDate) {
+            if (isBatchMode) {
+                if (batchSelectedDates.has(dateKey)) batchSelectedDates.delete(dateKey);
+                else batchSelectedDates.add(dateKey);
+                
                 document.getElementById('batchCount').innerText = batchSelectedDates.size;
                 renderCalendar(); 
                 return;
@@ -548,44 +543,35 @@ function clearAllMonth() {
         }
 
         function saveBatchHusbandOff() {
-    if (batchSelectedDates.size === 0) {
-        alert('請至少選取一天！');
-        return;
-    }
-    
-    if (!confirm(`確定要將 ${batchSelectedDates.size} 天標記為老公休假日嗎？\n\n⚠️ 未選取的天數將會取消休假標記。`)) return;
-    
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        
-        if (batchSelectedDates.has(dateKey)) {
-            // 標記為休假
-            if (!calendarData[dateKey]) calendarData[dateKey] = {};
-            calendarData[dateKey].husbandOff = true;
-        } else {
-            // 取消休假標記
-            if (calendarData[dateKey]) {
-                calendarData[dateKey].husbandOff = false;
-                
-                if (!calendarData[dateKey].shift && 
-                    (!calendarData[dateKey].events || calendarData[dateKey].events.length === 0) &&
-                    (!calendarData[dateKey].shiftHistory || calendarData[dateKey].shiftHistory.length === 0)) {
-                    delete calendarData[dateKey];
+            if (batchSelectedDates.size === 0) { alert('請至少選取一天！'); return; }
+            if (!confirm(`確定要將 ${batchSelectedDates.size} 天標記為老公休假日嗎？\n\n⚠️ 未選取的天數將會取消休假標記。`)) return;
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                if (batchSelectedDates.has(dateKey)) {
+                    if (!calendarData[dateKey]) calendarData[dateKey] = {};
+                    calendarData[dateKey].husbandOff = true;
+                } else {
+                    if (calendarData[dateKey]) {
+                        calendarData[dateKey].husbandOff = false;
+                        if (!calendarData[dateKey].shift && 
+                            (!calendarData[dateKey].events || calendarData[dateKey].events.length === 0) &&
+                            (!calendarData[dateKey].shiftHistory || calendarData[dateKey].shiftHistory.length === 0)) {
+                            delete calendarData[dateKey];
+                        }
+                    }
                 }
             }
+            
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            const count = batchSelectedDates.size;
+            cancelBatchMode();
+            alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
         }
-    }
-    
-    localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-    
-    const count = batchSelectedDates.size;
-    cancelBatchMode();
-    alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
-}
 
         function updateStatsDisplay() {
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
@@ -691,23 +677,25 @@ function clearAllMonth() {
             bottomHtml += '</div>';
             return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
         }
-let tempCompletedMonths = [];
 
-function toggleCompleteThisMonth() {
-    let btn = document.getElementById('completeToggleBtn');
-    let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    let i = tempCompletedMonths.indexOf(cm);
-    if (i > -1) { tempCompletedMonths.splice(i, 1); btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
-    else { tempCompletedMonths.push(cm); btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
-}
+        let tempCompletedMonths = [];
 
-function updateCompleteButton() {
-    let btn = document.getElementById('completeToggleBtn');
-    if (!btn) return;
-    let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    if (tempCompletedMonths.includes(cm)) { btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
-    else { btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
-}
+        function toggleCompleteThisMonth() {
+            let btn = document.getElementById('completeToggleBtn');
+            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            let i = tempCompletedMonths.indexOf(cm);
+            if (i > -1) { tempCompletedMonths.splice(i, 1); btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+            else { tempCompletedMonths.push(cm); btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+        }
+
+        function updateCompleteButton() {
+            let btn = document.getElementById('completeToggleBtn');
+            if (!btn) return;
+            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            if (tempCompletedMonths.includes(cm)) { btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+            else { btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+        }
+
         function renderCalendar() {
             try {
                 updateStatsDisplay(); 
@@ -757,7 +745,6 @@ function updateCompleteButton() {
                 weeks.forEach(week => {
                     let wStart = week[0].dateKey;
                     let wEnd = week[6].dateKey;
-
                     let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
 
                     wEvents.sort((a, b) => {
@@ -830,8 +817,8 @@ function updateCompleteButton() {
                         }
 
                         let htmlObj = generateDayTags(finalShift);
-
                         let tracksHtml = "";
+
                         if (week.tracks && week.tracks.length > 0) {
                             week.tracks.forEach(trackLine => {
                                 const ev = trackLine[dIdx];
@@ -852,15 +839,15 @@ function updateCompleteButton() {
 
                                     const cStyle = colorStyles[ev.color] || colorStyles['blue'];
                                     let showText = !hasLeft; 
-let monKey = year + '-' + (month + 1).toString().padStart(2, '0');
-let done = ev.completedMonths && ev.completedMonths.includes(monKey);
-let doneClass = done ? ' completed' : '';
+                                    let monKey = year + '-' + (month + 1).toString().padStart(2, '0');
+                                    let done = ev.completedMonths && ev.completedMonths.includes(monKey);
+                                    let doneClass = done ? ' completed' : '';
 
-tracksHtml += `
-    <div class="event-item${doneClass}" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
-        ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
-    </div>
-`;
+                                    tracksHtml += `
+                                        <div class="event-item${doneClass}" style="background: ${cStyle.bg}; border-left: ${hasLeft ? 'none' : '3px solid ' + cStyle.border}; color: ${cStyle.text}; ${marginStyle} ${radiusStyle}">
+                                            ${showText ? `<div class="event-item-title" style="color:${cStyle.text}">${ev.title || "未命名"}</div>` : `<div style="line-height:1;">&nbsp;</div>`}
+                                        </div>
+                                    `;
                                 } else {
                                     tracksHtml += `<div style="height: 15px; pointer-events: none;"></div>`;
                                 }
@@ -887,7 +874,7 @@ tracksHtml += `
 
                         let husbandOffClass = savedData.husbandOff ? "husband-off-bg" : "";
                         let batchClass = (isBatchMode && batchSelectedDates.has(dateKey)) ? "batch-selected" : "";
-                       let husbandIcon = ``;
+                        let husbandIcon = ``;
 
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass} ${husbandOffClass} ${batchClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
@@ -981,60 +968,61 @@ tracksHtml += `
         }
 
         function saveShiftOnly() {
-    let shiftVal = document.getElementById('shiftInput').value.trim();
-    let parts = selectedDateString.split('-');
-    let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+            let shiftVal = document.getElementById('shiftInput').value.trim();
+            let parts = selectedDateString.split('-');
+            let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
 
-    if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
-    let savedData = calendarData[selectedDateString];
-    let currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+            if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
+            let savedData = calendarData[selectedDateString];
+            let currentDisplayShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
 
-    if (!savedData.shiftHistory) savedData.shiftHistory = [];
+            if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
-    let newTokens = shiftVal.split(/\s+/).filter(Boolean);
-    let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
-    
-    let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
-    let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
+            let newTokens = shiftVal.split(/\s+/).filter(Boolean);
+            let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
+            
+            let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
+            let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
 
-    if (hasNewAnnualLeave && !hadOldAnnualLeave) {
-        let isFromQuick = newTokens.some(t => t.startsWith('年休-'));
-        if (!isFromQuick) {
-            globalStats.annualLeave.push({
-                id: "st_" + Date.now(),
-                date: selectedDateString,
-                amount: -8,
-                desc: "年休 (排班自動扣除)"
-            });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            if (hasNewAnnualLeave && !hadOldAnnualLeave) {
+                let isFromQuick = newTokens.some(t => t.startsWith('年休-'));
+                if (!isFromQuick) {
+                    globalStats.annualLeave.push({
+                        id: "st_" + Date.now(),
+                        date: selectedDateString,
+                        amount: -8,
+                        desc: "年休 (排班自動扣除)"
+                    });
+                    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                }
+            }
+            else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
+                globalStats.annualLeave.push({
+                    id: "st_" + Date.now(),
+                    date: selectedDateString,
+                    amount: +8,
+                    desc: "取消年休 (自動加回)"
+                });
+                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            }
+
+            if (shiftVal === "" || shiftVal === autoInfo.shift) {
+                if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
+                delete savedData.shift;
+            } else {
+                if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
+                savedData.shift = shiftVal;
+            }
+
+            if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
+                delete calendarData[selectedDateString];
+            }
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            updateStatsDisplay();
+            closeModal(); 
+            renderCalendar();
         }
-    }
-    else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
-        globalStats.annualLeave.push({
-            id: "st_" + Date.now(),
-            date: selectedDateString,
-            amount: +8,
-            desc: "取消年休 (自動加回)"
-        });
-        localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    }
 
-    if (shiftVal === "" || shiftVal === autoInfo.shift) {
-        if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
-        delete savedData.shift;
-    } else {
-        if (currentDisplayShift !== shiftVal) savedData.shiftHistory.push(currentDisplayShift);
-        savedData.shift = shiftVal;
-    }
-
-    if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
-        delete calendarData[selectedDateString];
-    }
-    localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-    updateStatsDisplay();
-    closeModal(); 
-    renderCalendar();
-}
         function openStatsModal(t) {
             currentStatType = t;
             document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
@@ -1044,46 +1032,45 @@ tracksHtml += `
         }
 
         function renderStatsList() {
-    let data = globalStats[currentStatType] || [];
-    data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
-    
-    let balance = data.reduce((s, i) => s + i.amount, 0);
-    document.getElementById('statsModalBalance').innerText = balance;
-    
-    // 反向計算：從最早到最新，算出每筆後的餘額
-    let sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
-    let runningBalance = 0;
-    let balanceMap = {};
-    sortedAsc.forEach(item => {
-        runningBalance += item.amount;
-        balanceMap[item.id] = runningBalance;
-    });
-    
-    // 顯示時用反向（最新在前）
-    let html = "";
-    data.forEach(item => {
-        let isPos = item.amount >= 0;
-        let sign = isPos ? '+' : '';
-        let remain = balanceMap[item.id];
-        let remainColor = remain >= 0 ? '#3ba377' : '#ff6b6b';
-        
-        html += `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
-                <div>
-                    <div style="font-size:14px; font-weight:900;">${item.desc}</div>
-                    <div style="font-size:12px; color:#999;">${item.date}</div>
-                </div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <div style="text-align:right;">
-                        <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:14px;">${sign}${item.amount}</span>
-                        <div style="font-size:11px; color:${remainColor}; font-weight:700;">剩餘 ${remain}</div>
-                    </div>
-                    <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
-                </div>
-            </div>`;
-    });
-    document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>目前無紀錄</div>";
-}
+            let data = globalStats[currentStatType] || [];
+            data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+            
+            let balance = data.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('statsModalBalance').innerText = balance;
+            
+            let sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let runningBalance = 0;
+            let balanceMap = {};
+            sortedAsc.forEach(item => {
+                runningBalance += item.amount;
+                balanceMap[item.id] = runningBalance;
+            });
+            
+            let html = "";
+            data.forEach(item => {
+                let isPos = item.amount >= 0;
+                let sign = isPos ? '+' : '';
+                let remain = balanceMap[item.id];
+                let remainColor = remain >= 0 ? '#3ba377' : '#ff6b6b';
+                
+                html += `
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
+                        <div>
+                            <div style="font-size:14px; font-weight:900;">${item.desc}</div>
+                            <div style="font-size:12px; color:#999;">${item.date}</div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="text-align:right;">
+                                <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:14px;">${sign}${item.amount}</span>
+                                <div style="font-size:11px; color:${remainColor}; font-weight:700;">剩餘 ${remain}</div>
+                            </div>
+                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>目前無紀錄</div>";
+        }
+
         function saveManualStat() {
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
@@ -1092,14 +1079,14 @@ tracksHtml += `
             updateStatsDisplay(); renderStatsList();
         }
 
-
         function deleteStat(id) {
-    globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay(); 
-    renderStatsList();
-    renderCalendar();
-}
+            globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay(); 
+            renderStatsList();
+            renderCalendar();
+        }
+
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
         function openNightFeeModal() {
@@ -1133,7 +1120,7 @@ tracksHtml += `
             ex.forEach(ev => {
                 let rep = (ev.repeat && ev.repeat.type !== 'none') ? " 🔁" : "";
                 html += `
-                    <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')">
+                    <div class="edit-event-item" onclick="openEventDetailModal('${ev.id}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; padding:10px; border-radius:8px;">
                         <div><strong style="color:#444; font-size:15px; font-weight:900;">${ev.title || "未命名"}${rep}</strong><div style="font-size:12px; color:#888; font-weight:700;">${ev.startDate} ~ ${ev.endDate || ev.startDate}</div></div>
                         <span style="color:#a28cdb; font-size:18px;">✎</span>
                     </div>`;
@@ -1141,24 +1128,60 @@ tracksHtml += `
             document.getElementById('existingEventsList').innerHTML = html || "<div style='text-align:center; font-size:12px; color:#aaa; padding:5px; font-weight:700;'>無排定行程</div>";
         }
 
-        function openEventDetailModal(id = null) {
+        // ======================= 照片上傳邏輯大升級 =======================
+        function resetPhotoPreview() {
+            tempPhotoBlob = null;
+            if (tempPhotoPreviewUrl) { URL.revokeObjectURL(tempPhotoPreviewUrl); tempPhotoPreviewUrl = ""; }
+            photoStatus = "removed"; 
+            document.getElementById('photoPlaceholder').style.display = 'block';
+            document.getElementById('eventPhotoPreview').style.display = 'none';
+            document.getElementById('eventPhotoPreview').src = "";
+            document.getElementById('removePhotoBtn').style.display = 'none';
+            document.getElementById('eventPhotoInput').value = "";
+        }
+
+        async function openEventDetailModal(id = null) {
             currentEditingEventId = id; tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
+            currentEventPhotoKey = ""; 
             
-setTimeout(() => updateCompleteButton(), 100);
+            setTimeout(() => updateCompleteButton(), 100);
             document.getElementById('eventTitle').value = ""; document.getElementById('eventStartDate').value = selectedDateString;
             document.getElementById('eventEndDate').value = selectedDateString;
+            
             resetPhotoPreview();
+            photoStatus = "unchanged"; // 覆蓋 reset 裡的設定，表示還沒進行修改
+            
             if (id) {
                 document.getElementById('deleteEventBtn').style.display = "block";
                 let ev = getAllBaseEvents().find(e => e.id === id);
                 if (ev) {
                     document.getElementById('eventTitle').value = ev.title; document.getElementById('eventStartDate').value = ev.startDate;
                     tempCompletedMonths = [];
-if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
+                    if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
                     document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
                     selectColorInPicker(ev.color);
                     if (ev.repeat) tempRepeatSetting = JSON.parse(JSON.stringify(ev.repeat));
-                    if (ev.photoUrl) { tempPhotoBase64 = ev.photoUrl; showPhotoPreview(ev.photoUrl); }
+                    
+                    // 讀取照片 (支援相容舊版 Base64 與新版 IndexedDB)
+                    if (ev.photoUrl) { 
+                        currentEventPhotoKey = ev.photoUrl; 
+                        if (currentEventPhotoKey.startsWith('data:image')) {
+                            // 舊資料：直接顯示
+                            tempPhotoPreviewUrl = currentEventPhotoKey;
+                            showPhotoPreview(tempPhotoPreviewUrl);
+                        } else {
+                            // 新資料：從 localForage 取出實體 Blob
+                            try {
+                                const blob = await localforage.getItem(currentEventPhotoKey);
+                                if (blob) {
+                                    tempPhotoPreviewUrl = URL.createObjectURL(blob);
+                                    showPhotoPreview(tempPhotoPreviewUrl);
+                                } else {
+                                    currentEventPhotoKey = ""; ev.photoUrl = ""; 
+                                }
+                            } catch (e) { console.error("載入照片失敗", e); }
+                        }
+                    }
                 }
             } else {
                 document.getElementById('deleteEventBtn').style.display = "none";
@@ -1189,8 +1212,17 @@ if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.8); 
-                    showPhotoPreview(tempPhotoBase64);
+                    
+                    // 轉成實體 Blob，不轉成 Base64 字串！
+                    canvas.toBlob(function(blob) {
+                        tempPhotoBlob = blob;
+                        photoStatus = "added";
+                        if (tempPhotoPreviewUrl && !tempPhotoPreviewUrl.startsWith('data:image')) {
+                            URL.revokeObjectURL(tempPhotoPreviewUrl); // 釋放舊記憶體
+                        }
+                        tempPhotoPreviewUrl = URL.createObjectURL(blob);
+                        showPhotoPreview(tempPhotoPreviewUrl);
+                    }, 'image/jpeg', 0.8); 
                 };
                 img.src = e.target.result;
             };
@@ -1204,28 +1236,99 @@ if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
             document.getElementById('removePhotoBtn').style.display = 'block';
         }
 
-        function resetPhotoPreview() {
-            tempPhotoBase64 = "";
-            document.getElementById('photoPlaceholder').style.display = 'block';
-            document.getElementById('eventPhotoPreview').style.display = 'none';
-            document.getElementById('eventPhotoPreview').src = "";
-            document.getElementById('removePhotoBtn').style.display = 'none';
-            document.getElementById('eventPhotoInput').value = "";
-        }
-
         function removePhoto(e) { e.stopPropagation(); resetPhotoPreview(); }
 
-        function saveEventDetail() {
+        async function saveEventDetail() {
             let t = document.getElementById('eventTitle').value.trim(), sD = document.getElementById('eventStartDate').value, eD = document.getElementById('eventEndDate').value;
             if (!t) return alert("請填寫標題！"); if (sD > eD) return alert("結束不能早於開始！");
-            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64, completedMonths: tempCompletedMonths };
+            
+            let finalPhotoKey = currentEventPhotoKey;
+
+            // 處理照片存檔或刪除的邏輯 (localForage)
+            if (photoStatus === "removed" && currentEventPhotoKey) {
+                if (!currentEventPhotoKey.startsWith('data:image')) await localforage.removeItem(currentEventPhotoKey);
+                finalPhotoKey = "";
+            } else if (photoStatus === "added" && tempPhotoBlob) {
+                if (currentEventPhotoKey && !currentEventPhotoKey.startsWith('data:image')) {
+                    await localforage.removeItem(currentEventPhotoKey); // 砍掉舊照片
+                }
+                finalPhotoKey = 'photo_' + Date.now(); // 產生全新檔名
+                await localforage.setItem(finalPhotoKey, tempPhotoBlob); // 存進手機空間
+            }
+
+            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: finalPhotoKey, completedMonths: tempCompletedMonths };
             if (currentEditingEventId) { for (let k in calendarData) if (calendarData[k].events) calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); }
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
+            
             localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
+
+        async function deleteCurrentEvent() {
+            if (!confirm("確定要刪除這個行程嗎？")) return;
+            if (currentEditingEventId) {
+                
+                // 刪除行程前，如果他有存照片，順便從手機底層把照片清掉
+                if (currentEventPhotoKey && !currentEventPhotoKey.startsWith('data:image')) {
+                    await localforage.removeItem(currentEventPhotoKey);
+                }
+
+                for (let k in calendarData) {
+                    if (calendarData[k].events) {
+                        calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId);
+                        
+                        if (calendarData[k].events.length === 0 && 
+                            calendarData[k].shift === undefined && 
+                            (!calendarData[k].shiftHistory || calendarData[k].shiftHistory.length === 0) &&
+                            !calendarData[k].husbandOff) {
+                            delete calendarData[k];
+                        }
+                    }
+                }
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                renderEventListInModal();
+                renderCalendar();
+                closeEventDetailModal();
+            }
+        }
+
+        async function autoCleanOldPhotos() {
+            const today = new Date();
+            const expireDays = 90; 
+            let dataChanged = false;
+
+            for (let dateKey in calendarData) {
+                if (calendarData[dateKey].events) {
+                    for (let ev of calendarData[dateKey].events) {
+                        if (ev.photoUrl && ev.photoUrl !== "") {
+                            let targetDateStr = ev.endDate || ev.startDate;
+                            if (targetDateStr) {
+                                let eventDate = new Date(targetDateStr);
+                                let diffTime = today.getTime() - eventDate.getTime();
+                                let diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                                if (diffDays > expireDays) {
+                                    // 殺掉過期照片釋放空間
+                                    if (!ev.photoUrl.startsWith('data:image')) {
+                                        await localforage.removeItem(ev.photoUrl);
+                                    }
+                                    ev.photoUrl = ""; 
+                                    dataChanged = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (dataChanged) {
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                console.log("🧹 已自動清理超過 " + expireDays + " 天的舊照片，釋放空間！");
+            }
+        }
+        // =========================================================
 
         function openRepeatModal() { syncRepeatSummary(); document.getElementById('repeatModal').style.display = 'flex'; }
         function closeRepeatModal() { document.getElementById('repeatModal').style.display = 'none'; }
@@ -1282,105 +1385,34 @@ if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
         function selectColorInPicker(color) {
             selectedEventColor = color || 'blue';
             document.querySelectorAll('.color-dot').forEach(el => {
-                if (el.dataset.color === selectedEventColor) {
-                    el.classList.add('selected');
-                } else {
-                    el.classList.remove('selected');
-                }
+                if (el.dataset.color === selectedEventColor) el.classList.add('selected');
+                else el.classList.remove('selected');
             });
         }
 
         document.querySelectorAll('.color-dot').forEach(el => {
-            el.addEventListener('click', function() {
-                selectColorInPicker(this.dataset.color);
-            });
+            el.addEventListener('click', function() { selectColorInPicker(this.dataset.color); });
         });
 
-        function deleteCurrentEvent() {
-            if (!confirm("確定要刪除這個行程嗎？")) return;
-            if (currentEditingEventId) {
-                for (let k in calendarData) {
-                    if (calendarData[k].events) {
-                        calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId);
-                        
-                        if (calendarData[k].events.length === 0 && 
-                            calendarData[k].shift === undefined && 
-                            (!calendarData[k].shiftHistory || calendarData[k].shiftHistory.length === 0) &&
-                            !calendarData[k].husbandOff) {
-                            delete calendarData[k];
-                        }
-                    }
-                }
-                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-                renderEventListInModal();
-                renderCalendar();
-                closeEventDetailModal();
-            }
-        }
-
-        function autoCleanOldPhotos() {
-            const today = new Date();
-            const expireDays = 90; 
-            let dataChanged = false;
-
-            for (let dateKey in calendarData) {
-                if (calendarData[dateKey].events) {
-                    calendarData[dateKey].events.forEach(ev => {
-                        if (ev.photoUrl && ev.photoUrl !== "") {
-                            let targetDateStr = ev.endDate || ev.startDate;
-                            if (targetDateStr) {
-                                let eventDate = new Date(targetDateStr);
-                                let diffTime = today.getTime() - eventDate.getTime();
-                                let diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-                                if (diffDays > expireDays) {
-                                    ev.photoUrl = ""; 
-                                    dataChanged = true;
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-
-            if (dataChanged) {
-                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-                console.log("🧹 已自動清理超過 " + expireDays + " 天的舊照片，釋放空間！");
-            }
-        }
-
-        autoCleanOldPhotos();
         // 滑動手勢切換月份
-let touchStartX = 0;
-let touchStartY = 0;
-
-document.addEventListener('DOMContentLoaded', function() {
-    const calendarEl = document.getElementById('calendar');
-    
-    calendarEl.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-    
-    calendarEl.addEventListener('touchend', function(e) {
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
+        let touchStartX = 0; let touchStartY = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            calendarEl.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            calendarEl.addEventListener('touchend', function(e) {
+                const touchEndX = e.changedTouches[0].clientX; const touchEndY = e.changedTouches[0].clientY;
+                const diffX = touchEndX - touchStartX; const diffY = touchEndY - touchStartY;
+                
+                if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0) changeMonth(-1); else changeMonth(1);
+                }
+            });
+            autoCleanOldPhotos();
+        });
         
-        const diffX = touchEndX - touchStartX;
-        const diffY = touchEndY - touchStartY;
-        
-        // 水平滑動距離大於 50px，且大於垂直滑動距離
-        if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-            if (diffX > 0) {
-                // 往右滑 → 上個月
-                changeMonth(-1);
-            } else {
-                // 往左滑 → 下個月
-                changeMonth(1);
-            }
-        }
-    });
-});
         renderCalendar();
     </script>
 </body>
