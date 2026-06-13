@@ -292,9 +292,16 @@
         </div>
     </div>
 
-    <div class="modal" id="eventDetailModal" style="z-index: 20;">
+   <div class="modal" id="eventDetailModal" style="z-index: 20;">
         <div class="modal-content">
-            <h3 id="eventModalTitle">新增行程</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="eventModalTitle" style="margin: 0;">新增行程</h3>
+                <button id="completeToggleBtn" type="button" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #5ece9d; background: #fff; color: #5ece9d; font-weight: bold; font-size: 13px; cursor: pointer; font-family: inherit;" onclick="toggleCompleteThisMonth()">標記完成</button>
+            </div>
+            
+            <div class="input-group" style="display: flex; gap: 8px; align-items: flex-end;">
+                ```
             
             <div class="input-group" style="display: flex; gap: 8px; align-items: flex-end;">
                 <div style="flex: 1;">
