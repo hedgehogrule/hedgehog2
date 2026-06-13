@@ -1136,8 +1136,7 @@ tracksHtml += `
 
         function openEventDetailModal(id = null) {
             currentEditingEventId = id; tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
-            tempCompletedMonths = [];
-if (ev && ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
+            
 setTimeout(() => updateCompleteButton(), 100);
             document.getElementById('eventTitle').value = ""; document.getElementById('eventStartDate').value = selectedDateString;
             document.getElementById('eventEndDate').value = selectedDateString;
@@ -1147,6 +1146,8 @@ setTimeout(() => updateCompleteButton(), 100);
                 let ev = getAllBaseEvents().find(e => e.id === id);
                 if (ev) {
                     document.getElementById('eventTitle').value = ev.title; document.getElementById('eventStartDate').value = ev.startDate;
+                    tempCompletedMonths = [];
+if (ev.completedMonths) tempCompletedMonths = [...ev.completedMonths];
                     document.getElementById('eventEndDate').value = ev.endDate || ev.startDate;
                     selectColorInPicker(ev.color);
                     if (ev.repeat) tempRepeatSetting = JSON.parse(JSON.stringify(ev.repeat));
@@ -1210,7 +1211,7 @@ setTimeout(() => updateCompleteButton(), 100);
         function saveEventDetail() {
             let t = document.getElementById('eventTitle').value.trim(), sD = document.getElementById('eventStartDate').value, eD = document.getElementById('eventEndDate').value;
             if (!t) return alert("請填寫標題！"); if (sD > eD) return alert("結束不能早於開始！");
-            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64 };, completedMonths: tempCompletedMonths
+            let evObj = { id: currentEditingEventId || ("ev_" + Date.now()), title: t, color: selectedEventColor, startDate: sD, endDate: eD, repeat: tempRepeatSetting, photoUrl: tempPhotoBase64, completedMonths: tempCompletedMonths };
             if (currentEditingEventId) { for (let k in calendarData) if (calendarData[k].events) calendarData[k].events = calendarData[k].events.filter(e => e.id !== currentEditingEventId); }
             if (!calendarData[sD]) calendarData[sD] = { events: [] };
             if (!calendarData[sD].events) calendarData[sD].events = [];
