@@ -163,12 +163,7 @@
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">📍 今天</button>
                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-                <div class="header-center">
-                <h2 id="monthYear"></h2>
-                <button class="today-btn" onclick="goToday()">📍 今天</button>
-               <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">⚙️ 備份</button>
-            </div>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -402,15 +397,7 @@
             </div>
         </div>
     </div>
-<!-- （上面是原本「重複設定」視窗結尾的幾行） -->
-            <div class="btn-row">
-                <button class="btn" style="background:#ffeaea; color:#ff6b6b; font-size:14px;" onclick="clearRepeatSetting()">清除</button>
-                <button class="btn" style="background:#5b9bd5; color:white; font-size:14px;" onclick="saveRepeatSetting()">設定完成</button>
-            </div>
-        </div>
-    </div>
 
-   
     <div class="modal" id="backupModal" style="z-index: 50;">
         <div class="modal-content" style="max-width: 320px;">
             <h3 style="margin-bottom: 15px; color:#444; text-align:center;">💾 資料備份與還原</h3>
@@ -431,11 +418,6 @@
         </div>
     </div>
 
-
-
-    <script>
-        const shiftPatterns = [
-            ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
     <script>
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
@@ -1452,7 +1434,7 @@
             autoCleanOldPhotos();
         });
         
-      // ======================= 備份與還原功能 =======================
+        // ======================= 備份與還原功能 =======================
         function openBackupModal() { document.getElementById('backupModal').style.display = 'flex'; }
         function closeBackupModal() { document.getElementById('backupModal').style.display = 'none'; }
 
@@ -1537,6 +1519,7 @@
             }
         }
         // =========================================================
+        
         renderCalendar();
     </script>
 </body>
