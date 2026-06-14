@@ -405,15 +405,16 @@
             ["DB1", "D7", "D1", "D8", "D5", "OFF", "OFF"], ["D3", "DB1", "N2", "N1", "N1", "N2", "OFF"],
             ["OFF", "D10", "D3", "D7", "D1", "OFF", "OFF"], ["12-8 1", "12-8 2", "12-8 3", "12-8 4", "12-8 5", "OFF", "E2"],
             ["12-8 2", "12-8 3", "12-8 4", "12-8 5", "12-8 1", "OFF", "OFF"], ["D7", "D4", "D9", "DB1", "D2", "OFF", "D2"],
-            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   ["12-8 3", "12-8 4", "12-8 5", "12-8 1", "12-8 2", "E1", "OFF"],
-            ["12-8 4", "12-8 5", "12-8 1", "12-8 2", "12-8 3", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "9-5訪", "OFF"],
-            ["D2", "D5", "DB1", "D6", "D8", "OFF", "D1"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D", "D3", "D10", "D1", "D9", "OFF", "OFF"],   ["12-8 3", "12-8 1", "12-8 2", "12-8 3", "12-8 1", "E1", "OFF"],
+            ["12-8 1", "12-8 2", "12-8 3", "12-8 1", "12-8 2", "OFF", "OFF"], ["D1", "D9", "D4", "D9", "D6", "OFF", "OFF"],
+            ["D9", "D", "DB1", "D6", "D8", "OFF", "D1"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
-            ["12-8 5", "12-8 1", "12-8 2", "12-8 3", "12-8 4", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"],
-            ["D6", "D1", "D8", "D3", "D10", "D3", "OFF"],   ["D", "D", "D", "D", "D", "OFF", "OFF"],
-            ["D11", "D11", "D11", "D11", "D11", "OFF", "9-5訪"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D", "D", "D", "D", "D", "OFF", "OFF"], ["D8", "D2", "D7", "D4", "D", "OFF.B", "OFF"],
+            ["D6", "D1", "D8", "D3", "D10", "OFF", "OFF"],   ["D", "D6", "D", "D6", "D", "OFF", "OFF"],
+            ["D11", "D11", "D11", "D11", "D11", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
-            ["D", "D", "D", "D", "D", "D4", "OFF"],         ["D13", "D13", "D13", "D13", "D13", "OFF", "OFF"]
+            ["D", "D", "D", "D", "D", "OFF", "OFF"],         ["D", "D", "D", "D", "D", "OFF", "OFF"]
+            ["D", "D", "D", "D", "D", "OFF", "OFF"]
         ];
 
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
@@ -424,7 +425,7 @@
             green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
            purple: { bg: 'rgba(246, 194, 62, 0.25)', text: '#a67c00', border: '#f6c23e' },
             gray: { bg: 'rgba(204, 204, 204, 0.3)', text: '#555555', border: '#cccccc' },
-            orange: { bg: 'rgba(255, 166, 124, 0.25)', text: '#a13b08', border: '#ffa67c' },
+            orange: { bg: 'rgba(255, 166, 124, 0.2)', text: '#a13b08', border: '#ffa67c' },
             transparent: { bg: 'transparent', text: '#666666', border: '#cccccc' }
         };
 
@@ -438,8 +439,8 @@
             let targetMon = new Date(y, m, d + diff);
             let ref = new Date(2026, 6, 6); 
             let weeksDiff = Math.floor(Math.round((targetMon - ref) / 864e5) / 7);
-            let idx = (13 + weeksDiff) % 34;
-            if (idx < 0) idx += 34; 
+            let idx = (13 + weeksDiff) % 35;
+            if (idx < 0) idx += 35; 
             return { shift: shiftPatterns[idx][dayW === 0 ? 6 : dayW - 1], weekNumber: idx + 1 };
         }
 
