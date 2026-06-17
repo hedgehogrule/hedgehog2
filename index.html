@@ -140,9 +140,26 @@
         <div class="header-center-wrap">
             <div class="header-center">
                 <h2 id="monthYear"></h2>
-                <button class="today-btn" onclick="goToday()">📍 今天</button>
+                <button class="today-btn" onclick="goToday()">🌱 今天</button>
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">⚙️ 備份</button>
+                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important; display: inline-flex; align-items: center; gap: 4px; padding-left: 6px !important;" onclick="openBackupModal()">
+    <!-- 紫色皮克敏 SVG 小圖示 -->
+    <svg width="15" height="15" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <!-- 綠色莖與小葉子 -->
+        <path d="M12 11 Q12 6 15 4" stroke="#5ece9d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M15 4 Q13 1 17 2 Q19 5 15 4Z" fill="#5ece9d"/>
+        <!-- 胖胖的紫色身體 -->
+        <ellipse cx="12" cy="16" rx="7" ry="6" fill="#8a6db5"/>
+        <!-- 呆萌的眼睛 -->
+        <circle cx="9.5" cy="14.5" r="1.5" fill="white"/>
+        <circle cx="14.5" cy="14.5" r="1.5" fill="white"/>
+        <circle cx="9.5" cy="14.5" r="0.6" fill="black"/>
+        <circle cx="14.5" cy="14.5" r="0.6" fill="black"/>
+        <!-- 紫色皮克敏特有的小鬚鬚 -->
+        <path d="M5 14.5 L3 13.5 M5 16.5 L3 17.5 M19 14.5 L21 13.5 M19 16.5 L21 17.5" stroke="#8a6db5" stroke-width="1.2" stroke-linecap="round"/>
+    </svg> 
+    備份
+</button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
