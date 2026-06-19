@@ -352,6 +352,10 @@
                     <span id="repUnitText" style="color:#555; font-weight:bold; font-size:15px;">年</span>
                 </div>
             </div>
+            <div class="repeat-row" id="monthOptionRow" style="display:none; justify-content: flex-start; gap: 15px; margin-left: 10px;">
+    <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="date" checked onchange="updateRepSummary()"> 同一天</label>
+    <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="nthDay" onchange="updateRepSummary()"> 第<span id="nthDayText"></span></label>
+</div>
             <div class="repeat-row">
                 <label>開始</label>
                 <div id="repStartText" style="color:#5b9bd5; font-weight:bold; font-size:14px;"></div>
@@ -607,6 +611,10 @@
                     let interval = parseInt(ev.repeat.interval) || 1;
                     if (interval < 1) interval = 1;
 
+                    // 新增：記錄初始的「第幾週」與「星期幾」，以備計算使用
+                    let origN = Math.ceil(currS.getDate() / 7);
+                    let origWDay = currS.getDay();
+
                     while(true) {
                         let iStart = formatDateLocal(currS);
                         let iEnd = formatDateLocal(new Date(currS.getTime() + dur));
@@ -614,9 +622,28 @@
                         if (iEnd >= vStart && iStart <= vEnd) expanded.push({...ev, instanceId: ev.id+'_'+safe, startDate: iStart, endDate: iEnd});
                         
                         if (ev.repeat.type === 'year') currS.setFullYear(currS.getFullYear() + interval);
-                        else if (ev.repeat.type === 'month') currS.setMonth(currS.getMonth() + interval);
+                        else if (ev.repeat.type === 'month') {
+                            // 新增：分岔判斷是同一天還是第幾個星期幾
+                            if (ev.repeat.monthType === 'nthDay') {
+                                currS.setDate(1); // 歸零到1號，避免月底跳月問題
+                                currS.setMonth(currS.getMonth() + interval);
+                                let firstDayWDay = currS.getDay();
+                                let diff = origWDay - firstDayWDay;
+                                if (diff < 0) diff += 7;
+                                let targetDate = 1 + diff + (origN - 1) * 7;
+                                let daysInMonth = new Date(currS.getFullYear(), currS.getMonth() + 1, 0).getDate();
+                                if (targetDate > daysInMonth) targetDate -= 7; // 如果超過該月天數，退回上一週
+                                currS.setDate(targetDate);
+                            } else {
+                                let currentMonth = currS.getMonth();
+                                currS.setMonth(currentMonth + interval);
+                                // 修正原本瀏覽器原生 setMonth 遇到 1/31 自動跳成 3/3 的潛在 BUG
+                                if (currS.getMonth() !== (currentMonth + interval) % 12) {
+                                    currS.setDate(0); // 退回上個月最後一天
+                                }
+                            }
+                        }
                         else if (ev.repeat.type === 'week') currS.setDate(currS.getDate() + interval * 7);
-                        else if (ev.repeat.type === 'day') currS.setDate(currS.getDate() + interval);
                         else break;
                         
                         safe++; if(safe>1000) break;
@@ -1191,6 +1218,15 @@
                 setRepType(tempRepeatSetting.type); document.getElementById('repInterval').value = tempRepeatSetting.interval;
                 if(tempRepeatSetting.endType === 'specific') { document.getElementsByName('repEndType')[1].checked = true; document.getElementById('repEndDate').value = tempRepeatSetting.endDate; }
                 else document.getElementsByName('repEndType')[0].checked = true;
+
+                // 新增：載入月份選項狀態
+                if (tempRepeatSetting.monthType === 'nthDay') document.getElementsByName('monthType')[1].checked = true;
+                else document.getElementsByName('monthType')[0].checked = true;
+            } else { 
+                setRepType('year'); tempRepeatSetting.type = 'none'; 
+                if (document.getElementsByName('monthType').length > 0) {
+                    document.getElementsByName('monthType')[0].checked = true; // 新增：預設勾選同一天
+                }
             } else { setRepType('year'); tempRepeatSetting.type = 'none'; }
             syncRepeatSummary(); updateRepeatDisplayBtn();
             document.getElementById('eventDetailModal').style.display = 'flex';
@@ -1339,6 +1375,7 @@
             document.getElementById('tab-'+t).classList.add('active'); 
             const unitMap = { 'year': '年', 'month': '月', 'week': '週'};
             document.getElementById('repUnitText').innerText = unitMap[t] || '年';
+           document.getElementById('monthOptionRow').style.display = (t === 'month') ? 'flex' : 'none';
             updateRepSummary(); 
         }
 
@@ -1349,6 +1386,10 @@
             let p = document.getElementById('eventStartDate').value.split('-');
             if(p.length === 3) document.getElementById('repStartText').innerText = `${p[0]}年 ${parseInt(p[1])}月 ${parseInt(p[2])}日`;
             updateRepSummary();
+       let d = new Date(p[0], p[1]-1, p[2]);
+        let n = Math.ceil(d.getDate() / 7);
+        let dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+        document.getElementById('nthDayText').innerText = `${n}個星期${dayNames[d.getDay()]}`;
         }
         function updateRepSummary() {
             tempRepeatSetting.interval = parseInt(document.getElementById('repInterval').value) || 1;
@@ -1357,12 +1398,26 @@
             if (tempRepeatSetting.endType === 'specific') { document.getElementById('repEndDateContainer').style.display = 'block'; tempRepeatSetting.endDate = document.getElementById('repEndDate').value; }
             else document.getElementById('repEndDateContainer').style.display = 'none';
 
+            // 新增：儲存月份類型
+            let mRadios = document.getElementsByName('monthType');
+            for(let r of mRadios) if(r.checked) tempRepeatSetting.monthType = r.value;
+
             if (tempRepeatSetting.type === 'none') { document.getElementById('repSummaryText').innerText = "不重複"; return; }
+            
             let p = document.getElementById('eventStartDate').value.split('-');
-            let unit = {'year':'年','month':'月','week':'週',}[tempRepeatSetting.type];
+            let unit = {'year':'年','month':'月','week':'週'}[tempRepeatSetting.type];
             let sum = `每 ${tempRepeatSetting.interval} ${unit}`;
+
             if (tempRepeatSetting.type === 'year') sum += `的 ${parseInt(p[1])}月${parseInt(p[2])}日`;
-            else if (tempRepeatSetting.type === 'month') sum += `的 ${parseInt(p[2])}日`;
+            else if (tempRepeatSetting.type === 'month') {
+                // 新增：根據選項變更文字
+                if (tempRepeatSetting.monthType === 'nthDay') {
+                    sum += `的第` + document.getElementById('nthDayText').innerText;
+                } else {
+                    sum += `的 ${parseInt(p[2])}日`;
+                }
+            }
+            
             if (tempRepeatSetting.endType === 'specific' && tempRepeatSetting.endDate) sum += `，至 ${tempRepeatSetting.endDate}`;
             document.getElementById('repSummaryText').innerText = sum;
         }
