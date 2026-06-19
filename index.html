@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="icon.png?v=4">
     <meta name="theme-color" content="#ffe0f0">
     <link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=4">
-    <link rel="icon" type="image/pg" sizes="512x512" href="icon.png?v=4">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=4">
     <link rel="shortcut icon" href="icon.png?v=4">
     <link rel="manifest" href="manifest.json?v=2">
     
@@ -142,9 +142,9 @@
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">🌱 今天</button>
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-<button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important; padding: 2px 10px !important; font-size: 14px !important;" onclick="openBackupModal()">
-    💾 備份
-</button>
+                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important; padding: 2px 10px !important; font-size: 14px !important;" onclick="openBackupModal()">
+                    💾 備份
+                </button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -1227,7 +1227,7 @@
                 if (document.getElementsByName('monthType').length > 0) {
                     document.getElementsByName('monthType')[0].checked = true; // 新增：預設勾選同一天
                 }
-            } else { setRepType('year'); tempRepeatSetting.type = 'none'; }
+            }
             syncRepeatSummary(); updateRepeatDisplayBtn();
             document.getElementById('eventDetailModal').style.display = 'flex';
         }
@@ -1375,7 +1375,7 @@
             document.getElementById('tab-'+t).classList.add('active'); 
             const unitMap = { 'year': '年', 'month': '月', 'week': '週'};
             document.getElementById('repUnitText').innerText = unitMap[t] || '年';
-           document.getElementById('monthOptionRow').style.display = (t === 'month') ? 'flex' : 'none';
+            document.getElementById('monthOptionRow').style.display = (t === 'month') ? 'flex' : 'none';
             updateRepSummary(); 
         }
 
@@ -1384,13 +1384,18 @@
         
         function syncRepeatSummary() {
             let p = document.getElementById('eventStartDate').value.split('-');
-            if(p.length === 3) document.getElementById('repStartText').innerText = `${p[0]}年 ${parseInt(p[1])}月 ${parseInt(p[2])}日`;
+            if(p.length === 3) {
+                document.getElementById('repStartText').innerText = `${p[0]}年 ${parseInt(p[1])}月 ${parseInt(p[2])}日`;
+
+                // 計算目前選的日期是「第幾個星期幾」
+                let d = new Date(p[0], p[1]-1, p[2]);
+                let n = Math.ceil(d.getDate() / 7);
+                let dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                document.getElementById('nthDayText').innerText = `${n}個星期${dayNames[d.getDay()]}`;
+            }
             updateRepSummary();
-       let d = new Date(p[0], p[1]-1, p[2]);
-        let n = Math.ceil(d.getDate() / 7);
-        let dayNames = ['日', '一', '二', '三', '四', '五', '六'];
-        document.getElementById('nthDayText').innerText = `${n}個星期${dayNames[d.getDay()]}`;
         }
+        
         function updateRepSummary() {
             tempRepeatSetting.interval = parseInt(document.getElementById('repInterval').value) || 1;
             let radios = document.getElementsByName('repEndType');
