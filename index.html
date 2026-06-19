@@ -1351,7 +1351,7 @@
             tempRepeatSetting.type = t; 
             document.querySelectorAll('.rep-tab').forEach(el => el.classList.remove('active')); 
             document.getElementById('tab-'+t).classList.add('active'); 
-            const unitMap = { 'year': '年', 'month': '月', 'week': '週', 'day': '天' };
+            const unitMap = { 'year': '年', 'month': '月', 'week': '週'};
             document.getElementById('repUnitText').innerText = unitMap[t] || '年';
             updateRepSummary(); 
         }
@@ -1373,7 +1373,7 @@
 
             if (tempRepeatSetting.type === 'none') { document.getElementById('repSummaryText').innerText = "不重複"; return; }
             let p = document.getElementById('eventStartDate').value.split('-');
-            let unit = {'year':'年','month':'月','week':'週','day':'天'}[tempRepeatSetting.type];
+            let unit = {'year':'年','month':'月','week':'週',}[tempRepeatSetting.type];
             let sum = `每 ${tempRepeatSetting.interval} ${unit}`;
             if (tempRepeatSetting.type === 'year') sum += `的 ${parseInt(p[1])}月${parseInt(p[2])}日`;
             else if (tempRepeatSetting.type === 'month') sum += `的 ${parseInt(p[2])}日`;
