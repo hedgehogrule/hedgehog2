@@ -30,18 +30,24 @@
         .header button { background: none; border: none; font-size: 24px; color: #777; cursor: pointer; padding: 2px 6px; font-weight: bold; }
         .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
         
-        /* 允許按鈕太擠時自動換行 */
-        .header-center { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
-        .header h2 { margin: 0; font-size: 19px; font-weight: 800; color: #555; letter-spacing: 1px; white-space: nowrap; }
+        /* 拆分按鈕區塊：標題與今天一排、其他功能一排 */
+        .header-title-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+        .header-btn-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        
+        .header h2 { margin: 0; font-size: 20px; font-weight: 800; color: #555; letter-spacing: 1px; white-space: nowrap; }
         .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 4px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; cursor: pointer; white-space: nowrap; }
         .today-btn:active { transform: scale(0.9); }
         
-        /* 頂部結餘方框：改成 2x2 兩排網格，避免橫向爆框 */
-        .header-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; width: 100%; max-width: 340px; }
-        .stat-box { background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 4px 2px; font-size: 12px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap; }
-        .stat-box span { font-size: 15px; font-weight: 800; color: #444; }
-        .stat-box.night-fee { border-color: #ffcc80; color: #e65100; cursor: pointer; }
+        /* 頂部結餘方框：設定一排最多 3 個 */
+        .header-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; max-width: 380px; margin-top: 2px; }
+        .stat-box { flex: 1 1 calc(33% - 4px); min-width: 85px; max-width: 115px; background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 0 4px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-box span { font-size: 13.5px; font-weight: 900; color: #444; }
+        
+        .stat-box.night-fee { border-color: #ffcc80; color: #e65100; }
         .stat-box.night-fee span { color: #e65100; }
+        
+        .stat-box.ot-fee { border-color: #fca5a5; color: #dc2626; }
+        .stat-box.ot-fee span { color: #dc2626; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
@@ -140,19 +146,21 @@
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
         <div class="header-center-wrap">
-            <div class="header-center">
+            <div class="header-title-row">
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">🌱 今天</button>
-                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important; padding: 2px 10px !important; font-size: 14px !important;" onclick="openBackupModal()">
-                    💾 備份
-                </button>
             </div>
+            
+            <div class="header-btn-row">
+                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
+                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
+            </div>
+
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
-                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰夜班 $<span id="hdrNightFee">0</span></div>
-                <div class="stat-box" style="border-color: #fca5a5; color: #dc2626; cursor: pointer;" onclick="openOtFeeModal()">⏱️加班 $<span id="hdrOtFee">0</span></div>
+                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰 夜班 $<span id="hdrNightFee">0</span></div>
+                <div class="stat-box ot-fee" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
