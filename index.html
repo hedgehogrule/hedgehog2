@@ -146,17 +146,14 @@
     <div class="header">
         <button onclick="changeMonth(-1)">&#10094;</button>
         <div class="header-center-wrap">
-            <div class="header-title-row">
-                <h2 id="monthYear"></h2>
-                <button class="today-btn" onclick="goToday()">🌱 今天</button>
+            <div class="header-btn-row">
+                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
+                <button class="today-btn" style="color:#ff6b81 !important; border-color:#ff6b81 !important;" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></button>
             </div>
-            
+
             <div class="header-stats">
-                <div class="stat-box" style="border-color:#5b9bd5; color:#5b9bd5;" onclick="toggleBatchMode()">🌿 森休假</div>
-                <div class="stat-box" style="border-color:#c3b3ef; color:#7a6baf;" onclick="openBackupModal()">💾 備份</div>
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
-                
-                <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
+                <div class="stat-box" style="border-color:#c3b3ef; cursor:pointer;" onclick="openBackupModal()">💾 <span style="color:#7a6baf;">備份</span></div>
                 <div class="stat-box night-fee" onclick="openNightFeeModal()">💰 夜班 $<span id="hdrNightFee">0</span></div>
                 <div class="stat-box ot-fee" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></div>
             </div>
