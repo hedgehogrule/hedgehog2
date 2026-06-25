@@ -149,7 +149,8 @@
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
-                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰  $<span id="hdrNightFee">0</span></div>
+                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰夜班 $<span id="hdrNightFee">0</span></div>
+                <div class="stat-box" style="border-color: #fca5a5; color: #dc2626; cursor: pointer;" onclick="openOtFeeModal()">⏱️加班 $<span id="hdrOtFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
@@ -276,6 +277,15 @@
             <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: $<span id="nightFeeTotal" style="font-size:28px; color:#e65100; margin-left:5px;">0</span></div>
             <div id="nightFeeList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeNightFeeModal()">關閉</button>
+        </div>
+    </div>
+
+    <div class="modal" id="otFeeModal" style="z-index: 30;">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 19px; font-weight: bold; color: #444; text-align: center;">⏱️ 本月加班費明細</h3>
+            <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: $<span id="otFeeTotal" style="font-size:28px; color:#dc2626; margin-left:5px;">0</span></div>
+            <div id="otFeeList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
+            <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeOtFeeModal()">關閉</button>
         </div>
     </div>
 
@@ -478,6 +488,7 @@
         
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
+        let currentMonthOtFees = []; // 新增：存當月加班費明細
         let currentQuickStatAct = '';
         let currentEditingEventId = null;
 
@@ -807,6 +818,8 @@
 
                 let monthlyNightFee = 0;
                 currentMonthNightFees = [];
+                let monthlyOtPay = 0; 
+                currentMonthOtFees = []; 
 
                 weeks.forEach(week => {
                     week.forEach((slot, dIdx) => {
@@ -830,16 +843,41 @@
                             let tokens = finalShift.trim().split(/\s+/);
                             let dailyFee = 0;
                             let feeDescs = [];
+                            let dailyOtPay = 0; 
+                            let otDescs = []; 
+
                             tokens.forEach(tok => {
                                 let s = tok.toUpperCase();
                                 if (s.startsWith('12-8')) { dailyFee += 270; feeDescs.push(`${tok} ($270)`); }
                                 else if (s.startsWith('E')) { dailyFee += 560; feeDescs.push(`${tok} ($560)`); }
                                 else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
-                                else if (s.includes('(津)')) { dailyFee += 270; dailyFee; feeDescs.push(`加班津貼 ($270)`); }
+                                else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
+                                
+                                // 加班費時數判定與算錢邏輯
+                                if (s.startsWith('+')) {
+                                    let match = s.match(/^\+([\d.]+)/); 
+                                    if (match) {
+                                        let otHours = parseFloat(match[1]);
+                                        if (otHours >= 1) { 
+                                            // 核心算法：每 0.5H 算 50 元，扣除前 0.5H
+                                            let calcPay = (Math.floor(otHours / 0.5) - 1) * 50;
+                                            if (calcPay > 0) {
+                                                dailyOtPay += calcPay;
+                                                otDescs.push(`加班 ${otHours}h ($${calcPay})`);
+                                            }
+                                        }
+                                    }
+                                }
                             });
+                            
                             if (dailyFee > 0) {
                                 monthlyNightFee += dailyFee;
                                 currentMonthNightFees.push({ date: dateKey, desc: feeDescs.join(', '), amount: dailyFee });
+                            }
+                            
+                            if (dailyOtPay > 0) {
+                                monthlyOtPay += dailyOtPay;
+                                currentMonthOtFees.push({ date: dateKey, desc: otDescs.join(', '), amount: dailyOtPay });
                             }
                         }
 
@@ -918,6 +956,7 @@
                 });
                 
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
+                document.getElementById('hdrOtFee').innerText = monthlyOtPay;
 
             } catch (error) { console.error(error); }
         }
@@ -1140,6 +1179,33 @@
             document.getElementById('nightFeeModal').style.display = 'flex';
         }
         function closeNightFeeModal() { document.getElementById('nightFeeModal').style.display = 'none'; }
+
+        // ======================= 加班費明細視窗邏輯 =======================
+        function openOtFeeModal() {
+            let listEl = document.getElementById('otFeeList');
+            let html = "";
+            currentMonthOtFees.sort((a, b) => new Date(a.date) - new Date(b.date));
+            let total = currentMonthOtFees.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('otFeeTotal').innerText = total;
+
+            if (currentMonthOtFees.length === 0) {
+                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無加班費紀錄</div>";
+            } else {
+                currentMonthOtFees.forEach(item => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
+                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="color:#dc2626; font-weight:900; font-size:16px;">+$${item.amount}</span>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+            document.getElementById('otFeeModal').style.display = 'flex';
+        }
+        function closeOtFeeModal() { document.getElementById('otFeeModal').style.display = 'none'; }
+        // ====================================================================
 
         function renderEventListInModal() {
             let ex = getExpandedEvents(selectedDateString, selectedDateString);
