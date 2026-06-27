@@ -630,11 +630,14 @@
         }
 
         function updateStatsDisplay() {
-            document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
-            const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
-            
-        }
+    document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
+    document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
+    const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
+    const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
+    if (makeupBtn) {
+        makeupBtn.innerHTML = `📚 補課 ${makeupTotal}`;
+    }
+}
 
         function getAllBaseEvents() {
             let all = []; let seen = new Set();
@@ -1006,8 +1009,11 @@
                 
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
-                document.getElementById('hdrMakeup').innerText = monthlyMakeup;
-
+               
+const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
+if (makeupBtn) {
+    makeupBtn.innerHTML = `📚 補課 ${monthlyMakeup}`;
+}
             } catch (error) { console.error(error); }
         }
 
