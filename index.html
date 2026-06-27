@@ -158,7 +158,7 @@
     <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
     <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
     <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
-    <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openQuickMakeupPrompt()">📚 補課</button>
+    <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 0</button>
 </div>
 
             <div class="header-stats">
@@ -1112,30 +1112,43 @@ if (makeupBtn) {
         }
 
         function openMakeupModal() {
-            let listEl = document.getElementById('makeupList');
-            let html = "";
-            currentMonthMakeup.sort((a, b) => new Date(a.date) - new Date(b.date));
-            let total = currentMonthMakeup.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('makeupTotal').innerText = total;
+    let listEl = document.getElementById('makeupList');
+    let html = "";
+    
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const monthKey = `${year}-${month}`;
+    const monthData = globalStats.makeup ? globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
+    monthData.sort((a, b) => new Date(a.date) - new Date(b.date));
+    let total = monthData.reduce((s, i) => s + i.amount, 0);
+    document.getElementById('makeupTotal').innerText = total;
 
-            if (currentMonthMakeup.length === 0) {
-                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無補課紀錄</div>";
-            } else {
-                currentMonthMakeup.forEach(item => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
-                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span style="color:#4a4aff; font-weight:900; font-size:16px;">+${item.amount}h</span>
-                            </div>
-                        </div>`;
-                });
-                listEl.innerHTML = html;
-            }
-            document.getElementById('makeupModal').style.display = 'flex';
-        }
+    if (monthData.length === 0) {
+        listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無補課紀錄</div>";
+    } else {
+        monthData.forEach(item => {
+            html += `
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
+                    <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#4a4aff; font-weight:900; font-size:16px;">+${item.amount}h</span>
+                        <button onclick="deleteMakeup('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
+                    </div>
+                </div>`;
+        });
+        listEl.innerHTML = html;
+    }
+    document.getElementById('makeupModal').style.display = 'flex';
+}
         function closeMakeupModal() { document.getElementById('makeupModal').style.display = 'none'; }
-
+function deleteMakeup(id) {
+    if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
+    globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay();
+    renderCalendar();
+    openMakeupModal(); // 重新整理明細視窗
+}
         function saveShiftOnly() {
             let shiftVal = document.getElementById('shiftInput').value.trim();
             let parts = selectedDateString.split('-');
