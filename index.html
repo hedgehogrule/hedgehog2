@@ -629,7 +629,7 @@
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
             document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
             const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
-            document.getElementById('hdrMakeup').innerText = makeupTotal;
+            
         }
 
         function getAllBaseEvents() {
