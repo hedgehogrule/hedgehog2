@@ -6,11 +6,11 @@
     <title>我的全自動夢幻行事曆</title>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="icon.png?v=6">
+    <link rel="apple-touch-icon" href="icon.png?v=7">
     <meta name="theme-color" content="#ffe0f0">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=6">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=6">
-    <link rel="shortcut icon" href="icon.png?v=6">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=7">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=7">
+    <link rel="shortcut icon" href="icon.png?v=7">
     <link rel="manifest" href="manifest.json?v=2">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js">
@@ -563,17 +563,22 @@
             return { idx: Math.abs(cycleIdx), isTop: isTop, isBottom: isBottom, isLeft: isLeft, isRight: isRight };
         }
 
-        // ==================== 全域變數 ====================
+        // ==================== 全域變數（使用原 key 名稱） ====================
         let currentDate = new Date();
         let selectedDateString = "";
         let selectedEventColor = "blue";
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar9')) || {}; } catch(e) {}
-        // 新增 nightFee 陣列
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar8')) || {}; } catch(e) {}
+        // 新增 nightFee 陣列，但使用原 key 名稱
         let globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
-        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats9')) || { hours: [], annualLeave: [], makeup: [], nightFee: [] }; } catch(e) {}
+        try { 
+            let saved = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || { hours: [], annualLeave: [], makeup: [] };
+            globalStats = { hours: saved.hours || [], annualLeave: saved.annualLeave || [], makeup: saved.makeup || [], nightFee: saved.nightFee || [] };
+        } catch(e) {
+            globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
+        }
         
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
@@ -590,12 +595,12 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        // ==================== 取得某日期的統計標記 ====================
+        // ==================== 取得某日期的統計標記（需求2：右上角小數字） ====================
         function getDayStatBadges(dateKey) {
             let badges = [];
             
             // 加班
-            let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
+            let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
             let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
             if (otTotal > 0) {
                 badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
@@ -678,7 +683,7 @@
                 if (nightCb && nightCb.checked) {
                     record.desc = '加班(含12-8津貼)';
                     
-                    // 津貼獨立存入 nightFee 陣列（歸夜班費）
+                    // ★ 需求1：津貼獨立存入 nightFee 陣列（歸夜班費）
                     if (!globalStats.nightFee) globalStats.nightFee = [];
                     globalStats.nightFee.push({
                         id: "nf_" + Date.now(),
@@ -701,7 +706,7 @@
                             savedData.shiftHistory.push(currentShift);
                         }
                         savedData.shift = newShift;
-                        localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+                        localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
                     }
                 }
             } else {
@@ -714,7 +719,7 @@
                 globalStats.hours.push(record);
             }
             
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay();
             closeQuickStatModal();
             renderCalendar();
@@ -748,7 +753,7 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
                             <div>
                                 <div style="font-size:14px; font-weight:900; color:#555;">
-                                    ${item.date}｜加班 ${item.amount} 小時
+                                    ${item.date}｜${item.desc} ${item.amount} 小時
                                 </div>
                                 ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">加班費：$${item.fee}</div>` : ''}
                             </div>
@@ -778,7 +783,7 @@
             if (!confirm("確定要刪除這筆加班紀錄嗎？\n（僅刪除加班費紀錄，不會影響班表）")) return;
             
             globalStats.hours = globalStats.hours.filter(item => item.id !== id);
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             
             updateStatsDisplay();
             renderCalendar();
@@ -790,7 +795,7 @@
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
             document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
             
-            // 加班費總計（只算加班費，不含夜班津貼）
+            // ★ 需求1：加班費總計（只算加班費，不含夜班津貼）
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
             document.getElementById('hdrOtFee').innerText = totalOtFee;
 
@@ -865,7 +870,7 @@
                 }
             }
             
-            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             const count = batchSelectedDates.size;
             cancelBatchMode();
             alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
@@ -1314,7 +1319,7 @@
                         amount: -8,
                         desc: "年休 (排班自動扣除)"
                     });
-                    localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+                    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
                 }
             }
             else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
@@ -1324,7 +1329,7 @@
                     amount: +8,
                     desc: "取消年休 (自動加回)"
                 });
-                localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             }
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
@@ -1338,7 +1343,7 @@
             if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
                 delete calendarData[selectedDateString];
             }
-            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             updateStatsDisplay();
             closeModal(); 
             renderCalendar();
@@ -1360,7 +1365,7 @@
             
             if (!globalStats.makeup) globalStats.makeup = [];
             globalStats.makeup.push({ id: "mk_"+Date.now(), date: selectedDateString, amount: num, desc: '加時補課' });
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay();
             closeQuickMakeupModal();
             renderCalendar();
@@ -1401,7 +1406,7 @@
         function deleteMakeup(id) {
             if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
             globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay();
             renderCalendar();
             openMakeupModal();
@@ -1459,13 +1464,13 @@
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
             globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
 
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); 
             renderStatsList();
             renderCalendar();
@@ -1649,7 +1654,7 @@
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
             
-            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
@@ -1673,7 +1678,7 @@
                         }
                     }
                 }
-                localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
                 renderEventListInModal();
                 renderCalendar();
                 closeEventDetailModal();
@@ -1709,7 +1714,7 @@
             }
 
             if (dataChanged) {
-                localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
                 console.log("🧹 已自動清理超過 " + expireDays + " 天的舊照片，釋放空間！");
             }
         }
@@ -1824,8 +1829,8 @@
         async function exportData() {
             try {
                 let backup = {
-                    calendar: localStorage.getItem('myCustomCalendar9'),
-                    stats: localStorage.getItem('myCustomCalendarStats9'),
+                    calendar: localStorage.getItem('myCustomCalendar8'),
+                    stats: localStorage.getItem('myCustomCalendarStats8'),
                     photos: {}
                 };
                 
@@ -1874,8 +1879,8 @@
                 let text = await file.text();
                 let backup = JSON.parse(text);
                 
-                if (backup.calendar) localStorage.setItem('myCustomCalendar9', backup.calendar);
-                if (backup.stats) localStorage.setItem('myCustomCalendarStats9', backup.stats);
+                if (backup.calendar) localStorage.setItem('myCustomCalendar8', backup.calendar);
+                if (backup.stats) localStorage.setItem('myCustomCalendarStats8', backup.stats);
                 
                 if (backup.photos) {
                     await localforage.clear(); 
