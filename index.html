@@ -914,6 +914,10 @@
                     topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
                     hasTop = true;
                 } 
+                else if (s === "(津)") {
+                    // ★ 修正：(津) 單獨存在時不顯示，因為已經透過 hasAllowance 影響底色
+                    // 不做任何事，讓它只影響底色
+                }
                 else {
                     hasBottom = true;
                     // ★ 需求3：有津貼標記的班別顯示綠色
