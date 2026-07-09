@@ -71,6 +71,20 @@
         .date-box { font-size: 11px; font-weight: 800; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
+
+        
+        .holiday-text {
+            font-size: 9px; 
+            font-weight: 800; 
+            color: #d9534f;
+            border: 1px solid #d9534f;
+            background: transparent;
+            padding: 1px 2px;
+            border-radius: 3px;
+            line-height: 1;
+            transform: scale(0.95);
+            transform-origin: left center;
+        }
         
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
         
@@ -145,6 +159,13 @@
 
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
+        /* 修復手機版彈出視窗明細列表空白，需要點按才顯示的渲染 Bug */
+.modal-content, #statsList, #nightFeeList, #otFeeList, #makeupList {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
     </style>
 </head>
 <body>
@@ -475,6 +496,27 @@
         ];
 
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
+        
+   
+       const twHolidays = {
+            "2026-01-01": "元旦",
+            "2026-02-16": "除夕",
+            "2026-02-17": "春節",
+            "2026-02-18": "春節",
+            "2026-02-19": "春節",
+            "2026-02-20": "春節連假", 
+            "2026-02-27": "228補假",   // 2/28為週六，週五補假
+            "2026-02-28": "二二八",
+            "2026-04-03": "兒童節補假", // 4/4為週六，週五補假
+            "2026-04-04": "兒童節",
+            "2026-04-05": "清明節",
+            "2026-04-06": "清明節補假", // 4/5為週日，週一補假
+            "2026-05-01": "勞動節",     // 勞工適用
+            "2026-06-19": "端午節",
+            "2026-09-25": "中秋節",
+            "2026-10-09": "國慶補假",   // 10/10為週六，週五補假
+            "2026-10-10": "國慶日"
+        };
         
         const colorStyles = {
             blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
@@ -994,11 +1036,21 @@
                         let batchClass = (isBatchMode && batchSelectedDates.has(dateKey)) ? "batch-selected" : "";
                         let husbandIcon = ``;
 
+                        // 判斷該天是否有國定假日
+                        let holidayName = twHolidays[dateKey];
+                        let holidayHtml = holidayName ? `<span class="holiday-text">${holidayName}</span>` : "";
+
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass} ${husbandOffClass} ${batchClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
                                 ${dotIndicator}
                                 <div class="day-row-1">
-                                    <div class="date-col"><span class="${dateClass}">${d}</span>${husbandIcon}</div>
+                                    <div class="date-col">
+                                        <div style="display: flex; align-items: center; gap: 3px;">
+                                            <span class="${dateClass}">${d}</span>
+                                            ${holidayHtml}
+                                        </div>
+                                        ${husbandIcon}
+                                    </div>
                                     ${htmlObj.topHtml}
                                 </div>
                                 ${row2Html}
