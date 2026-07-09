@@ -13,12 +13,13 @@
     <link rel="shortcut icon" href="icon.png?v=4">
     <link rel="manifest" href="manifest.json?v=2">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js">
+    </script>
 
     <style>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
         
         :root {
             --dreamy-bg: linear-gradient(135deg, #ffe0f0 0%, #e0f7fa 50%, #e6d9ff 100%);
@@ -27,12 +28,10 @@
         
         body { font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif; margin: 0; padding: 0 0 5px 0; background: var(--dreamy-bg); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; user-select: none; color: #444; overflow-x: hidden; }
         
-        /* 頂部導覽列 */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.4); margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .header button { background: none; border: none; font-size: 24px; color: #777; cursor: pointer; padding: 2px 6px; font-weight: bold; }
         .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
         
-        /* 拆分按鈕區塊：標題與今天一排、其他功能一排 */
         .header-title-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
         .header-btn-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
         
@@ -40,7 +39,7 @@
         .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 4px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; cursor: pointer; white-space: nowrap; }
         .today-btn:active { transform: scale(0.9); }
         .small-btn { font-size: 10px !important; padding: 2px 6px !important; }
-        /* 頂部結餘方框：設定一排最多 3 個 */
+        
         .header-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; max-width: 380px; margin-top: 2px; }
         .stat-box { flex: 1 1 calc(33% - 4px); min-width: 85px; max-width: 115px; background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 0 4px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-box span { font-size: 13.5px; font-weight: 900; color: #444; }
@@ -59,7 +58,6 @@
         .weekdays div:nth-child(6) { color: #5b9bd5; } 
         .weekdays div:nth-child(7) { color: #ed7d31; } 
         
-        /* 放大行事曆區域 */
         .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
         
         .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
@@ -67,14 +65,12 @@
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
         
-        /* 第一行排版 */
         .day-row-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 2px; }
         .date-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 12px; }
         .date-box { font-size: 11px; font-weight: 800; color: #555; line-height: 1; }
         .sat-text { color: #4183c4; }
         .sun-text { color: #d9534f; }
 
-        
         .holiday-text {
             font-size: 9px; 
             font-weight: 800; 
@@ -97,7 +93,6 @@
         .bg-orange { background: #ffa67c; }
         .national-holiday-badge { width: 18px; height: 18px; background: #ff0000; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; line-height: 1; box-shadow: 0 2px 4px rgba(255,0,0,0.4); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; border: 1.5px solid #fff; }
 
-        /* 第二行排版 */
         .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 14px; align-items: center; gap: 3px; }
         .week-badge { width: 13px; height: 13px; background: #5b9bd5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.15); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
         
@@ -110,12 +105,10 @@
 
         .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
-        /* 第三行：行程 */
         .event-area { margin-top: 2px; display: flex; flex-direction: column; gap: 1px; margin-left: -2px; margin-right: -2px; width: calc(100% + 4px); font-family: 'Helvetica Neue', Arial, sans-serif; }
         .event-item { font-size: 9px; padding: 1px 3px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; overflow: visible; white-space: nowrap; height: 14px; min-height: 14px; line-height: 12px; border-radius: 2px; }
         .event-item-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Modal 彈出視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 1); z-index: 10; font-family: inherit; justify-content: center; align-items: flex-start; }
         .modal-content { background: transparent; padding: 20px 15px; width: 100%; max-width: 100%; border-radius: 0; box-shadow: none; box-sizing: border-box; height: 100%; max-height: 100vh; overflow-y: auto; }
         .input-group { margin-bottom: 12px; }
@@ -144,8 +137,7 @@
         
         .repeat-display-btn { padding: 8px 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 12px; color: #444; cursor: pointer; text-align: center; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: inherit; white-space: nowrap; height: 38px; box-sizing: border-box; }
         
-        /* 照片上傳樣式 */
-       .photo-preview-box { width: 100%; height: 220px; border-radius: 8px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 8px; position: relative; cursor: pointer; }
+        .photo-preview-box { width: 100%; height: 220px; border-radius: 8px; background: #f0f0f0; border: 1px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-top: 8px; position: relative; cursor: pointer; }
         .photo-preview-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
         .photo-placeholder { color: #999; font-size: 12px; pointer-events: none; }
         .remove-photo-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; cursor: pointer; display: none; z-index: 5; }
@@ -172,18 +164,16 @@
                 <button class="today-btn" onclick="goToday()">🌱 今天</button>
             </div>
             <div class="header-btn-row">
-    <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-    <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
-    <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
-    <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 0</button>
-</div>
-
+                <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
+                <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
+                <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
+                <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 0</button>
+            </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
                 <div class="stat-box night-fee" onclick="openNightFeeModal()">💰 夜班 $<span id="hdrNightFee">0</span></div>
-                
-       </div>
+            </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
     </div>
@@ -200,88 +190,87 @@
         <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #ff6b81; color: white;" onclick="saveBatchHusbandOff()">✓ 確認排休</button>
     </div>
 
-  
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
-            <h3 id="modalTitle" style="margin:0;"></h3>
-            <button class="shift-action-btn" style="color:#4a4aff; background:#e0e0ff; border-color:#b0b0ff; font-size:11px; padding:4px 10px;" onclick="openQuickMakeupPrompt()">📚 加時補課</button>
-        </div>
-        <div id="modalSubtitle" style="text-align:center; font-size:12px; color:#888; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px; font-weight: bold;"></div>
-        
-        <div class="input-group">
-            <label id="shiftLabel">班別</label>
-            <div class="shift-input-row">
-                <input type="text" id="shiftInput" placeholder="快捷鍵填入" style="flex: 1; min-width: 70px;">
-                <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2; border-color:#f5c6cb;" onclick="openQuickStatPrompt('加班')">加班</button>
-                <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff; border-color:#b8daff;" onclick="openQuickStatPrompt('拿時間')">拿時間</button>
-                <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1; border-color:#c3e6cb;" onclick="openQuickStatPrompt('年休')">拿年休</button>
-                <button class="circle-btn" style="background: #ff0000; box-shadow: 0 2px 4px rgba(255,0,0,0.3);" onclick="toggleTag('國')"> 國 </button>
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+                <h3 id="modalTitle" style="margin:0;"></h3>
+                <button class="shift-action-btn" style="color:#4a4aff; background:#e0e0ff; border-color:#b0b0ff; font-size:11px; padding:4px 10px;" onclick="openQuickMakeupPrompt()">📚 加時補課</button>
             </div>
+            <div id="modalSubtitle" style="text-align:center; font-size:12px; color:#888; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px; font-weight: bold;"></div>
             
-            <div class="quick-section">
-                <div class="section-title">D 班系列</div>
-                <div class="quick-options">
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D')">D</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D1')">D1</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D2')">D2</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D3')">D3</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D4')">D4</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D5')">D5</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D6')">D6</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D7')">D7</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D8')">D8</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D9')">D9</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D10')">D10</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D11')">D11</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D12')">D12</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('D13')">D13</button>
-                    <button class="quick-btn quick-btn-d" onclick="setShift('DB1')">DB1</button>
-                    <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
-                    <button class="quick-btn quick-btn-off" onclick="setShift('年休')">年休</button>
-                    <button class="quick-btn quick-btn-off" onclick="setShift('例休')">例休</button>
+            <div class="input-group">
+                <label id="shiftLabel">班別</label>
+                <div class="shift-input-row">
+                    <input type="text" id="shiftInput" placeholder="快捷鍵填入" style="flex: 1; min-width: 70px;">
+                    <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2; border-color:#f5c6cb;" onclick="openQuickStatPrompt('加班')">加班</button>
+                    <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff; border-color:#b8daff;" onclick="openQuickStatPrompt('拿時間')">拿時間</button>
+                    <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1; border-color:#c3e6cb;" onclick="openQuickStatPrompt('年休')">拿年休</button>
+                    <button class="circle-btn" style="background: #ff0000; box-shadow: 0 2px 4px rgba(255,0,0,0.3);" onclick="toggleTag('國')"> 國 </button>
+                </div>
+                
+                <div class="quick-section">
+                    <div class="section-title">D 班系列</div>
+                    <div class="quick-options">
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D')">D</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D1')">D1</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D2')">D2</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D3')">D3</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D4')">D4</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D5')">D5</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D6')">D6</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D7')">D7</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D8')">D8</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D9')">D9</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D10')">D10</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D11')">D11</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D12')">D12</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('D13')">D13</button>
+                        <button class="quick-btn quick-btn-d" onclick="setShift('DB1')">DB1</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('年休')">年休</button>
+                        <button class="quick-btn quick-btn-off" onclick="setShift('例休')">例休</button>
+                    </div>
+                </div>
+
+                <div class="quick-section">
+                    <div class="section-title">12 / E / N 班系列</div>
+                    <div class="quick-options">
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 1')">12-8 1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 2')">12-8 2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 3')">12-8 3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 4')">12-8 4</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('12-8 5')">12-8 5</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E1')">E1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E2')">E2</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E3')">E3</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('E4')">E4</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('N1')">N1</button>
+                        <button class="quick-btn quick-btn-green" onclick="setShift('N2')">N2</button>
+                    </div>
+                </div>
+                            
+                <div style="margin-top: 15px; border-top: 2.5px solid #eee; padding-top: 15px;">
+                    <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">包含此日的行程與記事</label>
+                    <div id="existingEventsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
+                    <button style="width:100%; border:2.5px dashed #a28cdb; padding:10px; border-radius:10px; color:#a28cdb; background:#fff; font-weight:bold; font-family:inherit; font-size:14px;" onclick="openEventDetailModal()">+ 新增行程</button>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeModal()">取消</button>
+                    <button class="btn" style="background:linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color:white;" onclick="saveShiftOnly()">儲存變更</button>
                 </div>
             </div>
-
-            <div class="quick-section">
-                <div class="section-title">12 / E / N 班系列</div>
-                <div class="quick-options">
-                    <button class="quick-btn quick-btn-green" onclick="setShift('12-8 1')">12-8 1</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('12-8 2')">12-8 2</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('12-8 3')">12-8 3</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('12-8 4')">12-8 4</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('12-8 5')">12-8 5</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('E1')">E1</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('E2')">E2</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('E3')">E3</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('E4')">E4</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('N1')">N1</button>
-                    <button class="quick-btn quick-btn-green" onclick="setShift('N2')">N2</button>
-                </div>
-            </div>
-                        
-        <div style="margin-top: 15px; border-top: 2.5px solid #eee; padding-top: 15px;">
-            <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:8px;">包含此日的行程與記事</label>
-            <div id="existingEventsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
-            <button style="width:100%; border:2.5px dashed #a28cdb; padding:10px; border-radius:10px; color:#a28cdb; background:#fff; font-weight:bold; font-family:inherit; font-size:14px;" onclick="openEventDetailModal()">+ 新增行程</button>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeModal()">取消</button>
-            <button class="btn" style="background:linear-gradient(135deg, #a28cdb 0%, #84bde3 100%); color:white;" onclick="saveShiftOnly()">儲存變更</button>
         </div>
     </div>
-</div>
-
 
     <div class="modal" id="quickStatModal" style="z-index: 40;">
         <div class="modal-content" style="max-width: 280px;">
             <h3 id="quickStatTitle" style="margin-bottom: 15px;">輸入數量</h3>
             <input type="number" id="quickStatAmount" placeholder="請輸入數字 (例: 2.5)" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
-          <div id="manualFeeWrap" style="margin-top:12px; display:none;">
-    <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;">加班費金額 ($)</label>
-    <input type="number" id="quickStatFee" placeholder="請輸入金額" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-</div>
+            <div id="manualFeeWrap" style="margin-top:12px; display:none;">
+                <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;">加班費金額 ($)</label>
+                <input type="number" id="quickStatFee" placeholder="請輸入金額" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+            </div>
             <div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
                 <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer;">
                     <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($270)
@@ -373,13 +362,13 @@
                     <div class="color-dot selected" data-color="blue" style="background: #84bde3;">蕎</div>
                     <div class="color-dot" data-color="pink" style="background: #ff9ebb;"></div>
                     <div class="color-dot" data-color="green" style="background: #7fd9b2;">森</div>
-                   <div class="color-dot" data-color="purple" style="background: #f6c23e;">芷</div>
+                    <div class="color-dot" data-color="purple" style="background: #f6c23e;">芷</div>
                     <div class="color-dot" data-color="orange" style="background: #ffa67c;">麻</div>
                     <div class="color-dot" data-color="gray" style="background: #cccccc;">常</div>
                     <div class="color-dot" data-color="transparent" style="background: #ffffff; border: 2px dashed #ccc; color: #888 !important; text-shadow: none;">透</div>
                 </div>
             </div>
-          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                 <div style="flex: 1;">
                     <label style="display: block; font-size: 13px; margin-bottom: 4px; font-weight: bold; color: #666;">開始日期</label>
                     <input type="date" id="eventStartDate" onchange="syncRepeatSummary()" style="width: 100%; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fafafa; font-family: inherit;">
@@ -415,7 +404,7 @@
                 <button class="rep-tab active" id="tab-year" onclick="setRepType('year')">年</button>
                 <button class="rep-tab" id="tab-month" onclick="setRepType('month')">月</button>
                 <button class="rep-tab" id="tab-week" onclick="setRepType('week')">週</button>
-                </div>
+            </div>
             <div class="repeat-row">
                 <label>頻率</label>
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -424,9 +413,9 @@
                 </div>
             </div>
             <div class="repeat-row" id="monthOptionRow" style="display:none; justify-content: flex-start; gap: 15px; margin-left: 10px;">
-    <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="date" checked onchange="updateRepSummary()"> 同一天</label>
-    <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="nthDay" onchange="updateRepSummary()"> 第<span id="nthDayText"></span></label>
-</div>
+                <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="date" checked onchange="updateRepSummary()"> 同一天</label>
+                <label style="font-size:14px; font-weight:bold; cursor:pointer;"><input type="radio" name="monthType" value="nthDay" onchange="updateRepSummary()"> 第<span id="nthDayText"></span></label>
+            </div>
             <div class="repeat-row">
                 <label>開始</label>
                 <div id="repStartText" style="color:#5b9bd5; font-weight:bold; font-size:14px;"></div>
@@ -473,6 +462,7 @@
     </div>
 
     <script>
+        // ==================== 班表資料 ====================
         const shiftPatterns = [
             ["D9", "D", "D5", "D5", "D7", "OFF", "N2"], ["N1", "N2", "OFF", "OFF", "N2", "N1", "OFF"],
             ["E3", "E3", "E3", "E3", "E3", "OFF", "E1"], ["E4", "E4", "E4", "E4", "E4", "OFF", "OFF"],
@@ -496,24 +486,23 @@
 
         const cycleBorderColors = ['#a28cdb', '#ff9ebb', '#7fd9b2', '#fcd372'];
         
-   
-       const twHolidays = {
+        const twHolidays = {
             "2026-01-01": "元旦",
             "2026-02-16": "除夕",
             "2026-02-17": "春節",
             "2026-02-18": "春節",
             "2026-02-19": "春節",
             "2026-02-20": "春節連假", 
-            "2026-02-27": "228補假",   // 2/28為週六，週五補假
+            "2026-02-27": "228補假",
             "2026-02-28": "二二八",
-            "2026-04-03": "兒童節補假", // 4/4為週六，週五補假
+            "2026-04-03": "兒童節補假",
             "2026-04-04": "兒童節",
             "2026-04-05": "清明節",
-            "2026-04-06": "清明節補假", // 4/5為週日，週一補假
-            "2026-05-01": "勞動節",     // 勞工適用
+            "2026-04-06": "清明節補假",
+            "2026-05-01": "勞動節",
             "2026-06-19": "端午節",
             "2026-09-25": "中秋節",
-            "2026-10-09": "國慶補假",   // 10/10為週六，週五補假
+            "2026-10-09": "國慶補假",
             "2026-10-10": "國慶日"
         };
         
@@ -521,12 +510,13 @@
             blue: { bg: 'rgba(91, 155, 213, 0.25)', text: '#3e6e96', border: '#84bde3' },
             pink: { bg: 'rgba(255, 158, 187, 0.25)', text: '#a83b5c', border: '#ff9ebb' },
             green: { bg: 'rgba(127, 217, 178, 0.25)', text: '#23704d', border: '#7fd9b2' },
-           purple: { bg: 'rgba(246, 194, 62, 0.25)', text: '#a67c00', border: '#f6c23e' },
+            purple: { bg: 'rgba(246, 194, 62, 0.25)', text: '#a67c00', border: '#f6c23e' },
             gray: { bg: 'rgba(204, 204, 204, 0.3)', text: '#555555', border: '#cccccc' },
             orange: { bg: 'rgba(255, 166, 124, 0.2)', text: '#a13b08', border: '#ffa67c' },
             transparent: { bg: 'transparent', text: '#666666', border: 'transparent' }
         };
 
+        // ==================== 輔助函數 ====================
         function parseDateLocal(dateStr) { let p = dateStr.split('-'); return new Date(p[0], p[1]-1, p[2]); }
         function formatDateLocal(d) { return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`; }
 
@@ -558,6 +548,7 @@
             return { idx: Math.abs(cycleIdx), isTop: isTop, isBottom: isBottom, isLeft: isLeft, isRight: isRight };
         }
 
+        // ==================== 全域變數 ====================
         let currentDate = new Date();
         let selectedDateString = "";
         let selectedEventColor = "blue";
@@ -583,6 +574,146 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
+        // ==================== 加班費相關函數 (已優化) ====================
+        
+        function openQuickStatPrompt(act) {
+            currentQuickStatAct = act;
+            document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
+            document.getElementById('quickStatAmount').value = '';
+            
+            // 如果是加班，顯示金額輸入框
+            if (act === '加班') {
+                document.getElementById('manualFeeWrap').style.display = 'block';
+                document.getElementById('quickStatFee').value = '';
+                document.getElementById('quickStatFee').placeholder = '請輸入加班費金額 ($)';
+            } else {
+                document.getElementById('manualFeeWrap').style.display = 'none';
+                document.getElementById('quickStatFee').value = '0';
+            }
+            document.getElementById('quickStatModal').style.display = 'flex';
+        }
+
+        function closeQuickStatModal() {
+            document.getElementById('quickStatModal').style.display = 'none';
+        }
+
+        function confirmQuickStat() {
+            let hours = parseFloat(document.getElementById('quickStatAmount').value);
+            
+            if (isNaN(hours) || hours <= 0) {
+                alert("請輸入有效時數（大於 0）！");
+                return;
+            }
+            
+            let record = {
+                id: "st_" + Date.now(),
+                date: selectedDateString,
+                amount: hours,
+                desc: currentQuickStatAct
+            };
+            
+            // 只有當動作是「加班」時，才處理費用
+            if (currentQuickStatAct === '加班') {
+                let fee = parseFloat(document.getElementById('quickStatFee').value);
+                if (isNaN(fee) || fee < 0) {
+                    alert("請輸入有效的加班費金額！");
+                    return;
+                }
+                record.fee = fee;
+            } else {
+                record.fee = 0;
+            }
+            
+            globalStats.hours.push(record);
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            closeQuickStatModal();
+            renderCalendar();
+        }
+
+        function openOtFeeModal() {
+            let listEl = document.getElementById('otFeeList');
+            let html = "";
+            
+            // 直接從 globalStats.hours 篩選當月加班紀錄
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+            
+            const otRecords = globalStats.hours.filter(item => 
+                item.date.startsWith(monthKey) && item.desc === '加班'
+            );
+            
+            otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
+            document.getElementById('otFeeTotal').innerText = totalFee;
+
+            if (otRecords.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">
+                        本月無加班費紀錄
+                    </div>`;
+            } else {
+                otRecords.forEach(item => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
+                            <div>
+                                <div style="font-size:14px; font-weight:900; color:#555;">
+                                    ${item.date}｜加班 ${item.amount} 小時
+                                </div>
+                                ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">費用：$${item.fee}</div>` : ''}
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="color:#dc2626; font-weight:900; font-size:18px;">
+                                    ${item.fee ? '$' + item.fee : '-'}
+                                </span>
+                                <button onclick="deleteOtRecord('${item.id}')" 
+                                    style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
+                                    title="刪除此筆紀錄">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+            
+            document.getElementById('otFeeModal').style.display = 'flex';
+        }
+
+        function closeOtFeeModal() { 
+            document.getElementById('otFeeModal').style.display = 'none'; 
+        }
+
+        function deleteOtRecord(id) {
+            if (!confirm("確定要刪除這筆加班紀錄嗎？\n（僅刪除加班費紀錄，不會影響班表）")) return;
+            
+            globalStats.hours = globalStats.hours.filter(item => item.id !== id);
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            
+            updateStatsDisplay();
+            renderCalendar();
+            openOtFeeModal();
+        }
+
+        // ==================== 更新頂部顯示 ====================
+        function updateStatsDisplay() {
+            document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
+            
+            // 加班費總計
+            const totalFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
+            document.getElementById('hdrOtFee').innerText = totalFee;
+
+            const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
+            const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
+            if (makeupBtn) {
+                makeupBtn.innerHTML = `📚 補課 ${makeupTotal}`;
+            }
+        }
+
+        // ==================== 班表相關 ====================
         function toggleBatchMode() {
             if (isBatchMode) { cancelBatchMode(); return; }
             isBatchMode = true; batchSelectedDates.clear();
@@ -606,25 +737,6 @@
             isBatchMode = false;
             batchSelectedDates.clear();
             document.getElementById('batchBar').style.display = 'none';
-            renderCalendar();
-        }
-
-        function selectAllMonth() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            batchSelectedDates.clear();
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-                batchSelectedDates.add(dateKey);
-            }
-            document.getElementById('batchCount').innerText = batchSelectedDates.size;
-            renderCalendar();
-        }
-
-        function clearAllMonth() {
-            batchSelectedDates.clear();
-            document.getElementById('batchCount').innerText = '0';
             renderCalendar();
         }
 
@@ -671,20 +783,76 @@
             alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
         }
 
-        function updateStatsDisplay() {
-    document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
-    document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
-    
-    // 修正累加邏輯：加總所有紀錄中的 fee
-    const totalFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
-    document.getElementById('hdrOtFee').innerText = totalFee;
+        function setShift(v) { document.getElementById('shiftInput').value = v; }
 
-    const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
-    const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
-    if (makeupBtn) {
-        makeupBtn.innerHTML = `📚 補課 ${makeupTotal}`;
-    }
-}
+        function toggleTag(tag) {
+            let input = document.getElementById('shiftInput');
+            let parts = input.value.split(/\s+/).filter(Boolean);
+            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
+            else parts.push(tag);
+            input.value = parts.join(' ');
+        }
+
+        function generateDayTags(finalShift) {
+            if (!finalShift) return { topHtml: "", bottomHtml: "" };
+            let topHtml = '<div class="top-tags-wrap">';
+            let bottomHtml = '<div class="bottom-tags-wrap">';
+            let text = finalShift.trim();
+            let tokens = [];
+            
+            let m128 = text.match(/12-8\s\d+/g);
+            if(m128) { m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); }); }
+            text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
+
+            let hasTop = false;
+            let hasBottom = false;
+            let hasAllowance = tokens.some(t => t.includes('(津)'));
+
+            tokens.forEach(p => {
+                let s = p.toUpperCase();
+                if (s === "例休") { bottomHtml += `<div class="shift-badge shift-off">例休</div>`; hasBottom = true; }
+                else if (s === "年休") { bottomHtml += `<div class="shift-badge shift-off">年休</div>`; hasBottom = true; }
+                else if (s === "國") { topHtml += `<div class="national-holiday-badge">國</div>`; hasTop = true; }
+                else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
+                    let numText = p.replace("(津)", ""); 
+                    let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
+                    if(numText.startsWith("年休")) color = "#5ece9d";
+                    topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
+                    hasTop = true;
+                } 
+                else {
+                    hasBottom = true;
+                    let forceGreenClass = hasAllowance ? "shift-green" : "";
+                    
+                    if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-off'}">${p}</div>`; }
+                    else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-d'}">${p}</div>`; }
+                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; }
+                    else { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-default'}">${p}</div>`; }
+                }
+            });
+            topHtml += '</div>';
+            bottomHtml += '</div>';
+            return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
+        }
+
+        // ==================== 事件相關 ====================
+        let tempCompletedMonths = [];
+
+        function toggleCompleteThisMonth() {
+            let btn = document.getElementById('completeToggleBtn');
+            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            let i = tempCompletedMonths.indexOf(cm);
+            if (i > -1) { tempCompletedMonths.splice(i, 1); btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+            else { tempCompletedMonths.push(cm); btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+        }
+
+        function updateCompleteButton() {
+            let btn = document.getElementById('completeToggleBtn');
+            if (!btn) return;
+            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            if (tempCompletedMonths.includes(cm)) { btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
+            else { btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
+        }
 
         function getAllBaseEvents() {
             let all = []; let seen = new Set();
@@ -754,76 +922,7 @@
             return expanded;
         }
 
-        function setShift(v) { document.getElementById('shiftInput').value = v; }
-
-        function toggleTag(tag) {
-            let input = document.getElementById('shiftInput');
-            let parts = input.value.split(/\s+/).filter(Boolean);
-            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
-            else parts.push(tag);
-            input.value = parts.join(' ');
-        }
-
-        function generateDayTags(finalShift) {
-            if (!finalShift) return { topHtml: "", bottomHtml: "" };
-            let topHtml = '<div class="top-tags-wrap">';
-            let bottomHtml = '<div class="bottom-tags-wrap">';
-            let text = finalShift.trim();
-            let tokens = [];
-            
-            let m128 = text.match(/12-8\s\d+/g);
-            if(m128) { m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); }); }
-            text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
-
-            let hasTop = false;
-            let hasBottom = false;
-            let hasAllowance = tokens.some(t => t.includes('(津)'));
-
-            tokens.forEach(p => {
-                let s = p.toUpperCase();
-                if (s === "例休") { bottomHtml += `<div class="shift-badge shift-off">例休</div>`; hasBottom = true; }
-                else if (s === "年休") { bottomHtml += `<div class="shift-badge shift-off">年休</div>`; hasBottom = true; }
-                else if (s === "國") { topHtml += `<div class="national-holiday-badge">國</div>`; hasTop = true; }
-                else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
-                    let numText = p.replace("(津)", ""); 
-                    let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
-                    if(numText.startsWith("年休")) color = "#5ece9d";
-                    topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
-                    hasTop = true;
-                } 
-                else {
-                    hasBottom = true;
-                    let forceGreenClass = hasAllowance ? "shift-green" : "";
-                    
-                    if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-off'}">${p}</div>`; }
-                    else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-d'}">${p}</div>`; }
-                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; }
-                    else { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-default'}">${p}</div>`; }
-                }
-            });
-            topHtml += '</div>';
-            bottomHtml += '</div>';
-            return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
-        }
-
-        let tempCompletedMonths = [];
-
-        function toggleCompleteThisMonth() {
-            let btn = document.getElementById('completeToggleBtn');
-            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            let i = tempCompletedMonths.indexOf(cm);
-            if (i > -1) { tempCompletedMonths.splice(i, 1); btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
-            else { tempCompletedMonths.push(cm); btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
-        }
-
-        function updateCompleteButton() {
-            let btn = document.getElementById('completeToggleBtn');
-            if (!btn) return;
-            let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            if (tempCompletedMonths.includes(cm)) { btn.innerText = '✓ 已完成'; btn.style.background = '#5ece9d'; btn.style.color = '#fff'; }
-            else { btn.innerText = '標記完成'; btn.style.background = '#fff'; btn.style.color = '#5ece9d'; }
-        }
-
+        // ==================== 主渲染函數 ====================
         function renderCalendar() {
             try {
                 updateStatsDisplay(); 
@@ -935,8 +1034,6 @@
                             let tokens = finalShift.trim().split(/\s+/);
                             let dailyFee = 0;
                             let feeDescs = [];
-                            let dailyOtPay = 0; 
-                            let otDescs = []; 
 
                             tokens.forEach(tok => {
                                 let s = tok.toUpperCase();
@@ -944,34 +1041,15 @@
                                 else if (s.startsWith('E')) { dailyFee += 560; feeDescs.push(`${tok} ($560)`); }
                                 else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
                                 else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
-                                
-                                // --- 修改後的加班費計算邏輯 ---
-// --- 修改後的加班費計算邏輯 ---
-// 在 renderCalendar 函數內，取代原本處理 s.startsWith('+') 的區塊
-if (s.startsWith('+')) {
-    // 從 globalStats 撈取當天的加班紀錄
-    let dayOtRecords = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
-    
-    dayOtRecords.forEach(record => {
-        let fee = record.fee || 0; 
-        monthlyOtPay += fee; // 累加手動金額
-        otDescs.push(`加班 ${record.amount}h ($${fee})`);
-    });
-}
                             });
                             
                             if (dailyFee > 0) {
                                 monthlyNightFee += dailyFee;
                                 currentMonthNightFees.push({ date: dateKey, desc: feeDescs.join(', '), amount: dailyFee });
                             }
-                            
-                            if (dailyOtPay > 0) {
-                                monthlyOtPay += dailyOtPay;
-                                currentMonthOtFees.push({ date: dateKey, desc: otDescs.join(', '), amount: dailyOtPay });
-                            }
                         }
 
-                        // 加時補課統計 (從globalStats makeup篩選當月)
+                        // 加時補課統計
                         if (slot.type === 'current') {
                             const makeupData = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
                             makeupData.forEach(item => {
@@ -1018,7 +1096,6 @@ if (s.startsWith('+')) {
                             });
                         }
                         
-                        let dotIndicator = savedData.shift !== undefined && finalShift !== "" ? `<div class="manual-dot"></div>` : ``;
                         let weekBadge = (dayOfWeek === 1) ? `<div class="week-badge">${autoInfo.weekNumber}</div>` : ``;
                         
                         let bColor = cycleBorderColors[cycleInfo.idx % 4];
@@ -1038,22 +1115,18 @@ if (s.startsWith('+')) {
 
                         let husbandOffClass = savedData.husbandOff ? "husband-off-bg" : "";
                         let batchClass = (isBatchMode && batchSelectedDates.has(dateKey)) ? "batch-selected" : "";
-                        let husbandIcon = ``;
 
-                        // 判斷該天是否有國定假日
                         let holidayName = twHolidays[dateKey];
                         let holidayHtml = holidayName ? `<span class="holiday-text">${holidayName}</span>` : "";
 
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass} ${husbandOffClass} ${batchClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
-                                ${dotIndicator}
                                 <div class="day-row-1">
                                     <div class="date-col">
                                         <div style="display: flex; align-items: center; gap: 3px;">
                                             <span class="${dateClass}">${d}</span>
                                             ${holidayHtml}
                                         </div>
-                                        ${husbandIcon}
                                     </div>
                                     ${htmlObj.topHtml}
                                 </div>
@@ -1064,16 +1137,23 @@ if (s.startsWith('+')) {
                     });
                 });
                 
+                // 計算當月加班費（直接從 globalStats.hours 篩選）
+                const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
+                monthlyOtPay = globalStats.hours
+                    .filter(item => item.date.startsWith(monthStr) && item.desc === '加班')
+                    .reduce((s, item) => s + (item.fee || 0), 0);
+                
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
                
-const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
-if (makeupBtn) {
-    makeupBtn.innerHTML = `📚 補課 ${monthlyMakeup}`;
-}
+                const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
+                if (makeupBtn) {
+                    makeupBtn.innerHTML = `📚 補課 ${monthlyMakeup}`;
+                }
             } catch (error) { console.error(error); }
         }
 
+        // ==================== Modal 相關 ====================
         function openModal(dateKey, displayDate) {
             selectedDateString = dateKey;
             document.getElementById('modalTitle').innerText = displayDate;
@@ -1095,105 +1175,6 @@ if (makeupBtn) {
 
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
 
-        function openQuickStatPrompt(act) {
-    currentQuickStatAct = act;
-    document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
-    document.getElementById('quickStatAmount').value = '';
-    
-    // 如果是加班，顯示金額輸入框
-    if (act === '加班') {
-        document.getElementById('manualFeeWrap').style.display = 'block';
-        document.getElementById('quickStatFee').value = ''; // 清空舊值
-    } else {
-        document.getElementById('manualFeeWrap').style.display = 'none';
-    }
-    document.getElementById('quickStatModal').style.display = 'flex';
-}
-
-        function closeQuickStatModal() {
-            document.getElementById('quickStatModal').style.display = 'none';
-        }
-
-       function confirmQuickStat() {
-    let hours = parseFloat(document.getElementById('quickStatAmount').value);
-    let fee = parseFloat(document.getElementById('quickStatFee').value);
-    
-    if(isNaN(hours)) { alert("請輸入有效時數！"); return; }
-    
-    // 存入全域統計，新增 fee 欄位
-    globalStats.hours.push({ 
-        id: "st_"+Date.now(), 
-        date: selectedDateString, 
-        amount: hours, 
-        fee: (currentQuickStatAct === '加班' && !isNaN(fee)) ? fee : 0,
-        desc: currentQuickStatAct 
-    });
-    
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay();
-    closeQuickStatModal();
-    renderCalendar();
-}
-        function openQuickMakeupPrompt() {
-            document.getElementById('quickMakeupAmount').value = '';
-            document.getElementById('quickMakeupModal').style.display = 'flex';
-        }
-
-        function closeQuickMakeupModal() {
-            document.getElementById('quickMakeupModal').style.display = 'none';
-        }
-
-        function confirmQuickMakeup() {
-            let val = document.getElementById('quickMakeupAmount').value;
-            let num = parseFloat(val);
-            if(isNaN(num) || num <= 0) { alert("請輸入有效的小時數 (例: 0.5, 1)"); return; }
-            
-            if (!globalStats.makeup) globalStats.makeup = [];
-            globalStats.makeup.push({ id: "mk_"+Date.now(), date: selectedDateString, amount: num, desc: '加時補課' });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            closeQuickMakeupModal();
-            renderCalendar();
-        }
-
-        function openMakeupModal() {
-    let listEl = document.getElementById('makeupList');
-    let html = "";
-    
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    const monthKey = `${year}-${month}`;
-    const monthData = globalStats.makeup ? globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
-    monthData.sort((a, b) => new Date(a.date) - new Date(b.date));
-    let total = monthData.reduce((s, i) => s + i.amount, 0);
-    document.getElementById('makeupTotal').innerText = total;
-
-    if (monthData.length === 0) {
-        listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無補課紀錄</div>";
-    } else {
-        monthData.forEach(item => {
-            html += `
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
-                    <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:#4a4aff; font-weight:900; font-size:16px;">+${item.amount}h</span>
-                        <button onclick="deleteMakeup('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
-                    </div>
-                </div>`;
-        });
-        listEl.innerHTML = html;
-    }
-    document.getElementById('makeupModal').style.display = 'flex';
-}
-        function closeMakeupModal() { document.getElementById('makeupModal').style.display = 'none'; }
-function deleteMakeup(id) {
-    if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
-    globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay();
-    renderCalendar();
-    openMakeupModal(); // 重新整理明細視窗
-}
         function saveShiftOnly() {
             let shiftVal = document.getElementById('shiftInput').value.trim();
             let parts = selectedDateString.split('-');
@@ -1248,6 +1229,69 @@ function deleteMakeup(id) {
             updateStatsDisplay();
             closeModal(); 
             renderCalendar();
+        }
+
+        function openQuickMakeupPrompt() {
+            document.getElementById('quickMakeupAmount').value = '';
+            document.getElementById('quickMakeupModal').style.display = 'flex';
+        }
+
+        function closeQuickMakeupModal() {
+            document.getElementById('quickMakeupModal').style.display = 'none';
+        }
+
+        function confirmQuickMakeup() {
+            let val = document.getElementById('quickMakeupAmount').value;
+            let num = parseFloat(val);
+            if(isNaN(num) || num <= 0) { alert("請輸入有效的小時數 (例: 0.5, 1)"); return; }
+            
+            if (!globalStats.makeup) globalStats.makeup = [];
+            globalStats.makeup.push({ id: "mk_"+Date.now(), date: selectedDateString, amount: num, desc: '加時補課' });
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            closeQuickMakeupModal();
+            renderCalendar();
+        }
+
+        function openMakeupModal() {
+            let listEl = document.getElementById('makeupList');
+            let html = "";
+            
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+            const monthData = globalStats.makeup ? globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
+            monthData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            let total = monthData.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('makeupTotal').innerText = total;
+
+            if (monthData.length === 0) {
+                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無補課紀錄</div>";
+            } else {
+                monthData.forEach(item => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
+                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="color:#4a4aff; font-weight:900; font-size:16px;">+${item.amount}h</span>
+                                <button onclick="deleteMakeup('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+            document.getElementById('makeupModal').style.display = 'flex';
+        }
+
+        function closeMakeupModal() { document.getElementById('makeupModal').style.display = 'none'; }
+
+        function deleteMakeup(id) {
+            if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
+            globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            renderCalendar();
+            openMakeupModal();
         }
 
         function openStatsModal(t) {
@@ -1339,32 +1383,8 @@ function deleteMakeup(id) {
             }
             document.getElementById('nightFeeModal').style.display = 'flex';
         }
+
         function closeNightFeeModal() { document.getElementById('nightFeeModal').style.display = 'none'; }
-
-        function openOtFeeModal() {
-            let listEl = document.getElementById('otFeeList');
-            let html = "";
-            currentMonthOtFees.sort((a, b) => new Date(a.date) - new Date(b.date));
-            let total = currentMonthOtFees.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('otFeeTotal').innerText = total;
-
-            if (currentMonthOtFees.length === 0) {
-                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無加班費紀錄</div>";
-            } else {
-                currentMonthOtFees.forEach(item => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
-                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span style="color:#dc2626; font-weight:900; font-size:16px;">+$${item.amount}</span>
-                            </div>
-                        </div>`;
-                });
-                listEl.innerHTML = html;
-            }
-            document.getElementById('otFeeModal').style.display = 'flex';
-        }
-        function closeOtFeeModal() { document.getElementById('otFeeModal').style.display = 'none'; }
 
         function renderEventListInModal() {
             let ex = getExpandedEvents(selectedDateString, selectedDateString);
