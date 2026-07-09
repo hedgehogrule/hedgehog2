@@ -940,19 +940,17 @@
                                 else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
                                 else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
                                 
-                                if (s.startsWith('+')) {
-                                    let match = s.match(/^\+([\d.]+)/); 
-                                    if (match) {
-                                        let otHours = parseFloat(match[1]);
-                                        if (otHours >= 1) { 
-                                            let calcPay = (Math.floor(otHours / 0.5) - 1) * 50;
-                                            if (calcPay > 0) {
-                                                dailyOtPay += calcPay;
-                                                otDescs.push(`加班 ${otHours}h ($${calcPay})`);
-                                            }
-                                        }
-                                    }
-                                }
+                                // --- 修改後的加班費計算邏輯 ---
+if (s.startsWith('+')) {
+    // 透過日期找到該天在 globalStats.hours 中的紀錄
+    let dayOtRecords = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
+    
+    dayOtRecords.forEach(record => {
+        let fee = record.manualFee || 0; // 抓取剛剛手動輸入的金額
+        monthlyOtPay += fee;             // 累加總金額
+        otDescs.push(`加班 ${record.amount}h ($${fee})`); // 顯示時數與金額
+    });
+}
                             });
                             
                             if (dailyFee > 0) {
