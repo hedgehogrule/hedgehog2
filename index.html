@@ -80,7 +80,6 @@
             transform-origin: left center;
         }
         
-        /* 右上角小數字標記 */
         .day-stat-badge {
             position: absolute;
             top: 2px;
@@ -563,7 +562,7 @@
             return { idx: Math.abs(cycleIdx), isTop: isTop, isBottom: isBottom, isLeft: isLeft, isRight: isRight };
         }
 
-        // ==================== 全域變數（使用原 key 名稱） ====================
+        // ==================== 全域變數 ====================
         let currentDate = new Date();
         let selectedDateString = "";
         let selectedEventColor = "blue";
@@ -571,7 +570,7 @@
         
         let calendarData = {};
         try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar8')) || {}; } catch(e) {}
-        // 新增 nightFee 陣列，但使用原 key 名稱
+        
         let globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
         try { 
             let saved = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || { hours: [], annualLeave: [], makeup: [] };
@@ -595,32 +594,28 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        // ==================== 取得某日期的統計標記（需求2：右上角小數字） ====================
+        // ==================== 取得某日期的統計標記 ====================
         function getDayStatBadges(dateKey) {
             let badges = [];
             
-            // 加班
             let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
             let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
             if (otTotal > 0) {
                 badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
             }
             
-            // 拿時間
             let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
             let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
             if (takeTotal > 0) {
                 badges.push({ text: '-' + takeTotal + 'h', cssClass: 'badge-take' });
             }
             
-            // 拿年休
             let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
             let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
             if (alTotal > 0) {
                 badges.push({ text: '-' + alTotal + 'h', cssClass: 'badge-al' });
             }
             
-            // 加時補課
             let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
             let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
             if (mkTotal > 0) {
@@ -683,7 +678,6 @@
                 if (nightCb && nightCb.checked) {
                     record.desc = '加班(含12-8津貼)';
                     
-                    // ★ 需求1：津貼獨立存入 nightFee 陣列（歸夜班費）
                     if (!globalStats.nightFee) globalStats.nightFee = [];
                     globalStats.nightFee.push({
                         id: "nf_" + Date.now(),
@@ -691,23 +685,6 @@
                         amount: 280,
                         desc: '12-8津貼(加班)'
                     });
-                    
-                    // ★ 需求3：自動在班別中加入 (津) 標記，讓底色變綠色
-                    let parts = selectedDateString.split('-');
-                    let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-                    if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
-                    let savedData = calendarData[selectedDateString];
-                    let currentShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
-                    
-                    if (!currentShift.includes('(津)')) {
-                        let newShift = currentShift + ' (津)';
-                        if (!savedData.shiftHistory) savedData.shiftHistory = [];
-                        if (savedData.shift !== undefined && savedData.shift !== currentShift) {
-                            savedData.shiftHistory.push(currentShift);
-                        }
-                        savedData.shift = newShift;
-                        localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-                    }
                 }
             } else {
                 record.fee = 0;
@@ -795,7 +772,6 @@
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
             document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
             
-            // ★ 需求1：加班費總計（只算加班費，不含夜班津貼）
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
             document.getElementById('hdrOtFee').innerText = totalOtFee;
 
@@ -886,7 +862,7 @@
             input.value = parts.join(' ');
         }
 
-        function generateDayTags(finalShift) {
+        function generateDayTags(finalShift, hasAllowance) {
             if (!finalShift) return { topHtml: "", bottomHtml: "" };
             let topHtml = '<div class="top-tags-wrap">';
             let bottomHtml = '<div class="bottom-tags-wrap">';
@@ -899,34 +875,28 @@
 
             let hasTop = false;
             let hasBottom = false;
-            // ★ 需求3：檢查是否有 (津) 標記
-            let hasAllowance = tokens.some(t => t.includes('(津)'));
 
             tokens.forEach(p => {
                 let s = p.toUpperCase();
                 if (s === "例休") { bottomHtml += `<div class="shift-badge shift-off">例休</div>`; hasBottom = true; }
                 else if (s === "年休") { bottomHtml += `<div class="shift-badge shift-off">年休</div>`; hasBottom = true; }
                 else if (s === "國") { topHtml += `<div class="national-holiday-badge">國</div>`; hasTop = true; }
-                else if (s.match(/^[+-]\d+(\.\d+)?(\(津\))?$/) || s.startsWith("年休-")) {
-                    let numText = p.replace("(津)", ""); 
+                else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
+                    let numText = p;
                     let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
                     if(numText.startsWith("年休")) color = "#5ece9d";
                     topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
                     hasTop = true;
                 } 
-                else if (s === "(津)") {
-                    // ★ 修正：(津) 單獨存在時不顯示，因為已經透過 hasAllowance 影響底色
-                    // 不做任何事，讓它只影響底色
-                }
                 else {
                     hasBottom = true;
-                    // ★ 需求3：有津貼標記的班別顯示綠色
-                    let forceGreenClass = hasAllowance ? "shift-green" : "";
-                    
-                    if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-off'}">${p}</div>`; }
-                    else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-d'}">${p}</div>`; }
+                    if (hasAllowance) {
+                        bottomHtml += `<div class="shift-badge shift-green">${p}</div>`;
+                    }
+                    else if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge shift-off">${p}</div>`; }
+                    else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge shift-d">${p}</div>`; }
                     else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; }
-                    else { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-default'}">${p}</div>`; }
+                    else { bottomHtml += `<div class="shift-badge shift-default">${p}</div>`; }
                 }
             });
             topHtml += '</div>';
@@ -1147,7 +1117,6 @@
                             }
                         }
 
-                        // 加時補課統計
                         if (slot.type === 'current') {
                             const makeupData = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
                             makeupData.forEach(item => {
@@ -1156,7 +1125,9 @@
                             });
                         }
 
-                        let htmlObj = generateDayTags(finalShift);
+                        // ★ 直接查 nightFee 有沒有這天的津貼
+                        let hasAllowance = (globalStats.nightFee || []).some(item => item.date === dateKey);
+                        let htmlObj = generateDayTags(finalShift, hasAllowance);
                         let tracksHtml = "";
 
                         if (week.tracks && week.tracks.length > 0) {
@@ -1165,8 +1136,6 @@
                                 if (ev) {
                                     let hasLeft = (dIdx > 0 && trackLine[dIdx - 1] && trackLine[dIdx - 1].instanceId === ev.instanceId);
                                     let hasRight = (dIdx < 6 && trackLine[dIdx + 1] && trackLine[dIdx + 1].instanceId === ev.instanceId);
-                                    let globalLeft = (ev.startDate < dateKey);
-                                    let globalRight = (ev.endDate > dateKey);
 
                                     let marginStyle = "";
                                     let radiusStyle = "border-radius: 2px;";
@@ -1174,8 +1143,6 @@
                                     if (hasRight) { marginStyle += "margin-right: -4px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 2px 0 0 2px;"; }
                                     if (hasLeft) { radiusStyle = "border-radius: 0 2px 2px 0;"; }
                                     if (hasLeft && hasRight) { marginStyle += "margin-right: -4px; position: relative; z-index: 2;"; radiusStyle = "border-radius: 0;"; }
-                                    if (dIdx === 0 && globalLeft) { radiusStyle = hasRight ? "border-radius: 0;" : "border-radius: 0 2px 2px 0;"; }
-                                    if (dIdx === 6 && globalRight) { radiusStyle = hasLeft ? "border-radius: 0;" : "border-radius: 2px 0 0 2px;"; }
 
                                     const cStyle = colorStyles[ev.color] || colorStyles['blue'];
                                     let showText = !hasLeft; 
@@ -1206,7 +1173,6 @@
                         let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
                         let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
 
-                        // ★ 需求2：右上角小數字標記
                         let statBadges = getDayStatBadges(dateKey);
                         let badgeHtml = '';
                         if (statBadges.length > 0) {
@@ -1245,13 +1211,11 @@
                     });
                 });
                 
-                // 計算當月加班費（只算加班費，不含津貼）
                 const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
                 monthlyOtPay = globalStats.hours
                     .filter(item => item.date.startsWith(monthStr) && item.desc.includes('加班'))
                     .reduce((s, item) => s + (item.fee || 0), 0);
                 
-                // ★ 需求1：手動新增的夜班費（12-8津貼等）加入計算
                 if (globalStats.nightFee) {
                     globalStats.nightFee
                         .filter(item => item.date.startsWith(monthStr))
