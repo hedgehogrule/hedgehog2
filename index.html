@@ -284,9 +284,14 @@
             <h3 id="quickStatTitle" style="margin-bottom: 15px;">輸入數量</h3>
             <input type="number" id="quickStatAmount" placeholder="請輸入數字 (例: 2.5)" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
             <div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
-                <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer;">
-                    <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($270)
-                </label>
+                
+<div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
+    <label style="display:block; font-size:14px; font-weight:bold; margin-bottom:5px;">計算方式：</label>
+    <select id="otTypeSelect" style="width: 100%; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
+        <option value="old">舊制 (前半小時不計，之後每半小時 $50)</option>
+        <option value="new">加成 (前半小時不計，1.5h起每半小時 $100)</option>
+    </select>
+</div>
             </div>
             <div class="btn-row" style="margin-top: 20px;">
                 <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeQuickStatModal()">取消</button>
@@ -1109,32 +1114,51 @@ if (makeupBtn) {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-        function confirmQuickStat() {
-            let val = document.getElementById('quickStatAmount').value;
-            let num = parseFloat(val);
-            if(isNaN(num)) { alert("請輸入有效的數字！"); return; }
+       function confirmQuickStat() {
+    let val = document.getElementById('quickStatAmount').value;
+    let num = parseFloat(val);
+    if(isNaN(num) || num <= 0) { alert("請輸入有效的數字！"); return; }
 
-            let act = currentQuickStatAct;
-            let type = (act === '年休') ? 'annualLeave' : 'hours';
-            let sign = (act === '加班') ? 1 : -1;
-            let isNightFee = (act === '加班' && document.getElementById('quickStatNightFeeCb').checked);
+    let act = currentQuickStatAct;
+    let dailyOtPay = 0;
 
-            globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            
-            let input = document.getElementById('shiftInput');
-            let parts = input.value.split(/\s+/).filter(Boolean);
-            
-            let appendStr = "";
-            if (act === '加班') {
-                appendStr = `+${Math.abs(num)}`;
-                if(isNightFee) appendStr += `(津)`;
-            } else if (act === '拿時間') {
-                appendStr = `-${Math.abs(num)}`;
-            } else if (act === '年休') {
-                appendStr = `年休-${Math.abs(num)}`;
+    if (act === '加班') {
+        let otType = document.getElementById('otTypeSelect').value;
+        let extraHours = num - 0.5; // 前半小時不計
+
+        if (extraHours > 0) {
+            if (otType === 'old') {
+                // 舊制：每半小時 50
+                dailyOtPay = Math.floor(extraHours / 0.5) * 50;
+            } else {
+                // 加成：1.5h(即加班2h)起，每半小時 100
+                // 前 1 小時(加班0.5~1.5)每半小時 50
+                let firstPart = Math.min(extraHours, 1.0); 
+                dailyOtPay = Math.floor(firstPart / 0.5) * 50;
+                // 超過 1 小時(加班1.5以後)每半小時 100
+                if (extraHours > 1.0) {
+                    let secondPart = extraHours - 1.0;
+                    dailyOtPay += Math.floor(secondPart / 0.5) * 100;
+                }
             }
+        }
+        // 將計算結果加到加班費資料庫中
+        globalStats.hours.push({ id: "ot_"+Date.now(), date: selectedDateString, amount: dailyOtPay, desc: `加班 ${num}h (${otType==='old'?'舊制':'加成'})` });
+    } else {
+        // 原本的拿時間、年休邏輯
+        let sign = (act === '加班') ? 1 : -1;
+        globalStats[act === '年休' ? 'annualLeave' : 'hours'].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
+    }
+
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay();
+    
+    let input = document.getElementById('shiftInput');
+    input.value += ` +${num}`;
+    
+    closeQuickStatModal();
+    renderCalendar();
+}
 
             parts.push(appendStr);
             input.value = parts.join(' ');
