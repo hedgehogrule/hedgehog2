@@ -278,6 +278,10 @@
         <div class="modal-content" style="max-width: 280px;">
             <h3 id="quickStatTitle" style="margin-bottom: 15px;">輸入數量</h3>
             <input type="number" id="quickStatAmount" placeholder="請輸入數字 (例: 2.5)" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
+          <div id="manualFeeWrap" style="margin-top:12px; display:none;">
+    <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;">加班費金額 ($)</label>
+    <input type="number" id="quickStatFee" placeholder="請輸入金額" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+</div>
             <div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
                 <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer;">
                     <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($270)
@@ -1087,56 +1091,44 @@ if (makeupBtn) {
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
 
         function openQuickStatPrompt(act) {
-            currentQuickStatAct = act;
-            document.getElementById('quickStatTitle').innerText = `輸入「${act}」數量`;
-            document.getElementById('quickStatAmount').value = '';
-            
-            if (act === '加班') {
-                document.getElementById('quickStatNightFeeWrap').style.display = 'block';
-                document.getElementById('quickStatNightFeeCb').checked = false;
-            } else {
-                document.getElementById('quickStatNightFeeWrap').style.display = 'none';
-            }
-            document.getElementById('quickStatModal').style.display = 'flex';
-        }
+    currentQuickStatAct = act;
+    document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
+    document.getElementById('quickStatAmount').value = '';
+    
+    // 如果是加班，顯示金額輸入框
+    if (act === '加班') {
+        document.getElementById('manualFeeWrap').style.display = 'block';
+        document.getElementById('quickStatFee').value = ''; // 清空舊值
+    } else {
+        document.getElementById('manualFeeWrap').style.display = 'none';
+    }
+    document.getElementById('quickStatModal').style.display = 'flex';
+}
 
         function closeQuickStatModal() {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-        function confirmQuickStat() {
-            let val = document.getElementById('quickStatAmount').value;
-            let num = parseFloat(val);
-            if(isNaN(num)) { alert("請輸入有效的數字！"); return; }
-
-            let act = currentQuickStatAct;
-            let type = (act === '年休') ? 'annualLeave' : 'hours';
-            let sign = (act === '加班') ? 1 : -1;
-            let isNightFee = (act === '加班' && document.getElementById('quickStatNightFeeCb').checked);
-
-            globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            
-            let input = document.getElementById('shiftInput');
-            let parts = input.value.split(/\s+/).filter(Boolean);
-            
-            let appendStr = "";
-            if (act === '加班') {
-                appendStr = `+${Math.abs(num)}`;
-                if(isNightFee) appendStr += `(津)`;
-            } else if (act === '拿時間') {
-                appendStr = `-${Math.abs(num)}`;
-            } else if (act === '年休') {
-                appendStr = `年休-${Math.abs(num)}`;
-            }
-
-            parts.push(appendStr);
-            input.value = parts.join(' ');
-            
-            closeQuickStatModal();
-        }
-
+       function confirmQuickStat() {
+    let hours = parseFloat(document.getElementById('quickStatAmount').value);
+    let fee = parseFloat(document.getElementById('quickStatFee').value);
+    
+    if(isNaN(hours)) { alert("請輸入有效時數！"); return; }
+    
+    // 存入資料，多加一個 fee 欄位記錄手動輸入的金額
+    globalStats.hours.push({ 
+        id: "st_"+Date.now(), 
+        date: selectedDateString, 
+        amount: hours, 
+        fee: (currentQuickStatAct === '加班' && !isNaN(fee)) ? fee : 0,
+        desc: currentQuickStatAct 
+    });
+    
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay();
+    closeQuickStatModal();
+    renderCalendar();
+}
         function openQuickMakeupPrompt() {
             document.getElementById('quickMakeupAmount').value = '';
             document.getElementById('quickMakeupModal').style.display = 'flex';
