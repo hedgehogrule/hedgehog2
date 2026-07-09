@@ -159,6 +159,13 @@
 
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
+        /* 修復手機版彈出視窗明細列表空白，需要點按才顯示的渲染 Bug */
+.modal-content, #statsList, #nightFeeList, #otFeeList, #makeupList {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
     </style>
 </head>
 <body>
