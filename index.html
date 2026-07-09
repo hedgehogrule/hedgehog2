@@ -577,110 +577,120 @@
         // ==================== 加班費相關函數 (已優化) ====================
         
         function openQuickStatPrompt(act) {
-            currentQuickStatAct = act;
-            document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
-            document.getElementById('quickStatAmount').value = '';
-            
-            // 如果是加班，顯示金額輸入框
-            if (act === '加班') {
-                document.getElementById('manualFeeWrap').style.display = 'block';
-                document.getElementById('quickStatFee').value = '';
-                document.getElementById('quickStatFee').placeholder = '請輸入加班費金額 ($)';
-            } else {
-                document.getElementById('manualFeeWrap').style.display = 'none';
-                document.getElementById('quickStatFee').value = '0';
-            }
-            document.getElementById('quickStatModal').style.display = 'flex';
-        }
+    currentQuickStatAct = act;
+    document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
+    document.getElementById('quickStatAmount').value = '';
+    
+    // 如果是加班，顯示金額輸入框和津貼勾選
+    if (act === '加班') {
+        document.getElementById('manualFeeWrap').style.display = 'block';
+        document.getElementById('quickStatFee').value = '';
+        document.getElementById('quickStatFee').placeholder = '請輸入加班費金額 ($)';
+        document.getElementById('quickStatNightFeeWrap').style.display = 'block';
+        document.getElementById('quickStatNightFeeCb').checked = false;
+    } else {
+        document.getElementById('manualFeeWrap').style.display = 'none';
+        document.getElementById('quickStatFee').value = '0';
+        document.getElementById('quickStatNightFeeWrap').style.display = 'none';
+        document.getElementById('quickStatNightFeeCb').checked = false;
+    }
+    document.getElementById('quickStatModal').style.display = 'flex';
+}
 
         function closeQuickStatModal() {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-        function confirmQuickStat() {
-            let hours = parseFloat(document.getElementById('quickStatAmount').value);
-            
-            if (isNaN(hours) || hours <= 0) {
-                alert("請輸入有效時數（大於 0）！");
-                return;
-            }
-            
-            let record = {
-                id: "st_" + Date.now(),
-                date: selectedDateString,
-                amount: hours,
-                desc: currentQuickStatAct
-            };
-            
-            // 只有當動作是「加班」時，才處理費用
-            if (currentQuickStatAct === '加班') {
-                let fee = parseFloat(document.getElementById('quickStatFee').value);
-                if (isNaN(fee) || fee < 0) {
-                    alert("請輸入有效的加班費金額！");
-                    return;
-                }
-                record.fee = fee;
-            } else {
-                record.fee = 0;
-            }
-            
-            globalStats.hours.push(record);
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            closeQuickStatModal();
-            renderCalendar();
+function confirmQuickStat() {
+    let hours = parseFloat(document.getElementById('quickStatAmount').value);
+    
+    if (isNaN(hours) || hours <= 0) {
+        alert("請輸入有效時數（大於 0）！");
+        return;
+    }
+    
+    let record = {
+        id: "st_" + Date.now(),
+        date: selectedDateString,
+        amount: hours,
+        desc: currentQuickStatAct
+    };
+    
+    // 只有當動作是「加班」時，才處理費用
+    if (currentQuickStatAct === '加班') {
+        let fee = parseFloat(document.getElementById('quickStatFee').value);
+        if (isNaN(fee) || fee < 0) {
+            alert("請輸入有效的加班費金額！");
+            return;
         }
-
-        function openOtFeeModal() {
-            let listEl = document.getElementById('otFeeList');
-            let html = "";
-            
-            // 直接從 globalStats.hours 篩選當月加班紀錄
-            const year = currentDate.getFullYear();
-            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const monthKey = `${year}-${month}`;
-            
-            const otRecords = globalStats.hours.filter(item => 
-                item.date.startsWith(monthKey) && item.desc === '加班'
-            );
-            
-            otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            let totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
-            document.getElementById('otFeeTotal').innerText = totalFee;
-
-            if (otRecords.length === 0) {
-                listEl.innerHTML = `
-                    <div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">
-                        本月無加班費紀錄
-                    </div>`;
-            } else {
-                otRecords.forEach(item => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
-                            <div>
-                                <div style="font-size:14px; font-weight:900; color:#555;">
-                                    ${item.date}｜加班 ${item.amount} 小時
-                                </div>
-                                ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">費用：$${item.fee}</div>` : ''}
-                            </div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span style="color:#dc2626; font-weight:900; font-size:18px;">
-                                    ${item.fee ? '$' + item.fee : '-'}
-                                </span>
-                                <button onclick="deleteOtRecord('${item.id}')" 
-                                    style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
-                                    title="刪除此筆紀錄">
-                                    ✕
-                                </button>
-                            </div>
-                        </div>`;
-                });
-                listEl.innerHTML = html;
-            }
-            
-            document.getElementById('otFeeModal').style.display = 'flex';
+        record.fee = fee;
+        
+        // 檢查是否勾選了 12-8 津貼
+        let nightCb = document.getElementById('quickStatNightFeeCb');
+        if (nightCb && nightCb.checked) {
+            record.fee += 280; // 加計 12-8 津貼 280 元
         }
+    } else {
+        record.fee = 0;
+    }
+    
+    globalStats.hours.push(record);
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay();
+    closeQuickStatModal();
+    renderCalendar();
+}
+
+function openOtFeeModal() {
+    let listEl = document.getElementById('otFeeList');
+    let html = "";
+    
+    // 直接從 globalStats.hours 篩選當月加班紀錄
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const monthKey = `${year}-${month}`;
+    
+    const otRecords = globalStats.hours.filter(item => 
+        item.date.startsWith(monthKey) && item.desc === '加班'
+    );
+    
+    otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    let totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
+    document.getElementById('otFeeTotal').innerText = totalFee;
+
+    if (otRecords.length === 0) {
+        listEl.innerHTML = `
+            <div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">
+                本月無加班費紀錄
+            </div>`;
+    } else {
+        otRecords.forEach(item => {
+            html += `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
+                    <div>
+                        <div style="font-size:14px; font-weight:900; color:#555;">
+                            ${item.date}｜加班 ${item.amount} 小時
+                        </div>
+                        ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">費用：$${item.fee}</div>` : ''}
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#dc2626; font-weight:900; font-size:18px;">
+                            ${item.fee ? '$' + item.fee : '-'}
+                        </span>
+                        <button onclick="deleteOtRecord('${item.id}')" 
+                            style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
+                            title="刪除此筆紀錄">
+                            ✕
+                        </button>
+                    </div>
+                </div>`;
+        });
+        listEl.innerHTML = html;
+    }
+    
+    document.getElementById('otFeeModal').style.display = 'flex';
+}
 
         function closeOtFeeModal() { 
             document.getElementById('otFeeModal').style.display = 'none'; 
