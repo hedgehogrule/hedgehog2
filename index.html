@@ -6,21 +6,17 @@
     <title>我的全自動夢幻行事曆</title>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="icon.png?v=4">
+    <link rel="apple-touch-icon" href="icon.png?v=6">
     <meta name="theme-color" content="#ffe0f0">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=4">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=4">
-    <link rel="shortcut icon" href="icon.png?v=4">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=6">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon.png?v=6">
+    <link rel="shortcut icon" href="icon.png?v=6">
     <link rel="manifest" href="manifest.json?v=2">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js">
     </script>
 
     <style>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
-        
         :root {
             --dreamy-bg: linear-gradient(135deg, #ffe0f0 0%, #e0f7fa 50%, #e6d9ff 100%);
             --cycle-border-color: #a28cdb; 
@@ -60,7 +56,7 @@
         
         .calendar { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 0; padding: 0 3px; }
         
-        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; }
+        .day { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(2px); min-height: 85px; height: 14vh; padding: 3px; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; border: 0.5px solid rgba(0,0,0,0.03); overflow: hidden; position: relative; }
         .day:active { background: rgba(255, 255, 255, 0.9) !important; }
         .day.other-month { opacity: 0.45; background: rgba(240, 240, 240, 0.3); }
         .day.today-highlight { background: #fff5f6 !important; outline: 2.5px solid #ff4757; outline-offset: -2px; box-shadow: inset 0 0 10px rgba(255,71,87,0.15) !important; z-index: 2; }
@@ -83,6 +79,25 @@
             transform: scale(0.95);
             transform-origin: left center;
         }
+        
+        /* 右上角小數字標記 */
+        .day-stat-badge {
+            position: absolute;
+            top: 2px;
+            right: 3px;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 1px 3px;
+            border-radius: 4px;
+            line-height: 1;
+            z-index: 3;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+        .badge-ot { background: #fff0f0; color: #dc2626; border: 1px solid #fca5a5; }
+        .badge-take { background: #eef5ff; color: #5b9bd5; border: 1px solid #b8daff; }
+        .badge-al { background: #eafaf1; color: #3ba377; border: 1px solid #c3e6cb; }
+        .badge-makeup { background: #f0f0ff; color: #4a4aff; border: 1px solid #b0b0ff; }
         
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
         
@@ -273,7 +288,7 @@
             </div>
             <div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
                 <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer;">
-                    <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($270)
+                    <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($280)
                 </label>
             </div>
             <div class="btn-row" style="margin-top: 20px;">
@@ -555,9 +570,10 @@
         let tempRepeatSetting = { type: 'none', interval: 1, endType: 'none', endDate: '' };
         
         let calendarData = {};
-        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar8')) || {}; } catch(e) {}
-        let globalStats = { hours: [], annualLeave: [], makeup: [] };
-        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || { hours: [], annualLeave: [], makeup: [] }; } catch(e) {}
+        try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar9')) || {}; } catch(e) {}
+        // 新增 nightFee 陣列
+        let globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
+        try { globalStats = JSON.parse(localStorage.getItem('myCustomCalendarStats9')) || { hours: [], annualLeave: [], makeup: [], nightFee: [] }; } catch(e) {}
         
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
@@ -574,123 +590,185 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        // ==================== 加班費相關函數 (已優化) ====================
+        // ==================== 取得某日期的統計標記 ====================
+        function getDayStatBadges(dateKey) {
+            let badges = [];
+            
+            // 加班
+            let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
+            let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
+            if (otTotal > 0) {
+                badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
+            }
+            
+            // 拿時間
+            let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
+            let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
+            if (takeTotal > 0) {
+                badges.push({ text: '-' + takeTotal + 'h', cssClass: 'badge-take' });
+            }
+            
+            // 拿年休
+            let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
+            let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
+            if (alTotal > 0) {
+                badges.push({ text: '-' + alTotal + 'h', cssClass: 'badge-al' });
+            }
+            
+            // 加時補課
+            let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
+            let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
+            if (mkTotal > 0) {
+                badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
+            }
+            
+            return badges;
+        }
+
+        // ==================== 加班費相關函數 ====================
         
         function openQuickStatPrompt(act) {
-    currentQuickStatAct = act;
-    document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
-    document.getElementById('quickStatAmount').value = '';
-    
-    // 如果是加班，顯示金額輸入框和津貼勾選
-    if (act === '加班') {
-        document.getElementById('manualFeeWrap').style.display = 'block';
-        document.getElementById('quickStatFee').value = '';
-        document.getElementById('quickStatFee').placeholder = '請輸入加班費金額 ($)';
-        document.getElementById('quickStatNightFeeWrap').style.display = 'block';
-        document.getElementById('quickStatNightFeeCb').checked = false;
-    } else {
-        document.getElementById('manualFeeWrap').style.display = 'none';
-        document.getElementById('quickStatFee').value = '0';
-        document.getElementById('quickStatNightFeeWrap').style.display = 'none';
-        document.getElementById('quickStatNightFeeCb').checked = false;
-    }
-    document.getElementById('quickStatModal').style.display = 'flex';
-}
+            currentQuickStatAct = act;
+            document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
+            document.getElementById('quickStatAmount').value = '';
+            
+            if (act === '加班') {
+                document.getElementById('manualFeeWrap').style.display = 'block';
+                document.getElementById('quickStatFee').value = '';
+                document.getElementById('quickStatFee').placeholder = '請輸入加班費金額 ($)';
+                document.getElementById('quickStatNightFeeWrap').style.display = 'block';
+                document.getElementById('quickStatNightFeeCb').checked = false;
+            } else {
+                document.getElementById('manualFeeWrap').style.display = 'none';
+                document.getElementById('quickStatFee').value = '0';
+                document.getElementById('quickStatNightFeeWrap').style.display = 'none';
+                document.getElementById('quickStatNightFeeCb').checked = false;
+            }
+            document.getElementById('quickStatModal').style.display = 'flex';
+        }
 
         function closeQuickStatModal() {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-function confirmQuickStat() {
-    let hours = parseFloat(document.getElementById('quickStatAmount').value);
-    
-    if (isNaN(hours) || hours <= 0) {
-        alert("請輸入有效時數（大於 0）！");
-        return;
-    }
-    
-    let record = {
-        id: "st_" + Date.now(),
-        date: selectedDateString,
-        amount: hours,
-        desc: currentQuickStatAct
-    };
-    
-    // 只有當動作是「加班」時，才處理費用
-    if (currentQuickStatAct === '加班') {
-        let fee = parseFloat(document.getElementById('quickStatFee').value);
-        if (isNaN(fee) || fee < 0) {
-            alert("請輸入有效的加班費金額！");
-            return;
+        function confirmQuickStat() {
+            let hours = parseFloat(document.getElementById('quickStatAmount').value);
+            
+            if (isNaN(hours) || hours <= 0) {
+                alert("請輸入有效時數（大於 0）！");
+                return;
+            }
+            
+            let record = {
+                id: "st_" + Date.now(),
+                date: selectedDateString,
+                amount: hours,
+                desc: currentQuickStatAct
+            };
+            
+            if (currentQuickStatAct === '加班') {
+                let fee = parseFloat(document.getElementById('quickStatFee').value);
+                if (isNaN(fee) || fee < 0) {
+                    alert("請輸入有效的加班費金額！");
+                    return;
+                }
+                record.fee = fee;
+                
+                let nightCb = document.getElementById('quickStatNightFeeCb');
+                if (nightCb && nightCb.checked) {
+                    record.desc = '加班(含12-8津貼)';
+                    
+                    // 津貼獨立存入 nightFee 陣列（歸夜班費）
+                    if (!globalStats.nightFee) globalStats.nightFee = [];
+                    globalStats.nightFee.push({
+                        id: "nf_" + Date.now(),
+                        date: selectedDateString,
+                        amount: 280,
+                        desc: '12-8津貼(加班)'
+                    });
+                    
+                    // ★ 需求3：自動在班別中加入 (津) 標記，讓底色變綠色
+                    let parts = selectedDateString.split('-');
+                    let autoInfo = getAutoShift(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+                    if (!calendarData[selectedDateString]) calendarData[selectedDateString] = {};
+                    let savedData = calendarData[selectedDateString];
+                    let currentShift = savedData.shift !== undefined ? savedData.shift : autoInfo.shift;
+                    
+                    if (!currentShift.includes('(津)')) {
+                        let newShift = currentShift + ' (津)';
+                        if (!savedData.shiftHistory) savedData.shiftHistory = [];
+                        if (savedData.shift !== undefined && savedData.shift !== currentShift) {
+                            savedData.shiftHistory.push(currentShift);
+                        }
+                        savedData.shift = newShift;
+                        localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
+                    }
+                }
+            } else {
+                record.fee = 0;
+            }
+            
+            if (currentQuickStatAct === '年休') {
+                globalStats.annualLeave.push(record);
+            } else {
+                globalStats.hours.push(record);
+            }
+            
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            closeQuickStatModal();
+            renderCalendar();
         }
-        record.fee = fee;
-        
-        // 檢查是否勾選了 12-8 津貼
-        let nightCb = document.getElementById('quickStatNightFeeCb');
-        if (nightCb && nightCb.checked) {
-            record.fee += 280; // 加計 12-8 津貼 280 元
+
+        function openOtFeeModal() {
+            let listEl = document.getElementById('otFeeList');
+            let html = "";
+            
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+            
+            const otRecords = globalStats.hours.filter(item => 
+                item.date.startsWith(monthKey) && item.desc.includes('加班')
+            );
+            
+            otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
+            document.getElementById('otFeeTotal').innerText = totalFee;
+
+            if (otRecords.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">
+                        本月無加班費紀錄
+                    </div>`;
+            } else {
+                otRecords.forEach(item => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
+                            <div>
+                                <div style="font-size:14px; font-weight:900; color:#555;">
+                                    ${item.date}｜加班 ${item.amount} 小時
+                                </div>
+                                ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">加班費：$${item.fee}</div>` : ''}
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="color:#dc2626; font-weight:900; font-size:18px;">
+                                    ${item.fee ? '$' + item.fee : '-'}
+                                </span>
+                                <button onclick="deleteOtRecord('${item.id}')" 
+                                    style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
+                                    title="刪除此筆紀錄">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+            
+            document.getElementById('otFeeModal').style.display = 'flex';
         }
-    } else {
-        record.fee = 0;
-    }
-    
-    globalStats.hours.push(record);
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay();
-    closeQuickStatModal();
-    renderCalendar();
-}
-
-function openOtFeeModal() {
-    let listEl = document.getElementById('otFeeList');
-    let html = "";
-    
-    // 直接從 globalStats.hours 篩選當月加班紀錄
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    const monthKey = `${year}-${month}`;
-    
-    const otRecords = globalStats.hours.filter(item => 
-        item.date.startsWith(monthKey) && item.desc === '加班'
-    );
-    
-    otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    let totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
-    document.getElementById('otFeeTotal').innerText = totalFee;
-
-    if (otRecords.length === 0) {
-        listEl.innerHTML = `
-            <div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">
-                本月無加班費紀錄
-            </div>`;
-    } else {
-        otRecords.forEach(item => {
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
-                    <div>
-                        <div style="font-size:14px; font-weight:900; color:#555;">
-                            ${item.date}｜加班 ${item.amount} 小時
-                        </div>
-                        ${item.fee ? `<div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">費用：$${item.fee}</div>` : ''}
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:#dc2626; font-weight:900; font-size:18px;">
-                            ${item.fee ? '$' + item.fee : '-'}
-                        </span>
-                        <button onclick="deleteOtRecord('${item.id}')" 
-                            style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
-                            title="刪除此筆紀錄">
-                            ✕
-                        </button>
-                    </div>
-                </div>`;
-        });
-        listEl.innerHTML = html;
-    }
-    
-    document.getElementById('otFeeModal').style.display = 'flex';
-}
 
         function closeOtFeeModal() { 
             document.getElementById('otFeeModal').style.display = 'none'; 
@@ -700,7 +778,7 @@ function openOtFeeModal() {
             if (!confirm("確定要刪除這筆加班紀錄嗎？\n（僅刪除加班費紀錄，不會影響班表）")) return;
             
             globalStats.hours = globalStats.hours.filter(item => item.id !== id);
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             
             updateStatsDisplay();
             renderCalendar();
@@ -712,9 +790,9 @@ function openOtFeeModal() {
             document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
             document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
             
-            // 加班費總計
-            const totalFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
-            document.getElementById('hdrOtFee').innerText = totalFee;
+            // 加班費總計（只算加班費，不含夜班津貼）
+            const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
+            document.getElementById('hdrOtFee').innerText = totalOtFee;
 
             const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
             const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
@@ -787,7 +865,7 @@ function openOtFeeModal() {
                 }
             }
             
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
             const count = batchSelectedDates.size;
             cancelBatchMode();
             alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
@@ -816,6 +894,7 @@ function openOtFeeModal() {
 
             let hasTop = false;
             let hasBottom = false;
+            // ★ 需求3：檢查是否有 (津) 標記
             let hasAllowance = tokens.some(t => t.includes('(津)'));
 
             tokens.forEach(p => {
@@ -832,6 +911,7 @@ function openOtFeeModal() {
                 } 
                 else {
                     hasBottom = true;
+                    // ★ 需求3：有津貼標記的班別顯示綠色
                     let forceGreenClass = hasAllowance ? "shift-green" : "";
                     
                     if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge ${forceGreenClass || 'shift-off'}">${p}</div>`; }
@@ -1050,7 +1130,6 @@ function openOtFeeModal() {
                                 if (s.startsWith('12-8')) { dailyFee += 270; feeDescs.push(`${tok} ($270)`); }
                                 else if (s.startsWith('E')) { dailyFee += 560; feeDescs.push(`${tok} ($560)`); }
                                 else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
-                                else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
                             });
                             
                             if (dailyFee > 0) {
@@ -1118,6 +1197,15 @@ function openOtFeeModal() {
                         let todayHighlightClass = (isThisMonth && d === realToday.getDate() && slot.type==='current') ? "today-highlight" : "";
                         let otherMonthClass = (slot.type === 'other') ? "other-month" : "";
 
+                        // ★ 需求2：右上角小數字標記
+                        let statBadges = getDayStatBadges(dateKey);
+                        let badgeHtml = '';
+                        if (statBadges.length > 0) {
+                            badgeHtml = statBadges.map(b => 
+                                `<span class="day-stat-badge ${b.cssClass}">${b.text}</span>`
+                            ).join('');
+                        }
+
                         let row2Html = "";
                         if (weekBadge || htmlObj.bottomHtml) {
                             row2Html = `<div class="day-row-2">${weekBadge} ${htmlObj.bottomHtml}</div>`;
@@ -1131,6 +1219,7 @@ function openOtFeeModal() {
 
                         calendarEl.innerHTML += `
                             <div class="day ${todayHighlightClass} ${otherMonthClass} ${husbandOffClass} ${batchClass}" style="${inlineStyle}" onclick="handleDayClick('${dateKey}', '${y}年${m+1}月${d}日')">
+                                ${badgeHtml}
                                 <div class="day-row-1">
                                     <div class="date-col">
                                         <div style="display: flex; align-items: center; gap: 3px;">
@@ -1147,11 +1236,25 @@ function openOtFeeModal() {
                     });
                 });
                 
-                // 計算當月加班費（直接從 globalStats.hours 篩選）
+                // 計算當月加班費（只算加班費，不含津貼）
                 const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
                 monthlyOtPay = globalStats.hours
-                    .filter(item => item.date.startsWith(monthStr) && item.desc === '加班')
+                    .filter(item => item.date.startsWith(monthStr) && item.desc.includes('加班'))
                     .reduce((s, item) => s + (item.fee || 0), 0);
+                
+                // ★ 需求1：手動新增的夜班費（12-8津貼等）加入計算
+                if (globalStats.nightFee) {
+                    globalStats.nightFee
+                        .filter(item => item.date.startsWith(monthStr))
+                        .forEach(item => {
+                            monthlyNightFee += item.amount;
+                            currentMonthNightFees.push({ 
+                                date: item.date, 
+                                desc: item.desc, 
+                                amount: item.amount 
+                            });
+                        });
+                }
                 
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
@@ -1211,7 +1314,7 @@ function openOtFeeModal() {
                         amount: -8,
                         desc: "年休 (排班自動扣除)"
                     });
-                    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                    localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
                 }
             }
             else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
@@ -1221,7 +1324,7 @@ function openOtFeeModal() {
                     amount: +8,
                     desc: "取消年休 (自動加回)"
                 });
-                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             }
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
@@ -1235,7 +1338,7 @@ function openOtFeeModal() {
             if (savedData.shift === undefined && (!savedData.events || savedData.events.length === 0) && (!savedData.shiftHistory || savedData.shiftHistory.length === 0)) {
                 delete calendarData[selectedDateString];
             }
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
             updateStatsDisplay();
             closeModal(); 
             renderCalendar();
@@ -1257,7 +1360,7 @@ function openOtFeeModal() {
             
             if (!globalStats.makeup) globalStats.makeup = [];
             globalStats.makeup.push({ id: "mk_"+Date.now(), date: selectedDateString, amount: num, desc: '加時補課' });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             updateStatsDisplay();
             closeQuickMakeupModal();
             renderCalendar();
@@ -1298,7 +1401,7 @@ function openOtFeeModal() {
         function deleteMakeup(id) {
             if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
             globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             updateStatsDisplay();
             renderCalendar();
             openMakeupModal();
@@ -1356,13 +1459,13 @@ function openOtFeeModal() {
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
             globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
 
         function deleteStat(id) {
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            localStorage.setItem('myCustomCalendarStats9', JSON.stringify(globalStats));
             updateStatsDisplay(); 
             renderStatsList();
             renderCalendar();
@@ -1546,7 +1649,7 @@ function openOtFeeModal() {
             if (!calendarData[sD].events) calendarData[sD].events = [];
             calendarData[sD].events.push(evObj);
             
-            localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+            localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
             renderEventListInModal(); renderCalendar(); closeEventDetailModal();
         }
 
@@ -1570,7 +1673,7 @@ function openOtFeeModal() {
                         }
                     }
                 }
-                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
                 renderEventListInModal();
                 renderCalendar();
                 closeEventDetailModal();
@@ -1606,7 +1709,7 @@ function openOtFeeModal() {
             }
 
             if (dataChanged) {
-                localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
+                localStorage.setItem('myCustomCalendar9', JSON.stringify(calendarData));
                 console.log("🧹 已自動清理超過 " + expireDays + " 天的舊照片，釋放空間！");
             }
         }
@@ -1721,8 +1824,8 @@ function openOtFeeModal() {
         async function exportData() {
             try {
                 let backup = {
-                    calendar: localStorage.getItem('myCustomCalendar8'),
-                    stats: localStorage.getItem('myCustomCalendarStats8'),
+                    calendar: localStorage.getItem('myCustomCalendar9'),
+                    stats: localStorage.getItem('myCustomCalendarStats9'),
                     photos: {}
                 };
                 
@@ -1771,8 +1874,8 @@ function openOtFeeModal() {
                 let text = await file.text();
                 let backup = JSON.parse(text);
                 
-                if (backup.calendar) localStorage.setItem('myCustomCalendar8', backup.calendar);
-                if (backup.stats) localStorage.setItem('myCustomCalendarStats8', backup.stats);
+                if (backup.calendar) localStorage.setItem('myCustomCalendar9', backup.calendar);
+                if (backup.stats) localStorage.setItem('myCustomCalendarStats9', backup.stats);
                 
                 if (backup.photos) {
                     await localforage.clear(); 
