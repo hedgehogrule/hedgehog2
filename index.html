@@ -284,9 +284,10 @@
             <h3 id="quickStatTitle" style="margin-bottom: 15px;">輸入數量</h3>
             <input type="number" id="quickStatAmount" placeholder="請輸入數字 (例: 2.5)" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
             <div id="quickStatNightFeeWrap" style="margin-top:12px; display:none;">
-    <label style="display:block; font-size:14px; font-weight:bold; margin-bottom:5px;">加班費金額 ($)：</label>
-    <input type="number" id="quickStatMoney" placeholder="請輸入金額" style="width: 100%; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px;">
-</div>
+                <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer;">
+                    <input type="checkbox" id="quickStatNightFeeCb" style="width:18px; height:18px; margin:0;"> 加計 12-8 津貼 ($270)
+                </label>
+            </div>
             <div class="btn-row" style="margin-top: 20px;">
                 <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeQuickStatModal()">取消</button>
                 <button class="btn" style="background:#5b9bd5; color:white;" onclick="confirmQuickStat()">確認</button>
@@ -1109,28 +1110,31 @@ if (makeupBtn) {
         }
 
         function confirmQuickStat() {
-    let val = document.getElementById('quickStatAmount').value;
-    let money = parseFloat(prompt("請輸入這筆加班費金額 ($)：")) || 0;
-    let num = parseFloat(val);
-    
-    if(isNaN(num) || num <= 0) { alert("時數輸入錯誤！"); return; }
+            let val = document.getElementById('quickStatAmount').value;
+            let num = parseFloat(val);
+            if(isNaN(num)) { alert("請輸入有效的數字！"); return; }
 
-    globalStats.hours.push({ 
-        id: "ot_"+Date.now(), 
-        date: selectedDateString, 
-        amount: money, 
-        desc: `加班 ${num}h` 
-    });
+            let act = currentQuickStatAct;
+            let type = (act === '年休') ? 'annualLeave' : 'hours';
+            let sign = (act === '加班') ? 1 : -1;
+            let isNightFee = (act === '加班' && document.getElementById('quickStatNightFeeCb').checked);
 
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay();
-    
-    let input = document.getElementById('shiftInput');
-    input.value += ` +${num}h($${money})`;
-    
-    closeQuickStatModal();
-    renderCalendar();
-}
+            globalStats[type].push({ id: "st_"+Date.now(), date: selectedDateString, amount: Math.abs(num)*sign, desc: act });
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            
+            let input = document.getElementById('shiftInput');
+            let parts = input.value.split(/\s+/).filter(Boolean);
+            
+            let appendStr = "";
+            if (act === '加班') {
+                appendStr = `+${Math.abs(num)}`;
+                if(isNightFee) appendStr += `(津)`;
+            } else if (act === '拿時間') {
+                appendStr = `-${Math.abs(num)}`;
+            } else if (act === '年休') {
+                appendStr = `年休-${Math.abs(num)}`;
+            }
 
             parts.push(appendStr);
             input.value = parts.join(' ');
