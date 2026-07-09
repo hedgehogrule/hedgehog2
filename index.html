@@ -674,6 +674,11 @@
         function updateStatsDisplay() {
     document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
     document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
+    
+    // 修正：從 globalStats.hours 中累加所有紀錄的 fee
+    const totalFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
+    document.getElementById('hdrOtFee').innerText = totalFee;
+
     const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
     const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
     if (makeupBtn) {
@@ -941,14 +946,15 @@
                                 else if (s.includes('(津)')) { dailyFee += 270; feeDescs.push(`加班津貼 ($270)`); }
                                 
                                 // --- 修改後的加班費計算邏輯 ---
+// --- 修改後的加班費計算邏輯 ---
 if (s.startsWith('+')) {
-    // 透過日期找到該天在 globalStats.hours 中的紀錄
+    // 從全域統計中，找到今天的所有加班紀錄
     let dayOtRecords = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
     
     dayOtRecords.forEach(record => {
-        let fee = record.manualFee || 0; // 抓取剛剛手動輸入的金額
-        monthlyOtPay += fee;             // 累加總金額
-        otDescs.push(`加班 ${record.amount}h ($${fee})`); // 顯示時數與金額
+        let fee = record.fee || 0; // 讀取剛剛手動存入的 fee
+        monthlyOtPay += fee;       // 累加到月總計
+        otDescs.push(`加班 ${record.amount}h ($${fee})`); // 顯示在 Modal 中的說明
     });
 }
                             });
