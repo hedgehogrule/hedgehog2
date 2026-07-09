@@ -675,7 +675,7 @@
     document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
     document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
     
-    // 修正：從 globalStats.hours 中累加所有紀錄的 fee
+    // 修正累加邏輯：加總所有紀錄中的 fee
     const totalFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
     document.getElementById('hdrOtFee').innerText = totalFee;
 
@@ -947,14 +947,15 @@
                                 
                                 // --- 修改後的加班費計算邏輯 ---
 // --- 修改後的加班費計算邏輯 ---
+// 在 renderCalendar 函數內，取代原本處理 s.startsWith('+') 的區塊
 if (s.startsWith('+')) {
-    // 從全域統計中，找到今天的所有加班紀錄
+    // 從 globalStats 撈取當天的加班紀錄
     let dayOtRecords = globalStats.hours.filter(item => item.date === dateKey && item.desc === '加班');
     
     dayOtRecords.forEach(record => {
-        let fee = record.fee || 0; // 讀取剛剛手動存入的 fee
-        monthlyOtPay += fee;       // 累加到月總計
-        otDescs.push(`加班 ${record.amount}h ($${fee})`); // 顯示在 Modal 中的說明
+        let fee = record.fee || 0; 
+        monthlyOtPay += fee; // 累加手動金額
+        otDescs.push(`加班 ${record.amount}h ($${fee})`);
     });
 }
                             });
@@ -1119,7 +1120,7 @@ if (makeupBtn) {
     
     if(isNaN(hours)) { alert("請輸入有效時數！"); return; }
     
-    // 存入資料，多加一個 fee 欄位記錄手動輸入的金額
+    // 存入全域統計，新增 fee 欄位
     globalStats.hours.push({ 
         id: "st_"+Date.now(), 
         date: selectedDateString, 
