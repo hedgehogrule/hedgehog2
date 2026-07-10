@@ -598,27 +598,32 @@
 function getDayStatBadges(dateKey) {
     let badges = [];
     
+    // 加班標記（正數，大於 0 才顯示）
     let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
     let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
     if (otTotal > 0) {
         badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
     }
     
+    // ✅ 修正：拿時間（負數，檢查是否有紀錄而非總和）
     let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
-    let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
-    if (takeTotal > 0) {
-        badges.push({ text: '-' + takeTotal + 'h', cssClass: 'badge-take' });
+    if (takeItems.length > 0) {
+        let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
+        // 取絕對值顯示，因為存的是負數
+        badges.push({ text: Math.abs(takeTotal) + 'h', cssClass: 'badge-take' });
     }
     
+    // 年休標記（不變）
     let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
-    let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
-    if (alTotal > 0) {
-        badges.push({ text: '-' + alTotal + 'h', cssClass: 'badge-al' });
+    if (alItems.length > 0) {
+        let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
+        badges.push({ text: alTotal + 'h', cssClass: 'badge-al' });
     }
     
+    // 補課標記（不變）
     let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-    let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
-    if (mkTotal > 0) {
+    if (mkItems.length > 0) {
+        let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
         badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
     }
     
