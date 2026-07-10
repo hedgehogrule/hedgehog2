@@ -652,19 +652,29 @@
         }
 
         function confirmQuickStat() {
-            let hours = parseFloat(document.getElementById('quickStatAmount').value);
-            
-            if (isNaN(hours) || hours <= 0) {
-                alert("請輸入有效時數（大於 0）！");
-                return;
-            }
-            
-            let record = {
-                id: "st_" + Date.now(),
-                date: selectedDateString,
-                amount: hours,
-                desc: currentQuickStatAct
-            };
+    let hours = parseFloat(document.getElementById('quickStatAmount').value);
+    
+    if (isNaN(hours) || hours <= 0) {
+        alert("請輸入有效時數（大於 0）！");
+        return;
+    }
+    
+    // --- 在這裡加入邏輯判斷 ---
+    // 如果是「拿時間」，將時數變為負數
+    let amountToSave = hours;
+    if (currentQuickStatAct === '拿時間') {
+        amountToSave = -hours;
+    }
+    // ------------------------
+    
+    let record = {
+        id: "st_" + Date.now(),
+        date: selectedDateString,
+        amount: amountToSave, // 使用處理後的數值
+        desc: currentQuickStatAct
+    };
+    
+    // ... 後續程式碼保持不變
             
             if (currentQuickStatAct === '加班') {
                 let fee = parseFloat(document.getElementById('quickStatFee').value);
