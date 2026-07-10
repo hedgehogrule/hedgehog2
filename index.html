@@ -595,35 +595,35 @@
         let batchSelectedDates = new Set();
 
         // ==================== 取得某日期的統計標記 ====================
-        function getDayStatBadges(dateKey) {
-            let badges = [];
-            
-            let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
-            let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
-            if (otTotal > 0) {
-                badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
-            }
-            
-            let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
-            let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
-            if (takeTotal > 0) {
-                badges.push({ text: '-' + takeTotal + 'h', cssClass: 'badge-take' });
-            }
-            
-            let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
-            let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
-            if (alTotal > 0) {
-                badges.push({ text: '-' + alTotal + 'h', cssClass: 'badge-al' });
-            }
-            
-            let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-            let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
-            if (mkTotal > 0) {
-                badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
-            }
-            
-            return badges;
-        }
+function getDayStatBadges(dateKey) {
+    let badges = [];
+    
+    let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
+    let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
+    if (otTotal > 0) {
+        badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
+    }
+    
+    let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
+    let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
+    if (takeTotal > 0) {
+        badges.push({ text: '-' + takeTotal + 'h', cssClass: 'badge-take' });
+    }
+    
+    let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
+    let alTotal = alItems.reduce((s, item) => s + Math.abs(item.amount), 0);
+    if (alTotal > 0) {
+        badges.push({ text: '-' + alTotal + 'h', cssClass: 'badge-al' });
+    }
+    
+    let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
+    let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
+    if (mkTotal > 0) {
+        badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
+    }
+    
+    return badges;
+}
 
         // ==================== 加班費相關函數 ====================
         
