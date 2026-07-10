@@ -657,7 +657,7 @@ function getDayStatBadges(dateKey) {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-        function confirmQuickStat() {
+function confirmQuickStat() {
     let hours = parseFloat(document.getElementById('quickStatAmount').value);
     
     if (isNaN(hours) || hours <= 0) {
@@ -665,58 +665,55 @@ function getDayStatBadges(dateKey) {
         return;
     }
     
-    // --- 在這裡加入邏輯判斷 ---
-    // 如果是「拿時間」，將時數變為負數
     let amountToSave = hours;
-    if (currentQuickStatAct === '拿時間') {
+    
+    // ✅ 拿時間和年休都轉為負數
+    if (currentQuickStatAct === '拿時間' || currentQuickStatAct === '年休') {
         amountToSave = -hours;
     }
-    // ------------------------
     
     let record = {
         id: "st_" + Date.now(),
         date: selectedDateString,
-        amount: amountToSave, // 使用處理後的數值
+        amount: amountToSave,
         desc: currentQuickStatAct
     };
     
-    // ... 後續程式碼保持不變
-            
-            if (currentQuickStatAct === '加班') {
-                let fee = parseFloat(document.getElementById('quickStatFee').value);
-                if (isNaN(fee) || fee < 0) {
-                    alert("請輸入有效的加班費金額！");
-                    return;
-                }
-                record.fee = fee;
-                
-                let nightCb = document.getElementById('quickStatNightFeeCb');
-                if (nightCb && nightCb.checked) {
-                    record.desc = '加班(含12-8津貼)';
-                    
-                    if (!globalStats.nightFee) globalStats.nightFee = [];
-                    globalStats.nightFee.push({
-                        id: "nf_" + Date.now(),
-                        date: selectedDateString,
-                        amount: 280,
-                        desc: '12-8津貼(加班)'
-                    });
-                }
-            } else {
-                record.fee = 0;
-            }
-            
-            if (currentQuickStatAct === '年休') {
-                globalStats.annualLeave.push(record);
-            } else {
-                globalStats.hours.push(record);
-            }
-            
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            updateStatsDisplay();
-            closeQuickStatModal();
-            renderCalendar();
+    if (currentQuickStatAct === '加班') {
+        let fee = parseFloat(document.getElementById('quickStatFee').value);
+        if (isNaN(fee) || fee < 0) {
+            alert("請輸入有效的加班費金額！");
+            return;
         }
+        record.fee = fee;
+        
+        let nightCb = document.getElementById('quickStatNightFeeCb');
+        if (nightCb && nightCb.checked) {
+            record.desc = '加班(含12-8津貼)';
+            
+            if (!globalStats.nightFee) globalStats.nightFee = [];
+            globalStats.nightFee.push({
+                id: "nf_" + Date.now(),
+                date: selectedDateString,
+                amount: 280,
+                desc: '12-8津貼(加班)'
+            });
+        }
+    } else {
+        record.fee = 0;
+    }
+    
+    if (currentQuickStatAct === '年休') {
+        globalStats.annualLeave.push(record);
+    } else {
+        globalStats.hours.push(record);
+    }
+    
+    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+    updateStatsDisplay();
+    closeQuickStatModal();
+    renderCalendar();
+}
 
         function openOtFeeModal() {
             let listEl = document.getElementById('otFeeList');
