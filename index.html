@@ -168,7 +168,7 @@
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
         
-        /* 補課膠囊專用樣式 */
+        /* ========== 補課膠囊專用樣式 ========== */
         .makeup-quick-add {
             background: #f5f5ff;
             border-radius: 12px;
@@ -182,9 +182,17 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        .makeup-quick-add .input-row input {
+        .makeup-quick-add .input-row input,
+        .makeup-quick-add .input-row select {
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
+            padding: 8px;
+            font-size: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            background: #fff;
         }
         .makeup-quick-add .input-row .btn-small {
             padding: 8px 16px;
@@ -197,6 +205,22 @@
         }
         .btn-add-makeup { background: #4a4aff; color: white; }
         .btn-add-makeup:active { transform: scale(0.95); }
+        
+        /* 科目標籤顏色 */
+        .subject-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: white;
+            margin-right: 4px;
+        }
+        .subject-math { background: #e74c3c; }
+        .subject-english { background: #3498db; }
+        .subject-physics { background: #2ecc71; }
+        .subject-chemistry { background: #9b59b6; }
+        .subject-other { background: #95a5a6; }
         
         .makeup-item {
             display: flex;
@@ -241,6 +265,53 @@
             font-weight: 900;
             margin-top: 10px;
         }
+        .makeup-subject-filter {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            background: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            color: #666;
+        }
+        .filter-btn.active {
+            border-color: #4a4aff;
+            background: #eef0ff;
+            color: #4a4aff;
+        }
+        .filter-btn:active { transform: scale(0.95); }
+        
+        .subject-summary {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+        .subject-summary-item {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555;
+        }
+        .subject-summary-item .num {
+            font-size: 16px;
+            margin-left: 3px;
+        }
+        .subject-summary-item.math .num { color: #e74c3c; }
+        .subject-summary-item.english .num { color: #3498db; }
+        .subject-summary-item.physics .num { color: #2ecc71; }
+        .subject-summary-item.chemistry .num { color: #9b59b6; }
+        .subject-summary-item.other .num { color: #95a5a6; }
     </style>
 </head>
 <body>
@@ -418,29 +489,47 @@
         </div>
     </div>
 
-    <!-- ========== 全新設計的補課膠囊 Modal ========== -->
+    <!-- ========== 全新設計的補課膠囊 Modal（含科目選擇） ========== -->
     <div class="modal" id="makeupModal" style="z-index: 30;">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <h3 style="margin: 0; font-size: 19px; font-weight: bold; color: #444;">📚 補課膠囊</h3>
                 <span style="font-size: 14px; color: #888;">本月總計</span>
             </div>
-            <div style="text-align:center; margin-bottom: 15px; font-weight:bold; color:#4a4aff; font-size: 28px;" id="makeupTotalDisplay">0 小時</div>
+            <div style="text-align:center; margin-bottom: 10px; font-weight:bold; color:#4a4aff; font-size: 28px;" id="makeupTotalDisplay">0 小時</div>
+            
+            <!-- 各科目小計 -->
+            <div class="subject-summary" id="subjectSummary"></div>
             
             <!-- 快速新增區 -->
             <div class="makeup-quick-add">
                 <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">✏️ 新增補課時數</div>
                 <div class="input-row">
-                    <input type="number" id="makeupAddAmount" placeholder="小時 (例: 0.5)" step="0.5" min="0" style="flex: 1; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
-                    <input type="date" id="makeupAddDate" style="flex: 1; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
+                    <input type="number" id="makeupAddAmount" placeholder="小時" step="0.5" min="0" style="flex: 0.8; min-width: 60px;">
+                    <select id="makeupAddSubject" style="flex: 1; min-width: 80px;">
+                        <option value="數學">📐 數學</option>
+                        <option value="英文">🔤 英文</option>
+                        <option value="理化">⚗️ 理化</option>
+                        <option value="化學">🧪 化學</option>
+                        <option value="其他">📋 其他</option>
+                    </select>
+                    <input type="date" id="makeupAddDate" style="flex: 1; min-width: 90px;">
                     <button class="btn-small btn-add-makeup" onclick="addMakeupRecord()">➕ 新增</button>
                 </div>
-                <div style="font-size: 11px; color: #999; margin-top: 6px;">💡 輸入正數為增加補課時數，刪除時會自動扣回</div>
+                <div style="font-size: 11px; color: #999; margin-top: 6px;">💡 選擇科目分類，方便統計各科補課時數</div>
             </div>
             
-            <!-- 補課紀錄列表 -->
-            <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">📋 本月補課紀錄</div>
-            <div id="makeupList" style="max-height: 45vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 8px 12px; background: #fafafa;"></div>
+            <!-- 科目篩選 -->
+            <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 6px;">📋 本月補課紀錄</div>
+            <div class="makeup-subject-filter">
+                <button class="filter-btn active" data-filter="all" onclick="setMakeupFilter('all')">全部</button>
+                <button class="filter-btn" data-filter="數學" onclick="setMakeupFilter('數學')">📐 數學</button>
+                <button class="filter-btn" data-filter="英文" onclick="setMakeupFilter('英文')">🔤 英文</button>
+                <button class="filter-btn" data-filter="理化" onclick="setMakeupFilter('理化')">⚗️ 理化</button>
+                <button class="filter-btn" data-filter="化學" onclick="setMakeupFilter('化學')">🧪 化學</button>
+                <button class="filter-btn" data-filter="其他" onclick="setMakeupFilter('其他')">📋 其他</button>
+            </div>
+            <div id="makeupList" style="max-height: 35vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 8px 12px; background: #fafafa;"></div>
             
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeMakeupModal()">關閉</button>
         </div>
@@ -687,6 +776,9 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
+        // 補課篩選
+        let makeupFilter = 'all';
+
         // ==================== 取得某日期的統計標記 ====================
         function getDayStatBadges(dateKey) {
             let badges = [];
@@ -709,11 +801,12 @@
                 badges.push({ text: alTotal + 'h', cssClass: 'badge-al' });
             }
             
-            let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-            if (mkItems.length > 0) {
-                let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
-                badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
-            }
+            // ★ 移除補課標記（不在行事曆上顯示）
+            // let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
+            // if (mkItems.length > 0) {
+            //     let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
+            //     badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
+            // }
             
             return badges;
         }
@@ -1221,7 +1314,7 @@
                             const makeupData = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
                             makeupData.forEach(item => {
                                 monthlyMakeup += item.amount;
-                                currentMonthMakeup.push({ date: dateKey, desc: '加時補課', amount: item.amount });
+                                currentMonthMakeup.push({ date: dateKey, desc: item.subject ? `${item.subject}補課` : '加時補課', amount: item.amount });
                             });
                         }
 
@@ -1435,19 +1528,30 @@
             if(isNaN(num) || num <= 0) { alert("請輸入有效的小時數 (例: 0.5, 1)"); return; }
             
             if (!globalStats.makeup) globalStats.makeup = [];
-            globalStats.makeup.push({ id: "mk_"+Date.now(), date: selectedDateString, amount: num, desc: '加時補課' });
+            globalStats.makeup.push({ 
+                id: "mk_"+Date.now(), 
+                date: selectedDateString, 
+                amount: num, 
+                desc: '加時補課',
+                subject: '其他' 
+            });
             localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay();
             closeQuickMakeupModal();
             renderCalendar();
         }
 
-        // ==================== 全新設計的補課膠囊功能 ====================
+        // ==================== 全新設計的補課膠囊功能（含科目） ====================
         function openMakeupModal() {
-            // 設定今日日期為預設值
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('makeupAddDate').value = todayStr;
             document.getElementById('makeupAddAmount').value = '';
+            document.getElementById('makeupAddSubject').value = '數學';
+            
+            makeupFilter = 'all';
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === 'all');
+            });
             
             renderMakeupList();
             document.getElementById('makeupModal').style.display = 'flex';
@@ -1457,19 +1561,34 @@
             document.getElementById('makeupModal').style.display = 'none';
         }
 
+        function setMakeupFilter(subject) {
+            makeupFilter = subject;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === subject);
+            });
+            renderMakeupList();
+        }
+
         function renderMakeupList() {
             const year = currentDate.getFullYear();
             const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
             const monthKey = `${year}-${month}`;
             
-            const monthData = globalStats.makeup ? 
+            let monthData = globalStats.makeup ? 
                 globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
             
-            // 依日期排序（最新的在前）
+            // 依科目篩選
+            if (makeupFilter !== 'all') {
+                monthData = monthData.filter(item => item.subject === makeupFilter);
+            }
+            
             monthData.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             const total = monthData.reduce((s, i) => s + i.amount, 0);
             document.getElementById('makeupTotalDisplay').innerText = total + ' 小時';
+
+            // 顯示各科目小計
+            renderSubjectSummary(monthKey);
 
             const listEl = document.getElementById('makeupList');
 
@@ -1480,14 +1599,29 @@
 
             let html = '';
             monthData.forEach(item => {
-                // 格式化日期
                 const dateObj = new Date(item.date + 'T00:00:00');
                 const dateStr = `${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()}`;
+                const subject = item.subject || '其他';
+                const subjectClass = {
+                    '數學': 'subject-math',
+                    '英文': 'subject-english',
+                    '理化': 'subject-physics',
+                    '化學': 'subject-chemistry'
+                }[subject] || 'subject-other';
+                const subjectEmoji = {
+                    '數學': '📐',
+                    '英文': '🔤',
+                    '理化': '⚗️',
+                    '化學': '🧪'
+                }[subject] || '📋';
                 
                 html += `
                     <div class="makeup-item">
                         <div class="info">
-                            <div class="desc-text">${item.desc || '加時補課'}</div>
+                            <div class="desc-text">
+                                <span class="subject-tag ${subjectClass}">${subjectEmoji} ${subject}</span>
+                                ${item.desc || '補課'}
+                            </div>
                             <div class="date-text">📅 ${dateStr}</div>
                         </div>
                         <div style="display:flex; align-items:center;">
@@ -1501,12 +1635,55 @@
             listEl.innerHTML = html;
         }
 
+        function renderSubjectSummary(monthKey) {
+            const monthData = globalStats.makeup ? 
+                globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
+            
+            const subjects = ['數學', '英文', '理化', '化學', '其他'];
+            const subjectEmoji = {
+                '數學': '📐',
+                '英文': '🔤',
+                '理化': '⚗️',
+                '化學': '🧪',
+                '其他': '📋'
+            };
+            const subjectClassMap = {
+                '數學': 'math',
+                '英文': 'english',
+                '理化': 'physics',
+                '化學': 'chemistry',
+                '其他': 'other'
+            };
+            
+            let html = '';
+            subjects.forEach(sub => {
+                const total = monthData
+                    .filter(item => (item.subject || '其他') === sub)
+                    .reduce((s, i) => s + i.amount, 0);
+                if (total > 0) {
+                    html += `
+                        <span class="subject-summary-item ${subjectClassMap[sub]}">
+                            ${subjectEmoji[sub]} ${sub}: <span class="num">${total}h</span>
+                        </span>
+                    `;
+                }
+            });
+            
+            if (html === '') {
+                html = `<span style="color:#aaa; font-size:13px;">暫無補課紀錄</span>`;
+            }
+            
+            document.getElementById('subjectSummary').innerHTML = html;
+        }
+
         function addMakeupRecord() {
             const amountInput = document.getElementById('makeupAddAmount');
             const dateInput = document.getElementById('makeupAddDate');
+            const subjectSelect = document.getElementById('makeupAddSubject');
             
             const num = parseFloat(amountInput.value);
             const dateVal = dateInput.value;
+            const subject = subjectSelect.value;
             
             if (isNaN(num) || num <= 0) {
                 alert("請輸入有效的小時數（大於 0）！");
@@ -1520,13 +1697,13 @@
                 return;
             }
             
-            // 檢查是否已存在同一天的補課紀錄（避免重複）
+            // 檢查是否已存在同一天同一科目的補課紀錄
             const existItems = globalStats.makeup ? 
-                globalStats.makeup.filter(item => item.date === dateVal) : [];
+                globalStats.makeup.filter(item => item.date === dateVal && item.subject === subject) : [];
             
             if (existItems.length > 0) {
-                // 允許同一天有多筆，但提醒使用者
-                if (!confirm(`⚠️ ${dateVal} 已有 ${existItems.length} 筆補課紀錄（共 ${existItems.reduce((s,i)=>s+i.amount,0)} 小時），\n確定要再新增一筆嗎？`)) {
+                const totalExist = existItems.reduce((s, i) => s + i.amount, 0);
+                if (!confirm(`⚠️ ${dateVal} 已有 ${existItems.length} 筆「${subject}」補課紀錄（共 ${totalExist} 小時），\n確定要再新增一筆嗎？`)) {
                     return;
                 }
             }
@@ -1537,20 +1714,18 @@
                 id: "mk_" + Date.now(),
                 date: dateVal,
                 amount: num,
-                desc: '加時補課（手動新增）'
+                desc: `${subject}補課`,
+                subject: subject
             });
             
             localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             
-            // 清空輸入欄位
             amountInput.value = '';
             
-            // 重新整理列表與頂部顯示
             renderMakeupList();
             updateStatsDisplay();
             renderCalendar();
             
-            // 輕觸回饋
             const btn = document.querySelector('.btn-add-makeup');
             btn.style.transform = 'scale(0.95)';
             setTimeout(() => btn.style.transform = '', 150);
@@ -2051,7 +2226,7 @@
                 location.reload(); 
             } catch (err) {
                 console.error(err);
-                alert("還原失敗！備份檔可能已損毀或格式錯誤。");
+                alert("還原失敗！備份檔可能已毀損或格式錯誤。");
             }
         }
         
