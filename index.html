@@ -167,6 +167,80 @@
 
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
+        
+        /* 補課膠囊專用樣式 */
+        .makeup-quick-add {
+            background: #f5f5ff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px dashed #b0b0ff;
+        }
+        .makeup-quick-add .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .makeup-quick-add .input-row input {
+            flex: 1;
+            min-width: 80px;
+        }
+        .makeup-quick-add .input-row .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-add-makeup { background: #4a4aff; color: white; }
+        .btn-add-makeup:active { transform: scale(0.95); }
+        
+        .makeup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .makeup-item .info {
+            flex: 1;
+        }
+        .makeup-item .info .date-text {
+            font-size: 12px;
+            color: #999;
+            font-weight: 700;
+        }
+        .makeup-item .info .desc-text {
+            font-size: 14px;
+            font-weight: 900;
+            color: #555;
+        }
+        .makeup-item .amount-display {
+            font-weight: 900;
+            font-size: 16px;
+            color: #4a4aff;
+            margin-right: 12px;
+        }
+        .makeup-item .delete-btn {
+            background: none;
+            border: none;
+            color: #ffcccc;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 16px;
+            padding: 4px 8px;
+        }
+        .makeup-item .delete-btn:active { color: #ff6b6b; }
+        .makeup-empty {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            font-weight: 900;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -181,7 +255,7 @@
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
                 <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
                 <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
-                <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 0</button>
+                <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 <span id="hdrMakeupTotal">0</span></button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -344,11 +418,30 @@
         </div>
     </div>
 
+    <!-- ========== 全新設計的補課膠囊 Modal ========== -->
     <div class="modal" id="makeupModal" style="z-index: 30;">
         <div class="modal-content">
-            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 19px; font-weight: bold; color: #444; text-align: center;">📚 本月加時補課明細</h3>
-            <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: <span id="makeupTotal" style="font-size:28px; color:#4a4aff; margin-left:5px;">0</span> 小時</div>
-            <div id="makeupList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <h3 style="margin: 0; font-size: 19px; font-weight: bold; color: #444;">📚 補課膠囊</h3>
+                <span style="font-size: 14px; color: #888;">本月總計</span>
+            </div>
+            <div style="text-align:center; margin-bottom: 15px; font-weight:bold; color:#4a4aff; font-size: 28px;" id="makeupTotalDisplay">0 小時</div>
+            
+            <!-- 快速新增區 -->
+            <div class="makeup-quick-add">
+                <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">✏️ 新增補課時數</div>
+                <div class="input-row">
+                    <input type="number" id="makeupAddAmount" placeholder="小時 (例: 0.5)" step="0.5" min="0" style="flex: 1; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
+                    <input type="date" id="makeupAddDate" style="flex: 1; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
+                    <button class="btn-small btn-add-makeup" onclick="addMakeupRecord()">➕ 新增</button>
+                </div>
+                <div style="font-size: 11px; color: #999; margin-top: 6px;">💡 輸入正數為增加補課時數，刪除時會自動扣回</div>
+            </div>
+            
+            <!-- 補課紀錄列表 -->
+            <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">📋 本月補課紀錄</div>
+            <div id="makeupList" style="max-height: 45vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 8px 12px; background: #fafafa;"></div>
+            
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeMakeupModal()">關閉</button>
         </div>
     </div>
@@ -595,41 +688,35 @@
         let batchSelectedDates = new Set();
 
         // ==================== 取得某日期的統計標記 ====================
-function getDayStatBadges(dateKey) {
-    let badges = [];
-    
-    // 加班標記（正號）
-    let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
-    let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
-    if (otTotal > 0) {
-        badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
-    }
-    
-    // ✅ 拿時間（顯示負號）
-    let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
-    if (takeItems.length > 0) {
-        let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
-        // takeTotal 是負數，直接用就會顯示負號（如 -2.5）
-        badges.push({ text: takeTotal + 'h', cssClass: 'badge-take' });
-    }
-    
-    // ✅ 年休（顯示負號）
-    let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
-    if (alItems.length > 0) {
-        let alTotal = alItems.reduce((s, item) => s + item.amount, 0);
-        // alTotal 是負數，直接用就會顯示負號（如 -8）
-        badges.push({ text: alTotal + 'h', cssClass: 'badge-al' });
-    }
-    
-    // 補課標記（正號）
-    let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-    if (mkItems.length > 0) {
-        let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
-        badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
-    }
-    
-    return badges;
-}
+        function getDayStatBadges(dateKey) {
+            let badges = [];
+            
+            let otItems = globalStats.hours.filter(item => item.date === dateKey && item.desc.includes('加班'));
+            let otTotal = otItems.reduce((s, item) => s + item.amount, 0);
+            if (otTotal > 0) {
+                badges.push({ text: '+' + otTotal + 'h', cssClass: 'badge-ot' });
+            }
+            
+            let takeItems = globalStats.hours.filter(item => item.date === dateKey && item.desc === '拿時間');
+            if (takeItems.length > 0) {
+                let takeTotal = takeItems.reduce((s, item) => s + item.amount, 0);
+                badges.push({ text: takeTotal + 'h', cssClass: 'badge-take' });
+            }
+            
+            let alItems = globalStats.annualLeave.filter(item => item.date === dateKey);
+            if (alItems.length > 0) {
+                let alTotal = alItems.reduce((s, item) => s + item.amount, 0);
+                badges.push({ text: alTotal + 'h', cssClass: 'badge-al' });
+            }
+            
+            let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
+            if (mkItems.length > 0) {
+                let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
+                badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
+            }
+            
+            return badges;
+        }
 
         // ==================== 加班費相關函數 ====================
         
@@ -657,63 +744,62 @@ function getDayStatBadges(dateKey) {
             document.getElementById('quickStatModal').style.display = 'none';
         }
 
-function confirmQuickStat() {
-    let hours = parseFloat(document.getElementById('quickStatAmount').value);
-    
-    if (isNaN(hours) || hours <= 0) {
-        alert("請輸入有效時數（大於 0）！");
-        return;
-    }
-    
-    let amountToSave = hours;
-    
-    // ✅ 拿時間和年休都轉為負數
-    if (currentQuickStatAct === '拿時間' || currentQuickStatAct === '年休') {
-        amountToSave = -hours;
-    }
-    
-    let record = {
-        id: "st_" + Date.now(),
-        date: selectedDateString,
-        amount: amountToSave,
-        desc: currentQuickStatAct
-    };
-    
-    if (currentQuickStatAct === '加班') {
-        let fee = parseFloat(document.getElementById('quickStatFee').value);
-        if (isNaN(fee) || fee < 0) {
-            alert("請輸入有效的加班費金額！");
-            return;
-        }
-        record.fee = fee;
-        
-        let nightCb = document.getElementById('quickStatNightFeeCb');
-        if (nightCb && nightCb.checked) {
-            record.desc = '加班(含12-8津貼)';
+        function confirmQuickStat() {
+            let hours = parseFloat(document.getElementById('quickStatAmount').value);
             
-            if (!globalStats.nightFee) globalStats.nightFee = [];
-            globalStats.nightFee.push({
-                id: "nf_" + Date.now(),
+            if (isNaN(hours) || hours <= 0) {
+                alert("請輸入有效時數（大於 0）！");
+                return;
+            }
+            
+            let amountToSave = hours;
+            
+            if (currentQuickStatAct === '拿時間' || currentQuickStatAct === '年休') {
+                amountToSave = -hours;
+            }
+            
+            let record = {
+                id: "st_" + Date.now(),
                 date: selectedDateString,
-                amount: 280,
-                desc: '12-8津貼(加班)'
-            });
+                amount: amountToSave,
+                desc: currentQuickStatAct
+            };
+            
+            if (currentQuickStatAct === '加班') {
+                let fee = parseFloat(document.getElementById('quickStatFee').value);
+                if (isNaN(fee) || fee < 0) {
+                    alert("請輸入有效的加班費金額！");
+                    return;
+                }
+                record.fee = fee;
+                
+                let nightCb = document.getElementById('quickStatNightFeeCb');
+                if (nightCb && nightCb.checked) {
+                    record.desc = '加班(含12-8津貼)';
+                    
+                    if (!globalStats.nightFee) globalStats.nightFee = [];
+                    globalStats.nightFee.push({
+                        id: "nf_" + Date.now(),
+                        date: selectedDateString,
+                        amount: 280,
+                        desc: '12-8津貼(加班)'
+                    });
+                }
+            } else {
+                record.fee = 0;
+            }
+            
+            if (currentQuickStatAct === '年休') {
+                globalStats.annualLeave.push(record);
+            } else {
+                globalStats.hours.push(record);
+            }
+            
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            updateStatsDisplay();
+            closeQuickStatModal();
+            renderCalendar();
         }
-    } else {
-        record.fee = 0;
-    }
-    
-    if (currentQuickStatAct === '年休') {
-        globalStats.annualLeave.push(record);
-    } else {
-        globalStats.hours.push(record);
-    }
-    
-    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-    updateStatsDisplay();
-    closeQuickStatModal();
-    renderCalendar();
-}
 
         function openOtFeeModal() {
             let listEl = document.getElementById('otFeeList');
@@ -788,10 +874,11 @@ function confirmQuickStat() {
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
             document.getElementById('hdrOtFee').innerText = totalOtFee;
 
+            // 更新補課總時數（所有月份總和）
             const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
-            const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
-            if (makeupBtn) {
-                makeupBtn.innerHTML = `📚 補課 ${makeupTotal}`;
+            const hdrMakeupSpan = document.getElementById('hdrMakeupTotal');
+            if (hdrMakeupSpan) {
+                hdrMakeupSpan.innerText = makeupTotal;
             }
         }
 
@@ -1138,7 +1225,6 @@ function confirmQuickStat() {
                             });
                         }
 
-                        // ★ 直接查 nightFee 有沒有這天的津貼
                         let hasAllowance = (globalStats.nightFee || []).some(item => item.date === dateKey);
                         let htmlObj = generateDayTags(finalShift, hasAllowance);
                         let tracksHtml = "";
@@ -1245,9 +1331,13 @@ function confirmQuickStat() {
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
                
+                // 更新頂部補課按鈕（顯示本月總計）
                 const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
                 if (makeupBtn) {
-                    makeupBtn.innerHTML = `📚 補課 ${monthlyMakeup}`;
+                    const monthMakeupTotal = globalStats.makeup ? 
+                        globalStats.makeup.filter(item => item.date.startsWith(monthStr))
+                            .reduce((s, i) => s + i.amount, 0) : 0;
+                    makeupBtn.innerHTML = `📚 補課 ${monthMakeupTotal}`;
                 }
             } catch (error) { console.error(error); }
         }
@@ -1352,45 +1442,129 @@ function confirmQuickStat() {
             renderCalendar();
         }
 
+        // ==================== 全新設計的補課膠囊功能 ====================
         function openMakeupModal() {
-            let listEl = document.getElementById('makeupList');
-            let html = "";
+            // 設定今日日期為預設值
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('makeupAddDate').value = todayStr;
+            document.getElementById('makeupAddAmount').value = '';
             
-            const year = currentDate.getFullYear();
-            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const monthKey = `${year}-${month}`;
-            const monthData = globalStats.makeup ? globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
-            monthData.sort((a, b) => new Date(a.date) - new Date(b.date));
-            let total = monthData.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('makeupTotal').innerText = total;
-
-            if (monthData.length === 0) {
-                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無補課紀錄</div>";
-            } else {
-                monthData.forEach(item => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
-                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span style="color:#4a4aff; font-weight:900; font-size:16px;">+${item.amount}h</span>
-                                <button onclick="deleteMakeup('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
-                            </div>
-                        </div>`;
-                });
-                listEl.innerHTML = html;
-            }
+            renderMakeupList();
             document.getElementById('makeupModal').style.display = 'flex';
         }
 
-        function closeMakeupModal() { document.getElementById('makeupModal').style.display = 'none'; }
+        function closeMakeupModal() {
+            document.getElementById('makeupModal').style.display = 'none';
+        }
 
-        function deleteMakeup(id) {
-            if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
-            globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
+        function renderMakeupList() {
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+            
+            const monthData = globalStats.makeup ? 
+                globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
+            
+            // 依日期排序（最新的在前）
+            monthData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const total = monthData.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('makeupTotalDisplay').innerText = total + ' 小時';
+
+            const listEl = document.getElementById('makeupList');
+
+            if (monthData.length === 0) {
+                listEl.innerHTML = `<div class="makeup-empty">📭 本月尚無補課紀錄</div>`;
+                return;
+            }
+
+            let html = '';
+            monthData.forEach(item => {
+                // 格式化日期
+                const dateObj = new Date(item.date + 'T00:00:00');
+                const dateStr = `${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()}`;
+                
+                html += `
+                    <div class="makeup-item">
+                        <div class="info">
+                            <div class="desc-text">${item.desc || '加時補課'}</div>
+                            <div class="date-text">📅 ${dateStr}</div>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="amount-display">+${item.amount}h</span>
+                            <button class="delete-btn" onclick="deleteMakeupRecord('${item.id}')" title="刪除此筆補課">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listEl.innerHTML = html;
+        }
+
+        function addMakeupRecord() {
+            const amountInput = document.getElementById('makeupAddAmount');
+            const dateInput = document.getElementById('makeupAddDate');
+            
+            const num = parseFloat(amountInput.value);
+            const dateVal = dateInput.value;
+            
+            if (isNaN(num) || num <= 0) {
+                alert("請輸入有效的小時數（大於 0）！");
+                amountInput.focus();
+                return;
+            }
+            
+            if (!dateVal) {
+                alert("請選擇日期！");
+                dateInput.focus();
+                return;
+            }
+            
+            // 檢查是否已存在同一天的補課紀錄（避免重複）
+            const existItems = globalStats.makeup ? 
+                globalStats.makeup.filter(item => item.date === dateVal) : [];
+            
+            if (existItems.length > 0) {
+                // 允許同一天有多筆，但提醒使用者
+                if (!confirm(`⚠️ ${dateVal} 已有 ${existItems.length} 筆補課紀錄（共 ${existItems.reduce((s,i)=>s+i.amount,0)} 小時），\n確定要再新增一筆嗎？`)) {
+                    return;
+                }
+            }
+            
+            if (!globalStats.makeup) globalStats.makeup = [];
+            
+            globalStats.makeup.push({
+                id: "mk_" + Date.now(),
+                date: dateVal,
+                amount: num,
+                desc: '加時補課（手動新增）'
+            });
+            
             localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            
+            // 清空輸入欄位
+            amountInput.value = '';
+            
+            // 重新整理列表與頂部顯示
+            renderMakeupList();
             updateStatsDisplay();
             renderCalendar();
-            openMakeupModal();
+            
+            // 輕觸回饋
+            const btn = document.querySelector('.btn-add-makeup');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => btn.style.transform = '', 150);
+        }
+
+        function deleteMakeupRecord(id) {
+            if (!confirm("確定要刪除這筆補課紀錄嗎？")) return;
+            
+            globalStats.makeup = globalStats.makeup.filter(item => item.id !== id);
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            
+            renderMakeupList();
+            updateStatsDisplay();
+            renderCalendar();
         }
 
         function openStatsModal(t) {
