@@ -1239,7 +1239,17 @@
                     let wEnd = week[6].dateKey;
                     let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
 
+                    // ★★★ 排序：未完成的排前面，已完成的排後面 ★★★
                     wEvents.sort((a, b) => {
+                        let monKey = year + '-' + (month + 1).toString().padStart(2, '0');
+                        let aDone = a.completedMonths && a.completedMonths.includes(monKey);
+                        let bDone = b.completedMonths && b.completedMonths.includes(monKey);
+                        
+                        // 已完成排最後面
+                        if (aDone && !bDone) return 1;
+                        if (!aDone && bDone) return -1;
+                        
+                        // 都未完成或都已完成：按天數長短排序（長的在前）
                         let lenA = new Date(a.endDate).getTime() - new Date(a.startDate).getTime();
                         let lenB = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
                         if (isNaN(lenA)) lenA = 0; if (isNaN(lenB)) lenB = 0;
