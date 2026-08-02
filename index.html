@@ -489,7 +489,7 @@
         </div>
     </div>
 
-    <!-- ========== 全新設計的補課膠囊 Modal（含科目選擇） ========== -->
+    <!-- ========== 補課膠囊 Modal（含科目選擇） ========== -->
     <div class="modal" id="makeupModal" style="z-index: 30;">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -852,24 +852,31 @@
             };
             
             if (currentQuickStatAct === '加班') {
-                let fee = parseFloat(document.getElementById('quickStatFee').value);
-                if (isNaN(fee) || fee < 0) {
-                    alert("請輸入有效的加班費金額！");
-                    return;
-                }
-                record.fee = fee;
-                
-                let nightCb = document.getElementById('quickStatNightFeeCb');
-                if (nightCb && nightCb.checked) {
-                    record.desc = '加班(含12-8津貼)';
+                // ★ 加班時數 > 0.5 小時才需要輸入加班費（1小時以上含1小時）
+                if (hours > 0.5) {
+                    let fee = parseFloat(document.getElementById('quickStatFee').value);
+                    if (isNaN(fee) || fee < 0) {
+                        alert("請輸入有效的加班費金額！");
+                        return;
+                    }
+                    record.fee = fee;
                     
-                    if (!globalStats.nightFee) globalStats.nightFee = [];
-                    globalStats.nightFee.push({
-                        id: "nf_" + Date.now(),
-                        date: selectedDateString,
-                        amount: 280,
-                        desc: '12-8津貼(加班)'
-                    });
+                    let nightCb = document.getElementById('quickStatNightFeeCb');
+                    if (nightCb && nightCb.checked) {
+                        record.desc = '加班(含12-8津貼)';
+                        
+                        if (!globalStats.nightFee) globalStats.nightFee = [];
+                        globalStats.nightFee.push({
+                            id: "nf_" + Date.now(),
+                            date: selectedDateString,
+                            amount: 280,
+                            desc: '12-8津貼(加班)'
+                        });
+                    }
+                } else {
+                    // ★ 加班時數 ≤ 0.5 小時：不記錄加班費，自動標示為補休
+                    record.fee = 0;
+                    record.desc = '加班(補休)';
                 }
             } else {
                 record.fee = 0;
@@ -895,8 +902,11 @@
             const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
             const monthKey = `${year}-${month}`;
             
+            // ★ 只顯示有加班費的紀錄（fee > 0）
             const otRecords = globalStats.hours.filter(item => 
-                item.date.startsWith(monthKey) && item.desc.includes('加班')
+                item.date.startsWith(monthKey) && 
+                item.desc.includes('加班') && 
+                (item.fee || 0) > 0
             );
             
             otRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1398,7 +1408,7 @@
                 
                 const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
                 monthlyOtPay = globalStats.hours
-                    .filter(item => item.date.startsWith(monthStr) && item.desc.includes('加班'))
+                    .filter(item => item.date.startsWith(monthStr) && item.desc.includes('加班') && (item.fee || 0) > 0)
                     .reduce((s, item) => s + (item.fee || 0), 0);
                 
                 if (globalStats.nightFee) {
@@ -1534,7 +1544,7 @@
             renderCalendar();
         }
 
-        // ==================== 全新設計的補課膠囊功能（含科目） ====================
+        // ==================== 補課膠囊功能（含科目） ====================
         function openMakeupModal() {
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('makeupAddDate').value = todayStr;
@@ -1570,7 +1580,6 @@
             let monthData = globalStats.makeup ? 
                 globalStats.makeup.filter(item => item.date.startsWith(monthKey)) : [];
             
-            // 依科目篩選
             if (makeupFilter !== 'all') {
                 monthData = monthData.filter(item => item.subject === makeupFilter);
             }
@@ -1580,7 +1589,6 @@
             const total = monthData.reduce((s, i) => s + i.amount, 0);
             document.getElementById('makeupTotalDisplay').innerText = total + ' 小時';
 
-            // 顯示各科目小計
             renderSubjectSummary(monthKey);
 
             const listEl = document.getElementById('makeupList');
@@ -1690,7 +1698,6 @@
                 return;
             }
             
-            // 檢查是否已存在同一天同一科目的補課紀錄
             const existItems = globalStats.makeup ? 
                 globalStats.makeup.filter(item => item.date === dateVal && item.subject === subject) : [];
             
@@ -1743,7 +1750,7 @@
             renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
         }
 
-        // ==================== 修改後的 renderStatsList（含編輯功能） ====================
+        // ==================== renderStatsList（含編輯功能） ====================
         function renderStatsList() {
             let data = globalStats[currentStatType] || [];
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
@@ -1795,7 +1802,6 @@
             
             editingStatId = id;
             
-            // 建立一個簡易編輯對話框
             let overlay = document.createElement('div');
             overlay.id = 'editStatOverlay';
             overlay.style.cssText = `
