@@ -801,13 +801,6 @@
                 badges.push({ text: alTotal + 'h', cssClass: 'badge-al' });
             }
             
-            // ★ 移除補課標記（不在行事曆上顯示）
-            // let mkItems = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-            // if (mkItems.length > 0) {
-            //     let mkTotal = mkItems.reduce((s, item) => s + item.amount, 0);
-            //     badges.push({ text: '+' + mkTotal + 'h', cssClass: 'badge-makeup' });
-            // }
-            
             return badges;
         }
 
@@ -1750,6 +1743,7 @@
             renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
         }
 
+        // ==================== 修改後的 renderStatsList（含編輯功能） ====================
         function renderStatsList() {
             let data = globalStats[currentStatType] || [];
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
@@ -1774,22 +1768,98 @@
                 
                 html += `
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
-                        <div>
-                            <div style="font-size:14px; font-weight:900;">${item.desc}</div>
+                        <div style="flex:1; min-width:0; margin-right:8px;">
+                            <div style="font-size:14px; font-weight:900; word-break:break-word;">${item.desc}</div>
                             <div style="font-size:12px; color:#999;">${item.date}</div>
                         </div>
-                        <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
                             <div style="text-align:right;">
                                 <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:14px;">${sign}${item.amount}</span>
                                 <div style="font-size:11px; color:${remainColor}; font-weight:700;">剩餘 ${remain}</div>
                             </div>
-                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px;">X</button>
+                            <button onclick="openEditStatModal('${item.id}')" style="background:none; border:none; color:#5b9bd5; cursor:pointer; font-weight:900; font-size:14px; padding:2px 4px;" title="編輯此筆紀錄">✎</button>
+                            <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px; padding:2px 4px;" title="刪除此筆紀錄">X</button>
                         </div>
                     </div>`;
             });
             document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>目前無紀錄</div>";
         }
 
+        // ==================== 編輯統計紀錄功能 ====================
+        let editingStatId = null;
+
+        function openEditStatModal(id) {
+            let data = globalStats[currentStatType] || [];
+            let item = data.find(i => i.id === id);
+            if (!item) return;
+            
+            editingStatId = id;
+            
+            // 建立一個簡易編輯對話框
+            let overlay = document.createElement('div');
+            overlay.id = 'editStatOverlay';
+            overlay.style.cssText = `
+                position: fixed; top:0; left:0; width:100%; height:100%;
+                background: rgba(0,0,0,0.4); z-index:999;
+                display:flex; justify-content:center; align-items:center;
+                backdrop-filter: blur(2px);
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background:white; border-radius:16px; padding:24px 20px; max-width:340px; width:90%; box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+                    <h3 style="margin:0 0 6px 0; color:#444; font-size:17px;">✎ 編輯紀錄</h3>
+                    <div style="font-size:13px; color:#999; margin-bottom:16px;">${item.date}</div>
+                    
+                    <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;">備註 / 描述</label>
+                    <input type="text" id="editStatDesc" value="${item.desc}" style="width:100%; padding:8px; font-size:15px; border:2px solid #ddd; border-radius:8px; box-sizing:border-box; font-family:inherit; margin-bottom:12px;">
+                    
+                    <label style="display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;">數量</label>
+                    <input type="number" id="editStatAmount" value="${item.amount}" step="0.5" style="width:100%; padding:8px; font-size:15px; border:2px solid #ddd; border-radius:8px; box-sizing:border-box; font-family:inherit; margin-bottom:16px;">
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="closeEditStatModal()" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:bold; font-size:14px; background:#f1f1f1; color:#666; cursor:pointer;">取消</button>
+                        <button onclick="saveEditStat()" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:bold; font-size:14px; background:linear-gradient(135deg, #a28cdb, #84bde3); color:white; cursor:pointer;">儲存</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+
+        function closeEditStatModal() {
+            let el = document.getElementById('editStatOverlay');
+            if (el) el.remove();
+            editingStatId = null;
+        }
+
+        function saveEditStat() {
+            let newDesc = document.getElementById('editStatDesc').value.trim();
+            let newAmount = parseFloat(document.getElementById('editStatAmount').value);
+            
+            if (!newDesc) {
+                alert("請輸入備註！");
+                return;
+            }
+            if (isNaN(newAmount)) {
+                alert("請輸入有效數量！");
+                return;
+            }
+            
+            let data = globalStats[currentStatType] || [];
+            let item = data.find(i => i.id === editingStatId);
+            if (!item) return;
+            
+            item.desc = newDesc;
+            item.amount = newAmount;
+            
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            closeEditStatModal();
+            updateStatsDisplay();
+            renderStatsList();
+            renderCalendar();
+        }
+
+        // ==================== 其他函數 ====================
         function saveManualStat() {
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
