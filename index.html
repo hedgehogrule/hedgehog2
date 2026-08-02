@@ -29,12 +29,21 @@
         .header-center-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
         
         .header-title-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .header-btn-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .header-btn-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; flex-wrap: wrap; }
         
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; color: #555; letter-spacing: 1px; white-space: nowrap; }
         .today-btn { font-size: 12px !important; background: #fff !important; color: #ff6b81 !important; border: 1.5px solid #ff6b81 !important; border-radius: 6px !important; padding: 4px 8px !important; font-weight: bold; box-shadow: 0 2px 4px rgba(255,107,129,0.15); font-family: inherit; cursor: pointer; white-space: nowrap; }
         .today-btn:active { transform: scale(0.9); }
         .small-btn { font-size: 10px !important; padding: 2px 6px !important; }
+        
+        /* ★ 搜尋按鈕樣式 */
+        .search-btn { 
+            color: #7a6baf !important; 
+            border-color: #c3b3ef !important; 
+            background: #fff !important; 
+            font-size: 14px !important;
+        }
+        .search-btn:active { transform: scale(0.9); }
         
         .header-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; max-width: 380px; margin-top: 2px; }
         .stat-box { flex: 1 1 calc(33% - 4px); min-width: 85px; max-width: 115px; background: #fff; border: 1.5px solid #dcd0ff; border-radius: 8px; padding: 0 4px; font-size: 11px; font-weight: bold; color: #7a6baf; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -312,6 +321,108 @@
         .subject-summary-item.physics .num { color: #2ecc71; }
         .subject-summary-item.chemistry .num { color: #9b59b6; }
         .subject-summary-item.other .num { color: #95a5a6; }
+
+        /* ========== 搜尋 Modal 樣式 ========== */
+        .search-input-wrap {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .search-input-wrap input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            font-family: inherit;
+            background: #fafafa;
+            transition: border-color 0.2s;
+        }
+        .search-input-wrap input:focus {
+            border-color: #a28cdb;
+            background: #fff;
+        }
+        .search-input-wrap .clear-search-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #ccc;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: none;
+        }
+        .search-input-wrap .clear-search-btn:hover { color: #ff6b6b; }
+        .search-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .search-result-item:active { background: #f0edff; }
+        .search-result-item .left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 0;
+        }
+        .search-result-item .left .title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #444;
+            word-break: break-word;
+        }
+        .search-result-item .left .meta {
+            font-size: 12px;
+            color: #999;
+            font-weight: 600;
+        }
+        .search-result-item .left .meta .highlight {
+            background: #ffeaa7;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        .search-result-item .right {
+            font-size: 12px;
+            color: #a28cdb;
+            font-weight: 700;
+            white-space: nowrap;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+        .search-result-empty {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 30px 0;
+        }
+        .search-result-count {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .search-result-list {
+            max-height: 55vh;
+            overflow-y: auto;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 4px 8px;
+            background: #fafafa;
+        }
+        .search-result-list .no-result {
+            text-align: center;
+            color: #bbb;
+            font-size: 14px;
+            padding: 30px 0;
+        }
     </style>
 </head>
 <body>
@@ -321,6 +432,7 @@
             <div class="header-title-row">
                 <h2 id="monthYear"></h2>
                 <button class="today-btn" onclick="goToday()">🌱 今天</button>
+                <button class="today-btn search-btn" onclick="openSearchModal()">🔍 搜尋</button>
             </div>
             <div class="header-btn-row">
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
@@ -347,6 +459,26 @@
         <span style="font-weight:bold; color:#5b9bd5; font-size:14px; white-space:nowrap;">🌿 森休假 | <span id="batchCount" style="font-size:18px;">0</span> 天</span>
         <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #f1f1f1; color: #666;" onclick="cancelBatchMode()">取消</button>
         <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #ff6b81; color: white;" onclick="saveBatchHusbandOff()">✓ 確認排休</button>
+    </div>
+
+    <!-- ========== 搜尋 Modal ========== -->
+    <div class="modal" id="searchModal" style="z-index: 50;">
+        <div class="modal-content" style="padding: 15px 15px 30px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:19px; color:#444;">🔍 搜尋行事曆</h3>
+                <button onclick="closeSearchModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
+            </div>
+            <div class="search-input-wrap">
+                <input type="text" id="searchInput" placeholder="搜尋行程名稱、日期、班別..." oninput="performSearch()">
+                <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+            </div>
+            <div id="searchResultContainer">
+                <div class="search-result-count" id="searchResultCount">輸入關鍵字開始搜尋</div>
+                <div class="search-result-list" id="searchResultList">
+                    <div class="no-result">💡 可搜尋行程名稱、日期（如 2026-08）或班別（如 D、E1）</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal" id="editModal">
@@ -2315,6 +2447,266 @@
                 alert("還原失敗！備份檔可能已毀損或格式錯誤。");
             }
         }
+
+        // ======================= 🔍 搜尋功能 =======================
+        function openSearchModal() {
+            document.getElementById('searchModal').style.display = 'flex';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').focus();
+            document.getElementById('searchResultList').innerHTML = `<div class="no-result">💡 輸入關鍵字開始搜尋</div>`;
+            document.getElementById('searchResultCount').innerText = '輸入關鍵字開始搜尋';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').style.display = 'none';
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            document.getElementById('searchResultList').innerHTML = `<div class="no-result">💡 輸入關鍵字開始搜尋</div>`;
+            document.getElementById('searchResultCount').innerText = '輸入關鍵字開始搜尋';
+            document.getElementById('searchInput').focus();
+        }
+
+        function performSearch() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            if (keyword === '') {
+                clearBtn.style.display = 'none';
+                document.getElementById('searchResultList').innerHTML = `<div class="no-result">💡 輸入關鍵字開始搜尋</div>`;
+                document.getElementById('searchResultCount').innerText = '輸入關鍵字開始搜尋';
+                return;
+            }
+            
+            clearBtn.style.display = 'block';
+            
+            // 收集所有行程
+            let results = [];
+            const allEvents = getAllBaseEvents();
+            
+            // 取得所有有資料的日期
+            const dateKeys = Object.keys(calendarData);
+            
+            // 搜尋行程
+            allEvents.forEach(ev => {
+                const title = (ev.title || '').toLowerCase();
+                const startDate = ev.startDate || '';
+                const endDate = ev.endDate || '';
+                const keywordLower = keyword.toLowerCase();
+                
+                // 檢查標題、開始日期、結束日期
+                let match = false;
+                let matchField = '';
+                
+                if (title.includes(keywordLower)) {
+                    match = true;
+                    matchField = '標題';
+                } else if (startDate.includes(keyword)) {
+                    match = true;
+                    matchField = '日期';
+                } else if (endDate && endDate.includes(keyword)) {
+                    match = true;
+                    matchField = '日期';
+                }
+                
+                if (match) {
+                    results.push({
+                        type: '行程',
+                        title: ev.title || '未命名',
+                        date: startDate,
+                        endDate: endDate || startDate,
+                        matchField: matchField,
+                        id: ev.id,
+                        color: ev.color || 'blue'
+                    });
+                }
+            });
+            
+            // 搜尋班別
+            dateKeys.forEach(dateKey => {
+                const data = calendarData[dateKey];
+                if (data && data.shift) {
+                    const shift = data.shift.toLowerCase();
+                    const keywordLower = keyword.toLowerCase();
+                    if (shift.includes(keywordLower)) {
+                        // 檢查是否已經有相同日期的行程結果，避免重複
+                        const existing = results.some(r => r.date === dateKey && r.type === '班別');
+                        if (!existing) {
+                            results.push({
+                                type: '班別',
+                                title: data.shift,
+                                date: dateKey,
+                                endDate: dateKey,
+                                matchField: '班別',
+                                id: 'shift_' + dateKey,
+                                color: 'purple'
+                            });
+                        }
+                    }
+                }
+            });
+            
+            // 搜尋「國」標籤
+            dateKeys.forEach(dateKey => {
+                const data = calendarData[dateKey];
+                if (data && data.shift && data.shift.includes('國')) {
+                    const keywordLower = keyword.toLowerCase();
+                    if (keywordLower === '國' || keywordLower.includes('國')) {
+                        const existing = results.some(r => r.date === dateKey && r.type === '國定假日');
+                        if (!existing) {
+                            results.push({
+                                type: '國定假日',
+                                title: '🇹🇼 國定假日',
+                                date: dateKey,
+                                endDate: dateKey,
+                                matchField: '標籤',
+                                id: 'holiday_' + dateKey,
+                                color: 'red'
+                            });
+                        }
+                    }
+                }
+            });
+            
+            // 搜尋老公休假日
+            if (keyword.includes('老公') || keyword.includes('休假') || keyword.includes('森休假')) {
+                dateKeys.forEach(dateKey => {
+                    const data = calendarData[dateKey];
+                    if (data && data.husbandOff) {
+                        const existing = results.some(r => r.date === dateKey && r.type === '老公休假日');
+                        if (!existing) {
+                            results.push({
+                                type: '老公休假日',
+                                title: '🌿 老公休假日',
+                                date: dateKey,
+                                endDate: dateKey,
+                                matchField: '標籤',
+                                id: 'husband_' + dateKey,
+                                color: 'green'
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // 搜尋台灣假日
+            if (keyword.length >= 2) {
+                const keywordLower = keyword.toLowerCase();
+                for (let [date, name] of Object.entries(twHolidays)) {
+                    if (name.includes(keywordLower) || date.includes(keyword)) {
+                        const existing = results.some(r => r.date === date && r.type === '台灣假日');
+                        if (!existing) {
+                            results.push({
+                                type: '台灣假日',
+                                title: '🎉 ' + name,
+                                date: date,
+                                endDate: date,
+                                matchField: '假日',
+                                id: 'tw_holiday_' + date,
+                                color: 'orange'
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // 排序：依日期排序
+            results.sort((a, b) => a.date.localeCompare(b.date));
+            
+            // 顯示結果
+            const count = results.length;
+            const countEl = document.getElementById('searchResultCount');
+            const listEl = document.getElementById('searchResultList');
+            
+            if (count === 0) {
+                countEl.innerText = '🔍 找不到符合的結果';
+                listEl.innerHTML = `<div class="no-result">😅 找不到「<strong>${keyword}</strong>」的相關內容</div>`;
+                return;
+            }
+            
+            countEl.innerText = `📋 找到 ${count} 筆結果`;
+            
+            let html = '';
+            results.forEach(item => {
+                const colorMap = {
+                    'blue': '#84bde3',
+                    'pink': '#ff9ebb',
+                    'green': '#7fd9b2',
+                    'purple': '#b0b0ff',
+                    'orange': '#ffa67c',
+                    'red': '#ff6b6b'
+                };
+                const dotColor = colorMap[item.color] || '#84bde3';
+                
+                // 格式化日期顯示
+                const dateDisplay = item.date === item.endDate ? item.date : `${item.date} ~ ${item.endDate}`;
+                
+                html += `
+                    <div class="search-result-item" onclick="goToDate('${item.date}')">
+                        <div class="left">
+                            <div class="title">
+                                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${dotColor}; margin-right:6px;"></span>
+                                ${item.type === '班別' ? '🕒 ' : ''}
+                                ${item.type === '國定假日' ? '🇹🇼 ' : ''}
+                                ${item.type === '台灣假日' ? '🎉 ' : ''}
+                                ${item.type === '老公休假日' ? '🌿 ' : ''}
+                                ${item.title}
+                                <span style="font-size:11px; color:#aaa; font-weight:400; margin-left:6px;">#${item.matchField}</span>
+                            </div>
+                            <div class="meta">📅 ${dateDisplay}</div>
+                        </div>
+                        <div class="right">${item.type}</div>
+                    </div>
+                `;
+            });
+            
+            listEl.innerHTML = html;
+        }
+
+        function goToDate(dateStr) {
+            // 關閉搜尋視窗
+            closeSearchModal();
+            
+            // 跳到該月份
+            const parts = dateStr.split('-');
+            const targetYear = parseInt(parts[0]);
+            const targetMonth = parseInt(parts[1]) - 1;
+            
+            currentDate = new Date(targetYear, targetMonth, 1);
+            renderCalendar();
+            
+            // 稍微延遲後點擊該日期
+            setTimeout(() => {
+                const targetDateKey = dateStr;
+                // 在日曆中找到並點擊該日期
+                const dayEls = document.querySelectorAll('.day');
+                for (let el of dayEls) {
+                    if (el.textContent.includes(parts[2])) {
+                        // 檢查是否是正確的月份
+                        const monthYear = document.getElementById('monthYear').innerText;
+                        if (monthYear.includes(targetYear + '年') && monthYear.includes((targetMonth + 1) + '月')) {
+                            el.click();
+                            break;
+                        }
+                    }
+                }
+            }, 300);
+        }
+
+        // 讓搜尋框支援 Enter 鍵（雖然已經即時搜尋）
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closeSearchModal();
+                    }
+                });
+            }
+        });
         
         renderCalendar();
     </script>
