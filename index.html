@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的全自動夢幻行事曆</title>
+    <title>全自動夢幻行事曆</title>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="icon.png?v=7">
@@ -36,7 +36,6 @@
         .today-btn:active { transform: scale(0.9); }
         .small-btn { font-size: 10px !important; padding: 2px 6px !important; }
         
-        /* ★ 搜尋按鈕樣式 */
         .search-btn { 
             color: #7a6baf !important; 
             border-color: #c3b3ef !important; 
@@ -111,10 +110,30 @@
         
         .top-tags-wrap { display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-end; align-items: center; flex-grow: 1; margin-left: 2px; }
         .shift-num-tag { font-size: 9.5px; font-weight: bold; padding: 0 1px; flex-shrink: 0; line-height: 12px; letter-spacing: -0.2px; }
-        .special-badge { font-size: 8px; font-weight: bold; padding: 1px 3px; border-radius: 6px; color: white; line-height: 11px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        
+        .national-holiday-badge { 
+            width: 22px; 
+            height: 22px; 
+            background: #ff0000; 
+            color: white; 
+            border-radius: 50%; 
+            display: inline-flex;
+            align-items: center; 
+            justify-content: center; 
+            font-size: 13px; 
+            font-weight: 900; 
+            line-height: 1; 
+            box-shadow: 0 2px 6px rgba(255,0,0,0.5); 
+            flex-shrink: 0; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            border: 2px solid #fff;
+            margin: 0 1px;
+            position: relative;
+            z-index: 5;
+        }
+        
         .bg-pink { background: #ff9ebb; }
         .bg-orange { background: #ffa67c; }
-        .national-holiday-badge { width: 18px; height: 18px; background: #ff0000; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; line-height: 1; box-shadow: 0 2px 4px rgba(255,0,0,0.4); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; border: 1.5px solid #fff; }
 
         .day-row-2 { display: flex; width: 100%; margin-bottom: 2px; min-height: 14px; align-items: center; gap: 3px; }
         .week-badge { width: 13px; height: 13px; background: #5b9bd5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.15); flex-shrink: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
@@ -140,7 +159,23 @@
         
         .shift-input-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
         .shift-action-btn { background: #f8f9fa; border: 1.5px solid #ccd0d5; border-radius: 8px; padding: 6px 4px; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; white-space: nowrap; transition: all 0.1s; font-family: inherit; }
-        .circle-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 11px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); font-family: inherit; }
+        .circle-btn { 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 50%; 
+            border: none; 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: white; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+            font-family: inherit;
+            background: #ff0000;
+        }
+        .circle-btn:active { transform: scale(0.9); }
         
         .quick-section { margin-top: 10px; border-top: 2px dashed #eee; padding-top: 8px; }
         .quick-options { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -177,7 +212,6 @@
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
         
-        /* ========== 補課膠囊專用樣式 ========== */
         .makeup-quick-add {
             background: #f5f5ff;
             border-radius: 12px;
@@ -215,7 +249,6 @@
         .btn-add-makeup { background: #4a4aff; color: white; }
         .btn-add-makeup:active { transform: scale(0.95); }
         
-        /* 科目標籤顏色 */
         .subject-tag {
             display: inline-block;
             padding: 2px 8px;
@@ -322,7 +355,6 @@
         .subject-summary-item.chemistry .num { color: #9b59b6; }
         .subject-summary-item.other .num { color: #95a5a6; }
 
-        /* ========== 搜尋 Modal 樣式 ========== */
         .search-input-wrap {
             display: flex;
             gap: 8px;
@@ -461,7 +493,6 @@
         <button class="btn" style="padding: 6px 12px; font-size: 13px; background: #ff6b81; color: white;" onclick="saveBatchHusbandOff()">✓ 確認排休</button>
     </div>
 
-    <!-- ========== 搜尋 Modal ========== -->
     <div class="modal" id="searchModal" style="z-index: 50;">
         <div class="modal-content" style="padding: 15px 15px 30px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -496,7 +527,7 @@
                     <button class="shift-action-btn" style="color:#d9534f; background:#fdf1f2; border-color:#f5c6cb;" onclick="openQuickStatPrompt('加班')">加班</button>
                     <button class="shift-action-btn" style="color:#5b9bd5; background:#eef5ff; border-color:#b8daff;" onclick="openQuickStatPrompt('拿時間')">拿時間</button>
                     <button class="shift-action-btn" style="color:#5ece9d; background:#eafaf1; border-color:#c3e6cb;" onclick="openQuickStatPrompt('年休')">拿年休</button>
-                    <button class="circle-btn" style="background: #ff0000; box-shadow: 0 2px 4px rgba(255,0,0,0.3);" onclick="toggleTag('國')"> 國 </button>
+                    <button class="circle-btn" onclick="toggleTag('國')">國</button>
                 </div>
                 
                 <div class="quick-section">
@@ -621,7 +652,6 @@
         </div>
     </div>
 
-    <!-- ========== 補課膠囊 Modal（含科目選擇） ========== -->
     <div class="modal" id="makeupModal" style="z-index: 30;">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -630,10 +660,8 @@
             </div>
             <div style="text-align:center; margin-bottom: 10px; font-weight:bold; color:#4a4aff; font-size: 28px;" id="makeupTotalDisplay">0 小時</div>
             
-            <!-- 各科目小計 -->
             <div class="subject-summary" id="subjectSummary"></div>
             
-            <!-- 快速新增區 -->
             <div class="makeup-quick-add">
                 <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">✏️ 新增補課時數</div>
                 <div class="input-row">
@@ -651,7 +679,6 @@
                 <div style="font-size: 11px; color: #999; margin-top: 6px;">💡 選擇科目分類，方便統計各科補課時數</div>
             </div>
             
-            <!-- 科目篩選 -->
             <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 6px;">📋 本月補課紀錄</div>
             <div class="makeup-subject-filter">
                 <button class="filter-btn active" data-filter="all" onclick="setMakeupFilter('all')">全部</button>
@@ -908,8 +935,92 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        // 補課篩選
         let makeupFilter = 'all';
+        let tempCompletedMonths = [];
+
+        // ==================== 修正 toggleTag ====================
+        function toggleTag(tag) {
+            let input = document.getElementById('shiftInput');
+            let parts = input.value.split(/\s+/).filter(Boolean);
+            
+            if (tag === '國') {
+                if (parts.includes('國')) {
+                    parts = parts.filter(p => p !== '國');
+                } else {
+                    parts.push('國');
+                }
+            } else {
+                if (parts.includes(tag)) {
+                    parts = parts.filter(p => p !== tag);
+                } else {
+                    parts.push(tag);
+                }
+            }
+            
+            input.value = parts.join(' ');
+        }
+
+        // ==================== generateDayTags ====================
+        function generateDayTags(finalShift, hasAllowance) {
+            if (!finalShift) return { topHtml: "", bottomHtml: "" };
+            let topHtml = '<div class="top-tags-wrap">';
+            let bottomHtml = '<div class="bottom-tags-wrap">';
+            let text = finalShift.trim();
+            let tokens = [];
+            
+            let m128 = text.match(/12-8\s\d+/g);
+            if(m128) { m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); }); }
+            text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
+
+            let hasTop = false;
+            let hasBottom = false;
+
+            tokens.forEach(p => {
+                let s = p.toUpperCase();
+                
+                if (p === '國') {
+                    topHtml += `<div class="national-holiday-badge">國</div>`;
+                    hasTop = true;
+                }
+                else if (s === "例休") { 
+                    bottomHtml += `<div class="shift-badge shift-off">例休</div>`; 
+                    hasBottom = true; 
+                }
+                else if (s === "年休") { 
+                    bottomHtml += `<div class="shift-badge shift-off">年休</div>`; 
+                    hasBottom = true; 
+                }
+                else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
+                    let numText = p;
+                    let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
+                    if(numText.startsWith("年休")) color = "#5ece9d";
+                    topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
+                    hasTop = true;
+                } 
+                else {
+                    hasBottom = true;
+                    if (hasAllowance) {
+                        bottomHtml += `<div class="shift-badge shift-green">${p}</div>`;
+                    }
+                    else if (s.includes("OFF")) { 
+                        bottomHtml += `<div class="shift-badge shift-off">${p}</div>`; 
+                    }
+                    else if (s.startsWith("D")) { 
+                        bottomHtml += `<div class="shift-badge shift-d">${p}</div>`; 
+                    }
+                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { 
+                        bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; 
+                    }
+                    else { 
+                        bottomHtml += `<div class="shift-badge shift-default">${p}</div>`; 
+                    }
+                }
+            });
+            
+            topHtml += '</div>';
+            bottomHtml += '</div>';
+            return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
+        }
 
         // ==================== 取得某日期的統計標記 ====================
         function getDayStatBadges(dateKey) {
@@ -937,7 +1048,6 @@
         }
 
         // ==================== 加班費相關函數 ====================
-        
         function openQuickStatPrompt(act) {
             currentQuickStatAct = act;
             document.getElementById('quickStatTitle').innerText = `輸入「${act}」`;
@@ -984,7 +1094,6 @@
             };
             
             if (currentQuickStatAct === '加班') {
-                // ★ 加班時數 > 0.5 小時才需要輸入加班費（1小時以上含1小時）
                 if (hours > 0.5) {
                     let fee = parseFloat(document.getElementById('quickStatFee').value);
                     if (isNaN(fee) || fee < 0) {
@@ -1006,7 +1115,6 @@
                         });
                     }
                 } else {
-                    // ★ 加班時數 ≤ 0.5 小時：不記錄加班費，自動標示為補休
                     record.fee = 0;
                     record.desc = '加班(補休)';
                 }
@@ -1034,7 +1142,6 @@
             const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
             const monthKey = `${year}-${month}`;
             
-            // ★ 只顯示有加班費的紀錄（fee > 0）
             const otRecords = globalStats.hours.filter(item => 
                 item.date.startsWith(monthKey) && 
                 item.desc.includes('加班') && 
@@ -1102,7 +1209,6 @@
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
             document.getElementById('hdrOtFee').innerText = totalOtFee;
 
-            // 更新補課總時數（所有月份總和）
             const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
             const hdrMakeupSpan = document.getElementById('hdrMakeupTotal');
             if (hdrMakeupSpan) {
@@ -1182,59 +1288,7 @@
 
         function setShift(v) { document.getElementById('shiftInput').value = v; }
 
-        function toggleTag(tag) {
-            let input = document.getElementById('shiftInput');
-            let parts = input.value.split(/\s+/).filter(Boolean);
-            if(parts.includes(tag)) parts = parts.filter(p => p !== tag);
-            else parts.push(tag);
-            input.value = parts.join(' ');
-        }
-
-        function generateDayTags(finalShift, hasAllowance) {
-            if (!finalShift) return { topHtml: "", bottomHtml: "" };
-            let topHtml = '<div class="top-tags-wrap">';
-            let bottomHtml = '<div class="bottom-tags-wrap">';
-            let text = finalShift.trim();
-            let tokens = [];
-            
-            let m128 = text.match(/12-8\s\d+/g);
-            if(m128) { m128.forEach(m => { tokens.push(m); text = text.replace(m, ''); }); }
-            text.split(/\s+/).filter(Boolean).forEach(t => tokens.push(t));
-
-            let hasTop = false;
-            let hasBottom = false;
-
-            tokens.forEach(p => {
-                let s = p.toUpperCase();
-                if (s === "例休") { bottomHtml += `<div class="shift-badge shift-off">例休</div>`; hasBottom = true; }
-                else if (s === "年休") { bottomHtml += `<div class="shift-badge shift-off">年休</div>`; hasBottom = true; }
-                else if (s === "國") { topHtml += `<div class="national-holiday-badge">國</div>`; hasTop = true; }
-                else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
-                    let numText = p;
-                    let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
-                    if(numText.startsWith("年休")) color = "#5ece9d";
-                    topHtml += `<div class="shift-num-tag" style="color:${color};">${numText}</div>`;
-                    hasTop = true;
-                } 
-                else {
-                    hasBottom = true;
-                    if (hasAllowance) {
-                        bottomHtml += `<div class="shift-badge shift-green">${p}</div>`;
-                    }
-                    else if (s.includes("OFF")) { bottomHtml += `<div class="shift-badge shift-off">${p}</div>`; }
-                    else if (s.startsWith("D")) { bottomHtml += `<div class="shift-badge shift-d">${p}</div>`; }
-                    else if (s.startsWith("12") || s.startsWith("E") || s.startsWith("N")) { bottomHtml += `<div class="shift-badge shift-green">${p}</div>`; }
-                    else { bottomHtml += `<div class="shift-badge shift-default">${p}</div>`; }
-                }
-            });
-            topHtml += '</div>';
-            bottomHtml += '</div>';
-            return { topHtml: hasTop ? topHtml : "", bottomHtml: hasBottom ? bottomHtml : "" };
-        }
-
         // ==================== 事件相關 ====================
-        let tempCompletedMonths = [];
-
         function toggleCompleteThisMonth() {
             let btn = document.getElementById('completeToggleBtn');
             let cm = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1).toString().padStart(2, '0');
@@ -1371,17 +1425,14 @@
                     let wEnd = week[6].dateKey;
                     let wEvents = expandedEvents.filter(ev => ev.startDate <= wEnd && ev.endDate >= wStart);
 
-                    // ★★★ 排序：未完成的排前面，已完成的排後面 ★★★
                     wEvents.sort((a, b) => {
                         let monKey = year + '-' + (month + 1).toString().padStart(2, '0');
                         let aDone = a.completedMonths && a.completedMonths.includes(monKey);
                         let bDone = b.completedMonths && b.completedMonths.includes(monKey);
                         
-                        // 已完成排最後面
                         if (aDone && !bDone) return 1;
                         if (!aDone && bDone) return -1;
                         
-                        // 都未完成或都已完成：按天數長短排序（長的在前）
                         let lenA = new Date(a.endDate).getTime() - new Date(a.startDate).getTime();
                         let lenB = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
                         if (isNaN(lenA)) lenA = 0; if (isNaN(lenB)) lenB = 0;
@@ -1569,7 +1620,6 @@
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
                
-                // 更新頂部補課按鈕（顯示本月總計）
                 const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
                 if (makeupBtn) {
                     const monthMakeupTotal = globalStats.makeup ? 
@@ -1686,7 +1736,7 @@
             renderCalendar();
         }
 
-        // ==================== 補課膠囊功能（含科目） ====================
+        // ==================== 補課膠囊功能 ====================
         function openMakeupModal() {
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('makeupAddDate').value = todayStr;
@@ -1892,7 +1942,7 @@
             renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
         }
 
-        // ==================== renderStatsList（含編輯功能） ====================
+        // ==================== renderStatsList ====================
         function renderStatsList() {
             let data = globalStats[currentStatType] || [];
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
@@ -2483,21 +2533,16 @@
             
             clearBtn.style.display = 'block';
             
-            // 收集所有行程
             let results = [];
             const allEvents = getAllBaseEvents();
-            
-            // 取得所有有資料的日期
             const dateKeys = Object.keys(calendarData);
             
-            // 搜尋行程
             allEvents.forEach(ev => {
                 const title = (ev.title || '').toLowerCase();
                 const startDate = ev.startDate || '';
                 const endDate = ev.endDate || '';
                 const keywordLower = keyword.toLowerCase();
                 
-                // 檢查標題、開始日期、結束日期
                 let match = false;
                 let matchField = '';
                 
@@ -2525,14 +2570,12 @@
                 }
             });
             
-            // 搜尋班別
             dateKeys.forEach(dateKey => {
                 const data = calendarData[dateKey];
                 if (data && data.shift) {
                     const shift = data.shift.toLowerCase();
                     const keywordLower = keyword.toLowerCase();
                     if (shift.includes(keywordLower)) {
-                        // 檢查是否已經有相同日期的行程結果，避免重複
                         const existing = results.some(r => r.date === dateKey && r.type === '班別');
                         if (!existing) {
                             results.push({
@@ -2549,7 +2592,6 @@
                 }
             });
             
-            // 搜尋「國」標籤
             dateKeys.forEach(dateKey => {
                 const data = calendarData[dateKey];
                 if (data && data.shift && data.shift.includes('國')) {
@@ -2571,7 +2613,6 @@
                 }
             });
             
-            // 搜尋老公休假日
             if (keyword.includes('老公') || keyword.includes('休假') || keyword.includes('森休假')) {
                 dateKeys.forEach(dateKey => {
                     const data = calendarData[dateKey];
@@ -2592,7 +2633,6 @@
                 });
             }
             
-            // 搜尋台灣假日
             if (keyword.length >= 2) {
                 const keywordLower = keyword.toLowerCase();
                 for (let [date, name] of Object.entries(twHolidays)) {
@@ -2613,10 +2653,8 @@
                 }
             }
             
-            // 排序：依日期排序
             results.sort((a, b) => a.date.localeCompare(b.date));
             
-            // 顯示結果
             const count = results.length;
             const countEl = document.getElementById('searchResultCount');
             const listEl = document.getElementById('searchResultList');
@@ -2640,8 +2678,6 @@
                     'red': '#ff6b6b'
                 };
                 const dotColor = colorMap[item.color] || '#84bde3';
-                
-                // 格式化日期顯示
                 const dateDisplay = item.date === item.endDate ? item.date : `${item.date} ~ ${item.endDate}`;
                 
                 html += `
@@ -2667,10 +2703,7 @@
         }
 
         function goToDate(dateStr) {
-            // 關閉搜尋視窗
             closeSearchModal();
-            
-            // 跳到該月份
             const parts = dateStr.split('-');
             const targetYear = parseInt(parts[0]);
             const targetMonth = parseInt(parts[1]) - 1;
@@ -2678,14 +2711,11 @@
             currentDate = new Date(targetYear, targetMonth, 1);
             renderCalendar();
             
-            // 稍微延遲後點擊該日期
             setTimeout(() => {
                 const targetDateKey = dateStr;
-                // 在日曆中找到並點擊該日期
                 const dayEls = document.querySelectorAll('.day');
                 for (let el of dayEls) {
                     if (el.textContent.includes(parts[2])) {
-                        // 檢查是否是正確的月份
                         const monthYear = document.getElementById('monthYear').innerText;
                         if (monthYear.includes(targetYear + '年') && monthYear.includes((targetMonth + 1) + '月')) {
                             el.click();
@@ -2696,7 +2726,6 @@
             }, 300);
         }
 
-        // 讓搜尋框支援 Enter 鍵（雖然已經即時搜尋）
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
