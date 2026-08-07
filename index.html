@@ -899,9 +899,6 @@
         let makeupFilter = 'all';
         let tempCompletedMonths = [];
 
-        // ==================== 修正 toggleTag (移除"國") ====================
-        // 此函數已不再需要，因 "國" 按鈕已移除
-
         // ==================== generateDayTags ====================
         function generateDayTags(finalShift, hasAllowance) {
             if (!finalShift) return { topHtml: "", bottomHtml: "" };
@@ -920,7 +917,6 @@
             tokens.forEach(p => {
                 let s = p.toUpperCase();
                 
-                // "國" 的處理已移除
                 if (s === "例休") { 
                     bottomHtml += `<div class="shift-badge shift-off">例休</div>`; 
                     hasBottom = true; 
@@ -929,7 +925,7 @@
                     bottomHtml += `<div class="shift-badge shift-off">年休</div>`; 
                     hasBottom = true; 
                 }
-                else if (s.match(/^[+-]\d+(\.\d+)?$/) || s.startsWith("年休-")) {
+                else if (p.match(/^[+-]\d+(\.\d+)?$/) || p.startsWith("年休-")) {
                     let numText = p;
                     let color = numText.includes("-") ? "#5b9bd5" : "#d9534f";
                     if(numText.startsWith("年休")) color = "#5ece9d";
@@ -1049,7 +1045,7 @@
                         globalStats.nightFee.push({
                             id: "nf_" + Date.now(),
                             date: selectedDateString,
-                            amount: 270, // 修改為 270
+                            amount: 270,
                             desc: '12-8津貼(加班)'
                         });
                     }
@@ -2530,8 +2526,6 @@
                     }
                 }
             });
-            
-            // 移除"國"的搜尋
             
             if (keyword.includes('老公') || keyword.includes('休假') || keyword.includes('森休假')) {
                 dateKeys.forEach(dateKey => {
