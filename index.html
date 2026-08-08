@@ -2011,6 +2011,7 @@
 
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
+        // ==================== 夜班費明細（含刪除按鈕） ====================
         function openNightFeeModal() {
             let listEl = document.getElementById('nightFeeList');
             let html = "";
@@ -2021,12 +2022,35 @@
             if (currentMonthNightFees.length === 0) {
                 listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無夜班費紀錄</div>";
             } else {
-                currentMonthNightFees.forEach(item => {
+                currentMonthNightFees.forEach((item, index) => {
+                    // 確保每個 item 都有 id，如果沒有就自動生成
+                    const itemId = item.id || 'nf_' + Date.now() + '_' + index;
+                    // 如果原本沒有 id，就補上
+                    if (!item.id) {
+                        item.id = itemId;
+                        // 更新到 globalStats 中
+                        const originalItem = globalStats.nightFee.find(i => 
+                            i.date === item.date && 
+                            i.amount === item.amount && 
+                            i.desc === item.desc && 
+                            !i.id
+                        );
+                        if (originalItem) {
+                            originalItem.id = itemId;
+                            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                        }
+                    }
                     html += `
-                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0;">
-                            <div><div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div><div style="font-size:12px; color:#999;">${item.date}</div></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0;">
+                            <div>
+                                <div style="font-size:14px; font-weight:900; color:#555;">${item.desc}</div>
+                                <div style="font-size:12px; color:#999;">${item.date}</div>
+                            </div>
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <span style="color:#e65100; font-weight:900; font-size:16px;">+$${item.amount}</span>
+                                <button onclick="deleteNightFee('${itemId}')" 
+                                    style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
+                                    title="刪除此筆紀錄">✕</button>
                             </div>
                         </div>`;
                 });
@@ -2035,8 +2059,31 @@
             document.getElementById('nightFeeModal').style.display = 'flex';
         }
 
-        function closeNightFeeModal() { document.getElementById('nightFeeModal').style.display = 'none'; }
+        function closeNightFeeModal() { 
+            document.getElementById('nightFeeModal').style.display = 'none'; 
+        }
 
+        function deleteNightFee(id) {
+            if (!confirm("確定要刪除這筆夜班費紀錄嗎？")) return;
+            
+            // 從 globalStats.nightFee 中刪除
+            globalStats.nightFee = globalStats.nightFee.filter(item => item.id !== id);
+            
+            // 同時從 currentMonthNightFees 中刪除
+            currentMonthNightFees = currentMonthNightFees.filter(item => item.id !== id);
+            
+            // 儲存到 localStorage
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            
+            // 更新顯示
+            updateStatsDisplay();
+            renderCalendar();
+            
+            // 重新開啟夜班費明細以更新列表
+            openNightFeeModal();
+        }
+
+        // ==================== 其餘函數 ====================
         function renderEventListInModal() {
             let ex = getExpandedEvents(selectedDateString, selectedDateString);
             let html = "";
