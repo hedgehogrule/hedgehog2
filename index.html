@@ -2011,35 +2011,111 @@
 
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
-        // ==================== 夜班費明細（含刪除按鈕） ====================
+        // ==================== 夜班費明細（含刪除按鈕 - 修正版） ====================
         function openNightFeeModal() {
             let listEl = document.getElementById('nightFeeList');
             let html = "";
+            
+            // 重新整理 currentMonthNightFees，確保每個項目都有 id
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+            
+            // 從 globalStats.nightFee 重新建立 currentMonthNightFees
+            currentMonthNightFees = [];
+            if (globalStats.nightFee) {
+                globalStats.nightFee
+                    .filter(item => item.date.startsWith(monthKey))
+                    .forEach(item => {
+                        // 確保每個 item 都有 id
+                        if (!item.id) {
+                            item.id = 'nf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        }
+                        currentMonthNightFees.push(item);
+                    });
+            }
+            
+            // 再加上自動計算的夜班費（如果有 id 就保留，沒有就生成）
+            const savedIds = new Set(currentMonthNightFees.map(item => item.id));
+            
+            // 重新掃描行事曆中的夜班費（自動計算的部分）
+            const yearNum = currentDate.getFullYear();
+            const monthNum = currentDate.getMonth();
+            const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${yearNum}-${(monthNum + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                const savedData = calendarData[dateKey] || {};
+                let finalShift = savedData.shift !== undefined ? savedData.shift : getAutoShift(yearNum, monthNum, d).shift;
+                
+                if (finalShift) {
+                    let tokens = finalShift.trim().split(/\s+/);
+                    let dailyFee = 0;
+                    let feeDescs = [];
+
+                    tokens.forEach(tok => {
+                        let s = tok.toUpperCase();
+                        if (s.startsWith('12-8')) { dailyFee += 270; feeDescs.push(`${tok} ($270)`); }
+                        else if (s.startsWith('E')) { dailyFee += 560; feeDescs.push(`${tok} ($560)`); }
+                        else if (s.startsWith('N')) { dailyFee += 800; feeDescs.push(`${tok} ($800)`); }
+                    });
+                    
+                    if (dailyFee > 0) {
+                        // 檢查是否已經存在（避免重複）
+                        const existing = currentMonthNightFees.some(item => 
+                            item.date === dateKey && item.amount === dailyFee && item.desc === feeDescs.join(', ')
+                        );
+                        if (!existing) {
+                            const autoId = 'auto_' + Date.now() + '_' + d;
+                            currentMonthNightFees.push({ 
+                                id: autoId,
+                                date: dateKey, 
+                                desc: feeDescs.join(', '), 
+                                amount: dailyFee,
+                                isAuto: true
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // 重新排序
             currentMonthNightFees.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
             let total = currentMonthNightFees.reduce((s, i) => s + i.amount, 0);
             document.getElementById('nightFeeTotal').innerText = total;
 
             if (currentMonthNightFees.length === 0) {
                 listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無夜班費紀錄</div>";
             } else {
-                currentMonthNightFees.forEach((item, index) => {
-                    // 確保每個 item 都有 id，如果沒有就自動生成
-                    const itemId = item.id || 'nf_' + Date.now() + '_' + index;
-                    // 如果原本沒有 id，就補上
+                currentMonthNightFees.forEach((item) => {
+                    const itemId = item.id || 'nf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                    // 確保 item 有 id
                     if (!item.id) {
                         item.id = itemId;
-                        // 更新到 globalStats 中
-                        const originalItem = globalStats.nightFee.find(i => 
-                            i.date === item.date && 
-                            i.amount === item.amount && 
-                            i.desc === item.desc && 
-                            !i.id
-                        );
-                        if (originalItem) {
-                            originalItem.id = itemId;
-                            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                        // 如果是從 globalStats 來的，更新回去
+                        if (globalStats.nightFee) {
+                            const originalItem = globalStats.nightFee.find(i => 
+                                i.date === item.date && 
+                                i.amount === item.amount && 
+                                i.desc === item.desc && 
+                                !i.id
+                            );
+                            if (originalItem) {
+                                originalItem.id = itemId;
+                                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+                            }
                         }
                     }
+                    
+                    // 判斷是否為自動計算的（不可刪除）
+                    const isAuto = item.isAuto === true;
+                    const deleteBtn = isAuto ? 
+                        `<span style="color:#ccc; font-size:12px; margin-left:8px;">(自動)</span>` :
+                        `<button onclick="deleteNightFee('${item.id}')" 
+                            style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
+                            title="刪除此筆紀錄">✕</button>`;
+                    
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0;">
                             <div>
@@ -2048,9 +2124,7 @@
                             </div>
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <span style="color:#e65100; font-weight:900; font-size:16px;">+$${item.amount}</span>
-                                <button onclick="deleteNightFee('${itemId}')" 
-                                    style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 8px;"
-                                    title="刪除此筆紀錄">✕</button>
+                                ${deleteBtn}
                             </div>
                         </div>`;
                 });
@@ -2067,13 +2141,13 @@
             if (!confirm("確定要刪除這筆夜班費紀錄嗎？")) return;
             
             // 從 globalStats.nightFee 中刪除
-            globalStats.nightFee = globalStats.nightFee.filter(item => item.id !== id);
+            if (globalStats.nightFee) {
+                globalStats.nightFee = globalStats.nightFee.filter(item => item.id !== id);
+                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+            }
             
             // 同時從 currentMonthNightFees 中刪除
             currentMonthNightFees = currentMonthNightFees.filter(item => item.id !== id);
-            
-            // 儲存到 localStorage
-            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             
             // 更新顯示
             updateStatsDisplay();
