@@ -2770,7 +2770,396 @@
                 });
             }
         });
-        
+// ============================================================
+        // 🔧 夜班費 / 加班費「可修改」擴充包
+        // 貼在原本最後那行 renderCalendar(); 的「上面」即可
+        // ============================================================
+
+        // --- 讀回使用者對自動夜班費做過的金額調整 ---
+        try {
+            const _savedStats = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || {};
+            globalStats.nightFeeOverride = _savedStats.nightFeeOverride || {};
+        } catch (e) {
+            globalStats.nightFeeOverride = {};
+        }
+
+        function saveStats() {
+            localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
+        }
+
+        // --- 依班別推算某天原始夜班費 ---
+        function getRawNightFee(dateKey) {
+            const p = dateKey.split('-');
+            const savedData = calendarData[dateKey] || {};
+            let finalShift = savedData.shift !== undefined
+                ? savedData.shift
+                : getAutoShift(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).shift;
+
+            let amount = 0;
+            let descs = [];
+            if (finalShift) {
+                finalShift.trim().split(/\s+/).filter(Boolean).forEach(tok => {
+                    const s = tok.toUpperCase();
+                    if (s.startsWith('12-8')) { amount += 270; descs.push(`${tok} ($270)`); }
+                    else if (s.startsWith('E')) { amount += 560; descs.push(`${tok} ($560)`); }
+                    else if (s.startsWith('N')) { amount += 800; descs.push(`${tok} ($800)`); }
+                });
+            }
+            if (amount === 0) return null;
+            return { amount: amount, desc: descs.join(', ') };
+        }
+
+        // --- 套用使用者調整後的夜班費 ---
+        function computeAutoNightFee(dateKey) {
+            const base = getRawNightFee(dateKey);
+            if (!base) return null;
+            const ov = (globalStats.nightFeeOverride || {})[dateKey];
+            if (ov) {
+                return { amount: ov.amount, desc: ov.desc || base.desc, overridden: true, rawAmount: base.amount, rawDesc: base.desc };
+            }
+            return { amount: base.amount, desc: base.desc, overridden: false, rawAmount: base.amount, rawDesc: base.desc };
+        }
+
+        // --- 組出本月夜班費清單（自動 + 手動）---
+        function buildMonthNightFees() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthKey = `${year}-${(month + 1).toString().padStart(2, '0')}`;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let list = [];
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${monthKey}-${d.toString().padStart(2, '0')}`;
+                const info = computeAutoNightFee(dateKey);
+                if (info) {
+                    list.push({
+                        id: 'auto_' + dateKey, date: dateKey, desc: info.desc, amount: info.amount,
+                        isAuto: true, overridden: info.overridden, rawAmount: info.rawAmount
+                    });
+                }
+            }
+
+            let idAdded = false;
+            (globalStats.nightFee || []).forEach(item => {
+                if (!item.date || !item.date.startsWith(monthKey)) return;
+                if (!item.id) {
+                    item.id = 'nf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                    idAdded = true;
+                }
+                list.push({ id: item.id, date: item.date, desc: item.desc, amount: item.amount, isAuto: false });
+            });
+            if (idAdded) saveStats();
+
+            list.sort((a, b) => a.date.localeCompare(b.date) || (a.isAuto === b.isAuto ? 0 : (a.isAuto ? -1 : 1)));
+            return list;
+        }
+
+        // --- 共用的小編輯視窗 ---
+        function showEditOverlay(opts) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(2px);";
+
+            const box = document.createElement('div');
+            box.style.cssText = "background:#fff; border-radius:16px; padding:22px 20px; max-width:340px; width:90%; box-shadow:0 8px 30px rgba(0,0,0,0.2); max-height:88vh; overflow-y:auto;";
+
+            const h = document.createElement('h3');
+            h.style.cssText = "margin:0 0 6px 0; color:#444; font-size:17px;";
+            h.innerText = opts.title;
+            box.appendChild(h);
+
+            if (opts.subtitle) {
+                const sub = document.createElement('div');
+                sub.style.cssText = "font-size:13px; color:#999; margin-bottom:14px; font-weight:700;";
+                sub.innerText = opts.subtitle;
+                box.appendChild(sub);
+            }
+
+            const inputs = {};
+            opts.fields.forEach(f => {
+                const lb = document.createElement('label');
+                lb.style.cssText = "display:block; font-size:13px; font-weight:bold; color:#666; margin-bottom:4px;";
+                lb.innerText = f.label;
+                box.appendChild(lb);
+
+                const ip = document.createElement('input');
+                ip.type = f.type || 'text';
+                if (f.step) ip.step = f.step;
+                ip.value = (f.value === undefined || f.value === null) ? '' : f.value;
+                ip.style.cssText = "width:100%; padding:8px; font-size:15px; border:2px solid #ddd; border-radius:8px; box-sizing:border-box; font-family:inherit; margin-bottom:12px; background:#fafafa;";
+                box.appendChild(ip);
+                inputs[f.key] = ip;
+            });
+
+            if (opts.note) {
+                const n = document.createElement('div');
+                n.style.cssText = "font-size:11px; color:#aaa; margin-bottom:12px; line-height:1.6; font-weight:700;";
+                n.innerText = opts.note;
+                box.appendChild(n);
+            }
+
+            const row = document.createElement('div');
+            row.style.cssText = "display:flex; gap:10px;";
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.innerText = '取消';
+            cancelBtn.style.cssText = "flex:1; padding:10px; border:none; border-radius:10px; font-weight:bold; font-size:14px; background:#f1f1f1; color:#666; cursor:pointer; font-family:inherit;";
+            cancelBtn.onclick = () => overlay.remove();
+
+            const saveBtn = document.createElement('button');
+            saveBtn.innerText = '儲存';
+            saveBtn.style.cssText = "flex:1; padding:10px; border:none; border-radius:10px; font-weight:bold; font-size:14px; background:linear-gradient(135deg, #a28cdb, #84bde3); color:#fff; cursor:pointer; font-family:inherit;";
+            saveBtn.onclick = () => {
+                const vals = {};
+                for (let k in inputs) vals[k] = inputs[k].value;
+                if (opts.onSave(vals) !== false) overlay.remove();
+            };
+
+            row.appendChild(cancelBtn);
+            row.appendChild(saveBtn);
+            box.appendChild(row);
+
+            if (opts.extra) {
+                const eb = document.createElement('button');
+                eb.innerText = opts.extra.label;
+                eb.style.cssText = "width:100%; margin-top:10px; padding:9px; border:2px solid #ffcc80; border-radius:10px; font-weight:bold; font-size:13px; background:#fff8ef; color:#e65100; cursor:pointer; font-family:inherit;";
+                eb.onclick = () => { if (opts.extra.onClick() !== false) overlay.remove(); };
+                box.appendChild(eb);
+            }
+
+            overlay.appendChild(box);
+            overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+            document.body.appendChild(overlay);
+        }
+
+        function refreshAfterNightFeeChange() {
+            saveStats();
+            updateStatsDisplay();
+            renderCalendar();
+            openNightFeeModal();
+        }
+
+        // ==================== 夜班費明細（可修改 + 可刪除）====================
+        function openNightFeeModal() {
+            const list = buildMonthNightFees();
+            currentMonthNightFees = list;
+
+            const total = list.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('nightFeeTotal').innerText = total;
+
+            const listEl = document.getElementById('nightFeeList');
+
+            if (list.length === 0) {
+                listEl.innerHTML = "<div style='text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;'>本月無夜班費紀錄</div>";
+            } else {
+                let html = "";
+                list.forEach(item => {
+                    let tag;
+                    if (item.isAuto && item.overridden) {
+                        tag = `<span style="font-size:10px; color:#e65100; background:#fff3e0; border:1px solid #ffcc80; border-radius:4px; padding:1px 4px; margin-left:6px;">已修改</span>`;
+                    } else if (item.isAuto) {
+                        tag = `<span style="font-size:10px; color:#999; background:#f5f5f5; border:1px solid #e0e0e0; border-radius:4px; padding:1px 4px; margin-left:6px;">自動</span>`;
+                    } else {
+                        tag = `<span style="font-size:10px; color:#4a4aff; background:#f0f0ff; border:1px solid #b0b0ff; border-radius:4px; padding:1px 4px; margin-left:6px;">手動</span>`;
+                    }
+
+                    const originNote = item.overridden ? `（原 $${item.rawAmount}）` : '';
+
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0;">
+                            <div style="flex:1; min-width:0; margin-right:8px;">
+                                <div style="font-size:14px; font-weight:900; color:#555; word-break:break-word;">${item.desc}${tag}</div>
+                                <div style="font-size:12px; color:#999;">${item.date}${originNote}</div>
+                            </div>
+                            <div style="display:flex; gap:4px; align-items:center; flex-shrink:0;">
+                                <span style="color:#e65100; font-weight:900; font-size:16px;">+$${item.amount}</span>
+                                <button onclick="openEditNightFee('${item.id}')" style="background:none; border:none; color:#5b9bd5; cursor:pointer; font-weight:900; font-size:16px; padding:4px 6px;" title="修改金額">✎</button>
+                                <button onclick="deleteNightFee('${item.id}')" style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:16px; padding:4px 6px;" title="刪除或歸零">✕</button>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+
+            document.getElementById('nightFeeModal').style.display = 'flex';
+        }
+
+        function openEditNightFee(id) {
+            const item = buildMonthNightFees().find(i => i.id === id);
+            if (!item) return;
+
+            if (item.isAuto) {
+                showEditOverlay({
+                    title: '✎ 修改夜班費',
+                    subtitle: `${item.date}　班別推算金額 $${item.rawAmount}`,
+                    fields: [
+                        { key: 'amount', label: '金額 ($)', type: 'number', value: item.amount },
+                        { key: 'desc', label: '說明', value: item.desc }
+                    ],
+                    note: '這天的金額原本由班別自動推算。存檔後會固定用你填的金額，班別之後有變動也一樣，隨時可按下面還原。',
+                    onSave: (v) => {
+                        const amt = parseFloat(v.amount);
+                        if (isNaN(amt) || amt < 0) { alert('金額請填 0 或以上的數字'); return false; }
+                        if (!v.desc.trim()) { alert('說明不能空白'); return false; }
+                        if (!globalStats.nightFeeOverride) globalStats.nightFeeOverride = {};
+                        globalStats.nightFeeOverride[item.date] = { amount: amt, desc: v.desc.trim() };
+                        refreshAfterNightFeeChange();
+                    },
+                    extra: item.overridden ? {
+                        label: `↺ 還原為班別推算 ($${item.rawAmount})`,
+                        onClick: () => {
+                            delete globalStats.nightFeeOverride[item.date];
+                            refreshAfterNightFeeChange();
+                        }
+                    } : null
+                });
+            } else {
+                showEditOverlay({
+                    title: '✎ 編輯夜班費紀錄',
+                    subtitle: item.date,
+                    fields: [
+                        { key: 'date', label: '日期', type: 'date', value: item.date },
+                        { key: 'amount', label: '金額 ($)', type: 'number', value: item.amount },
+                        { key: 'desc', label: '說明', value: item.desc }
+                    ],
+                    onSave: (v) => {
+                        const amt = parseFloat(v.amount);
+                        if (!v.date) { alert('請選日期'); return false; }
+                        if (isNaN(amt)) { alert('金額請填數字'); return false; }
+                        if (!v.desc.trim()) { alert('說明不能空白'); return false; }
+                        const rec = (globalStats.nightFee || []).find(i => i.id === id);
+                        if (!rec) return;
+                        rec.date = v.date;
+                        rec.amount = amt;
+                        rec.desc = v.desc.trim();
+                        refreshAfterNightFeeChange();
+                    }
+                });
+            }
+        }
+
+        function deleteNightFee(id) {
+            if (id.startsWith('auto_')) {
+                const dateKey = id.slice(5);
+                if (!confirm(`${dateKey} 的夜班費是依班別自動算出來的，不能直接刪除。\n要把金額設為 $0 嗎？（之後還可以還原）`)) return;
+                const base = getRawNightFee(dateKey);
+                if (!globalStats.nightFeeOverride) globalStats.nightFeeOverride = {};
+                globalStats.nightFeeOverride[dateKey] = {
+                    amount: 0,
+                    desc: (base ? base.desc : '夜班費') + ' 已歸零'
+                };
+                refreshAfterNightFeeChange();
+                return;
+            }
+
+            if (!confirm('確定要刪除這筆夜班費紀錄嗎？')) return;
+            if (globalStats.nightFee) {
+                globalStats.nightFee = globalStats.nightFee.filter(item => item.id !== id);
+            }
+            refreshAfterNightFeeChange();
+        }
+
+        // ==================== 加班費明細（可修改 + 可刪除）====================
+        function openOtFeeModal() {
+            const listEl = document.getElementById('otFeeList');
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const monthKey = `${year}-${month}`;
+
+            const otRecords = globalStats.hours.filter(item =>
+                item.date.startsWith(monthKey) &&
+                item.desc.includes('加班') &&
+                (item.fee || 0) > 0
+            );
+            otRecords.sort((a, b) => a.date.localeCompare(b.date));
+
+            const totalFee = otRecords.reduce((s, item) => s + (item.fee || 0), 0);
+            document.getElementById('otFeeTotal').innerText = totalFee;
+
+            if (otRecords.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center; color:#aaa; font-size:13px; margin-top:10px; font-weight:900;">本月無加班費紀錄</div>`;
+            } else {
+                let html = "";
+                otRecords.forEach(item => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:12px 0;">
+                            <div style="flex:1; min-width:0; margin-right:8px;">
+                                <div style="font-size:14px; font-weight:900; color:#555; word-break:break-word;">
+                                    ${item.date}｜${item.desc} ${item.amount} 小時
+                                </div>
+                                <div style="font-size:13px; color:#dc2626; font-weight:700; margin-top:2px;">加班費：$${item.fee}</div>
+                            </div>
+                            <div style="display:flex; gap:4px; align-items:center; flex-shrink:0;">
+                                <span style="color:#dc2626; font-weight:900; font-size:18px;">$${item.fee}</span>
+                                <button onclick="openEditOtRecord('${item.id}')" style="background:none; border:none; color:#5b9bd5; cursor:pointer; font-weight:900; font-size:16px; padding:4px 6px;" title="修改此筆">✎</button>
+                                <button onclick="deleteOtRecord('${item.id}')" style="background:none; border:none; color:#ffaaaa; cursor:pointer; font-weight:900; font-size:18px; padding:4px 6px;" title="刪除此筆">✕</button>
+                            </div>
+                        </div>`;
+                });
+                listEl.innerHTML = html;
+            }
+
+            document.getElementById('otFeeModal').style.display = 'flex';
+        }
+
+        function openEditOtRecord(id) {
+            const item = globalStats.hours.find(i => i.id === id);
+            if (!item) return;
+
+            showEditOverlay({
+                title: '✎ 編輯加班紀錄',
+                subtitle: item.date,
+                fields: [
+                    { key: 'date', label: '日期', type: 'date', value: item.date },
+                    { key: 'amount', label: '加班時數', type: 'number', step: '0.5', value: item.amount },
+                    { key: 'fee', label: '加班費金額 ($)', type: 'number', value: item.fee || 0 },
+                    { key: 'desc', label: '備註', value: item.desc }
+                ],
+                note: '時數會同步影響上方「⏳ 時數」結餘。金額改成 0 這筆就不再出現在加班費明細，但時數紀錄仍保留。若這筆有加計 12-8 津貼，津貼金額請到夜班費明細那邊改。',
+                onSave: (v) => {
+                    const amt = parseFloat(v.amount);
+                    const fee = parseFloat(v.fee);
+                    const desc = v.desc.trim();
+                    if (!v.date) { alert('請選日期'); return false; }
+                    if (isNaN(amt)) { alert('時數請填數字'); return false; }
+                    if (isNaN(fee) || fee < 0) { alert('金額請填 0 或以上的數字'); return false; }
+                    if (!desc) { alert('備註不能空白'); return false; }
+                    if (!desc.includes('加班')) { alert('備註要包含「加班」兩個字，這筆才會留在加班費明細裡'); return false; }
+
+                    item.date = v.date;
+                    item.amount = amt;
+                    item.fee = fee;
+                    item.desc = desc;
+
+                    saveStats();
+                    updateStatsDisplay();
+                    renderCalendar();
+                    openOtFeeModal();
+                }
+            });
+        }
+
+        // --- 讓標題列的夜班費總額也吃到「已修改」的金額 ---
+        (function () {
+            const originalRender = renderCalendar;
+            renderCalendar = function () {
+                originalRender.apply(this, arguments);
+                try {
+                    const monthStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                    let diff = 0;
+                    const ovMap = globalStats.nightFeeOverride || {};
+                    for (let dk in ovMap) {
+                        if (!dk.startsWith(monthStr)) continue;
+                        const base = getRawNightFee(dk);
+                        if (!base) continue;
+                        diff += (ovMap[dk].amount - base.amount);
+                    }
+                    if (diff !== 0) {
+                        const el = document.getElementById('hdrNightFee');
+                        el.innerText = (parseInt(el.innerText) || 0) + diff;
+                    }
+                } catch (e) { console.error(e); }
+            };
+        })();        
         renderCalendar();
     </script>
 </body>
