@@ -1069,7 +1069,9 @@
             renderCalendar();
         }
 
-        function openOtFeeModal() {
+        // Retained for reference during this cleanup; the active implementation is
+        // defined with the editable-fee helpers below.
+        function legacyOpenOtFeeModal() {
             let listEl = document.getElementById('otFeeList');
             let html = "";
             
@@ -1673,7 +1675,7 @@
 
         // ==================== 補課膠囊功能 ====================
         function openMakeupModal() {
-            const todayStr = new Date().toISOString().split('T')[0];
+            const todayStr = formatDateLocal(new Date());
             document.getElementById('makeupAddDate').value = todayStr;
             document.getElementById('makeupAddAmount').value = '';
             document.getElementById('makeupAddSubject').value = '數學';
@@ -1872,7 +1874,7 @@
         function openStatsModal(t) {
             currentStatType = t;
             document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
-            document.getElementById('statDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('statDate').value = formatDateLocal(new Date());
             document.getElementById('statAmount').value = ""; document.getElementById('statDesc').value = "";
             renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
         }
@@ -2012,7 +2014,8 @@
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
         // ==================== 夜班費明細（含刪除按鈕 - 修正版） ====================
-        function openNightFeeModal() {
+        // Superseded by the editable-fee implementation below.
+        function legacyOpenNightFeeModal() {
             let listEl = document.getElementById('nightFeeList');
             let html = "";
             
@@ -2137,7 +2140,7 @@
             document.getElementById('nightFeeModal').style.display = 'none'; 
         }
 
-        function deleteNightFee(id) {
+        function legacyDeleteNightFee(id) {
             if (!confirm("確定要刪除這筆夜班費紀錄嗎？")) return;
             
             // 從 globalStats.nightFee 中刪除
@@ -3164,3 +3167,4 @@
     </script>
 </body>
 </html>
+
