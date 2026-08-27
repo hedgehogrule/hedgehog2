@@ -1139,8 +1139,28 @@
         }
 
         // ==================== 更新頂部顯示 ====================
+        // 時數採每月結算：本月起始結餘承接所有前月紀錄，再加上本月異動。
+        function getMonthBoundary() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+            const nextMonth = new Date(year, month + 1, 1);
+            const nextMonthStart = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+            return { monthStart, nextMonthStart };
+        }
+
+        function getHoursMonthSummary() {
+            const { monthStart, nextMonthStart } = getMonthBoundary();
+            const records = (globalStats.hours || []).filter(item => item.date >= monthStart && item.date < nextMonthStart);
+            const openingBalance = (globalStats.hours || [])
+                .filter(item => item.date < monthStart)
+                .reduce((sum, item) => sum + item.amount, 0);
+            const monthChange = records.reduce((sum, item) => sum + item.amount, 0);
+            return { records, openingBalance, monthChange, closingBalance: openingBalance + monthChange };
+        }
+
         function updateStatsDisplay() {
-            document.getElementById('hdrHours').innerText = globalStats.hours.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('hdrHours').innerText = getHoursMonthSummary().closingBalance;
             document.getElementById('hdrAL').innerText = globalStats.annualLeave.reduce((s, i) => s + i.amount, 0);
             
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
@@ -1873,29 +1893,34 @@
 
         function openStatsModal(t) {
             currentStatType = t;
-            document.getElementById('statsModalTitle').innerText = t === 'hours' ? "時數明細紀錄" : "年休明細紀錄";
-            document.getElementById('statDate').value = formatDateLocal(new Date());
+            const monthLabel = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月`;
+            document.getElementById('statsModalTitle').innerText = t === 'hours' ? `${monthLabel} 時數月結明細` : "年休明細紀錄";
+            document.getElementById('statDate').value = formatDateLocal(currentDate);
             document.getElementById('statAmount').value = ""; document.getElementById('statDesc').value = "";
             renderStatsList(); document.getElementById('statsModal').style.display = 'flex';
         }
 
         // ==================== renderStatsList ====================
         function renderStatsList() {
-            let data = globalStats[currentStatType] || [];
+            const hoursSummary = currentStatType === 'hours' ? getHoursMonthSummary() : null;
+            let data = hoursSummary ? [...hoursSummary.records] : [...(globalStats[currentStatType] || [])];
             data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
             
-            let balance = data.reduce((s, i) => s + i.amount, 0);
+            let balance = hoursSummary ? hoursSummary.closingBalance : data.reduce((s, i) => s + i.amount, 0);
             document.getElementById('statsModalBalance').innerText = balance;
             
             let sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
-            let runningBalance = 0;
+            let runningBalance = hoursSummary ? hoursSummary.openingBalance : 0;
             let balanceMap = {};
             sortedAsc.forEach(item => {
                 runningBalance += item.amount;
                 balanceMap[item.id] = runningBalance;
             });
             
-            let html = "";
+            let html = hoursSummary ? `
+                <div style="display:flex; justify-content:space-between; border-bottom:1px dashed #ddd; padding:0 0 8px; margin-bottom:4px; color:#7a6baf; font-size:12px; font-weight:800;">
+                    <span>承接上月結餘</span><span>${hoursSummary.openingBalance}</span>
+                </div>` : "";
             data.forEach(item => {
                 let isPos = item.amount >= 0;
                 let sign = isPos ? '+' : '';
@@ -1918,7 +1943,8 @@
                         </div>
                     </div>`;
             });
-            document.getElementById('statsList').innerHTML = html || "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>目前無紀錄</div>";
+            const emptyMessage = "<div style='text-align:center; color:#aaa; font-size:12px; margin-top:10px; font-weight:700;'>本月無紀錄</div>";
+            document.getElementById('statsList').innerHTML = html + (data.length ? "" : emptyMessage);
         }
 
         // ==================== 編輯統計紀錄功能 ====================
