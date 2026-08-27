@@ -1023,6 +1023,7 @@
             
             let record = {
                 id: "st_" + Date.now(),
+                createdAt: Date.now(),
                 date: selectedDateString,
                 amount: amountToSave,
                 desc: currentQuickStatAct
@@ -1631,6 +1632,7 @@
                 if (!isFromQuick) {
                     globalStats.annualLeave.push({
                         id: "st_" + Date.now(),
+                        createdAt: Date.now(),
                         date: selectedDateString,
                         amount: -8,
                         desc: "年休 (排班自動扣除)"
@@ -1641,6 +1643,7 @@
             else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
                 globalStats.annualLeave.push({
                     id: "st_" + Date.now(),
+                    createdAt: Date.now(),
                     date: selectedDateString,
                     amount: +8,
                     desc: "取消年休 (自動加回)"
@@ -1901,15 +1904,27 @@
         }
 
         // ==================== renderStatsList ====================
+        // 年休依建立順序扣除；舊資料沒有 createdAt 時，從原本的 st_時間戳識別碼還原順序。
+        function getRecordCreatedAt(item) {
+            if (item.createdAt) return item.createdAt;
+            const match = String(item.id || '').match(/^st_(\d+)/);
+            return match ? Number(match[1]) : 0;
+        }
+
         function renderStatsList() {
             const hoursSummary = currentStatType === 'hours' ? getHoursMonthSummary() : null;
             let data = hoursSummary ? [...hoursSummary.records] : [...(globalStats[currentStatType] || [])];
-            data.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+            const sortByInputOrder = currentStatType === 'annualLeave';
+            data.sort((a, b) => sortByInputOrder
+                ? getRecordCreatedAt(a) - getRecordCreatedAt(b)
+                : new Date(b.date) - new Date(a.date));
             
             let balance = hoursSummary ? hoursSummary.closingBalance : data.reduce((s, i) => s + i.amount, 0);
             document.getElementById('statsModalBalance').innerText = balance;
             
-            let sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let sortedAsc = [...data].sort((a, b) => sortByInputOrder
+                ? getRecordCreatedAt(a) - getRecordCreatedAt(b)
+                : new Date(a.date) - new Date(b.date));
             let runningBalance = hoursSummary ? hoursSummary.openingBalance : 0;
             let balanceMap = {};
             sortedAsc.forEach(item => {
@@ -2024,7 +2039,7 @@
         function saveManualStat() {
             let d = document.getElementById('statDate').value, a = parseFloat(document.getElementById('statAmount').value);
             if(!d || isNaN(a)) return;
-            globalStats[currentStatType].push({ id: "st_"+Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
+            globalStats[currentStatType].push({ id: "st_"+Date.now(), createdAt: Date.now(), date: d, desc: document.getElementById('statDesc').value||"手動調整", amount: a });
             localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); renderStatsList();
         }
