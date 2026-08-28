@@ -54,8 +54,6 @@
         .stat-box.ot-fee { border-color: #fca5a5; color: #dc2626; }
         .stat-box.ot-fee span { color: #dc2626; }
 
-        .stat-box.makeup { border-color: #9b9bff; color: #4a4aff; }
-        .stat-box.makeup span { color: #4a4aff; }
         
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 255, 255, 0.65); border-radius: 6px; margin: 0 3px 3px 3px; color: #666; text-align: center; font-size: 11px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .weekdays div { padding: 4px 0; }
@@ -104,7 +102,6 @@
         .badge-ot { background: #fff0f0; color: #dc2626; border: 1px solid #fca5a5; }
         .badge-take { background: #eef5ff; color: #5b9bd5; border: 1px solid #b8daff; }
         .badge-al { background: #eafaf1; color: #3ba377; border: 1px solid #c3e6cb; }
-        .badge-makeup { background: #f0f0ff; color: #4a4aff; border: 1px solid #b0b0ff; }
         
         .top-tags-wrap, .bottom-tags-wrap { font-family: 'Helvetica Neue', Arial, sans-serif; }
         
@@ -146,7 +143,6 @@
         .quick-btn-green { background: #5ece9d; color: #ffffff; border: 1.5px solid #5ece9d; }
         .quick-btn-off { background: #b6a4e3; color: #ffffff; border: 1.5px solid #b6a4e3; }
         .quick-btn-clear { background: #fff5f5; color: #ff6b6b; border: 1.5px solid #ffcccc; }
-        .quick-btn-makeup { background: #b0b0ff; color: #ffffff; border: 1.5px solid #b0b0ff; }
         
         .color-picker-options { display: flex; gap: 8px; margin-top: 4px; }
         .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 800; color: #ffffff !important; text-shadow: 0px 1px 3px rgba(0,0,0,0.6); font-family: inherit; }
@@ -174,107 +170,6 @@
         .husband-off-bg .date-box { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border: 2px solid #c3b3ef; border-radius: 50%; color: #5c439c; font-weight: 900; background: rgba(195, 179, 239, 0.15); }
         .event-item.completed { opacity: 0.35 !important; filter: grayscale(30%); } 
         
-        .makeup-quick-add {
-            background: #f5f5ff;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px dashed #b0b0ff;
-        }
-        .makeup-quick-add .input-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .makeup-quick-add .input-row input,
-        .makeup-quick-add .input-row select {
-            flex: 1;
-            min-width: 70px;
-            padding: 8px;
-            font-size: 14px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-family: inherit;
-            background: #fff;
-        }
-        .makeup-quick-add .input-row .btn-small {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        .btn-add-makeup { background: #4a4aff; color: white; }
-        .btn-add-makeup:active { transform: scale(0.95); }
-        
-        .subject-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            color: white;
-            margin-right: 4px;
-        }
-        .subject-math { background: #e74c3c; }
-        .subject-english { background: #3498db; }
-        .subject-physics { background: #2ecc71; }
-        .subject-chemistry { background: #9b59b6; }
-        .subject-other { background: #95a5a6; }
-        
-        .makeup-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
-        }
-        .makeup-item .info {
-            flex: 1;
-        }
-        .makeup-item .info .date-text {
-            font-size: 12px;
-            color: #999;
-            font-weight: 700;
-        }
-        .makeup-item .info .desc-text {
-            font-size: 14px;
-            font-weight: 900;
-            color: #555;
-        }
-        .makeup-item .amount-display {
-            font-weight: 900;
-            font-size: 16px;
-            color: #4a4aff;
-            margin-right: 12px;
-        }
-        .makeup-item .delete-btn {
-            background: none;
-            border: none;
-            color: #ffcccc;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 16px;
-            padding: 4px 8px;
-        }
-        .makeup-item .delete-btn:active { color: #ff6b6b; }
-        .makeup-empty {
-            text-align: center;
-            color: #aaa;
-            font-size: 13px;
-            font-weight: 900;
-            margin-top: 10px;
-        }
-        .makeup-subject-filter {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
         .filter-btn {
             padding: 4px 12px;
             border-radius: 12px;
@@ -432,7 +327,6 @@
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
                 <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
                 <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
-                <button class="today-btn small-btn" style="color:#4a4aff !important; border-color:#b0b0ff !important; background:#fff !important;" onclick="openMakeupModal()">📚 補課 <span id="hdrMakeupTotal">0</span></button>
             </div>
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
@@ -478,7 +372,6 @@
         <div class="modal-content">
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
                 <h3 id="modalTitle" style="margin:0;"></h3>
-                <button class="shift-action-btn" style="color:#4a4aff; background:#e0e0ff; border-color:#b0b0ff; font-size:11px; padding:4px 10px;" onclick="openQuickMakeupPrompt()">📚 加時補課</button>
             </div>
             <div id="modalSubtitle" style="text-align:center; font-size:12px; color:#888; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px; font-weight: bold;"></div>
             
@@ -566,17 +459,6 @@
         </div>
     </div>
 
-    <div class="modal" id="quickMakeupModal" style="z-index: 40;">
-        <div class="modal-content" style="max-width: 280px;">
-            <h3 style="margin-bottom: 15px;">📚 加時補課</h3>
-            <input type="number" id="quickMakeupAmount" placeholder="請輸入小時數 (例: 0.5, 1)" step="0.5" min="0" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;">
-            <div class="btn-row" style="margin-top: 20px;">
-                <button class="btn" style="background:#f1f1f1; color:#666;" onclick="closeQuickMakeupModal()">取消</button>
-                <button class="btn" style="background:#4a4aff; color:white;" onclick="confirmQuickMakeup()">確認</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal" id="statsModal" style="z-index: 30;">
         <div class="modal-content">
             <h3 id="statsModalTitle">明細紀錄</h3>
@@ -610,48 +492,6 @@
             <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: $<span id="otFeeTotal" style="font-size:28px; color:#dc2626; margin-left:5px;">0</span></div>
             <div id="otFeeList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeOtFeeModal()">關閉</button>
-        </div>
-    </div>
-
-    <div class="modal" id="makeupModal" style="z-index: 30;">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <h3 style="margin: 0; font-size: 19px; font-weight: bold; color: #444;">📚 補課膠囊</h3>
-                <span style="font-size: 14px; color: #888;">本月總計</span>
-            </div>
-            <div style="text-align:center; margin-bottom: 10px; font-weight:bold; color:#4a4aff; font-size: 28px;" id="makeupTotalDisplay">0 小時</div>
-            
-            <div class="subject-summary" id="subjectSummary"></div>
-            
-            <div class="makeup-quick-add">
-                <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 8px;">✏️ 新增補課時數</div>
-                <div class="input-row">
-                    <input type="number" id="makeupAddAmount" placeholder="小時" step="0.5" min="0" style="flex: 0.8; min-width: 60px;">
-                    <select id="makeupAddSubject" style="flex: 1; min-width: 80px;">
-                        <option value="數學">📐 數學</option>
-                        <option value="英文">🔤 英文</option>
-                        <option value="理化">⚗️ 理化</option>
-                        <option value="化學">🧪 化學</option>
-                        <option value="其他">📋 其他</option>
-                    </select>
-                    <input type="date" id="makeupAddDate" style="flex: 1; min-width: 90px;">
-                    <button class="btn-small btn-add-makeup" onclick="addMakeupRecord()">➕ 新增</button>
-                </div>
-                <div style="font-size: 11px; color: #999; margin-top: 6px;">💡 選擇科目分類，方便統計各科補課時數</div>
-            </div>
-            
-            <div style="font-weight: bold; color: #666; font-size: 13px; margin-bottom: 6px;">📋 本月補課紀錄</div>
-            <div class="makeup-subject-filter">
-                <button class="filter-btn active" data-filter="all" onclick="setMakeupFilter('all')">全部</button>
-                <button class="filter-btn" data-filter="數學" onclick="setMakeupFilter('數學')">📐 數學</button>
-                <button class="filter-btn" data-filter="英文" onclick="setMakeupFilter('英文')">🔤 英文</button>
-                <button class="filter-btn" data-filter="理化" onclick="setMakeupFilter('理化')">⚗️ 理化</button>
-                <button class="filter-btn" data-filter="化學" onclick="setMakeupFilter('化學')">🧪 化學</button>
-                <button class="filter-btn" data-filter="其他" onclick="setMakeupFilter('其他')">📋 其他</button>
-            </div>
-            <div id="makeupList" style="max-height: 35vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 8px 12px; background: #fafafa;"></div>
-            
-            <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeMakeupModal()">關閉</button>
         </div>
     </div>
 
@@ -884,7 +724,6 @@
         let currentStatType = 'hours';
         let currentMonthNightFees = []; 
         let currentMonthOtFees = []; 
-        let currentMonthMakeup = []; 
         let currentQuickStatAct = '';
         let currentEditingEventId = null;
 
@@ -896,7 +735,6 @@
         let isBatchMode = false;
         let batchSelectedDates = new Set();
 
-        let makeupFilter = 'all';
         let tempCompletedMonths = [];
 
         // ==================== generateDayTags ====================
@@ -1167,11 +1005,6 @@
             const totalOtFee = globalStats.hours.reduce((s, i) => s + (i.fee || 0), 0);
             document.getElementById('hdrOtFee').innerText = totalOtFee;
 
-            const makeupTotal = globalStats.makeup ? globalStats.makeup.reduce((s, i) => s + i.amount, 0) : 0;
-            const hdrMakeupSpan = document.getElementById('hdrMakeupTotal');
-            if (hdrMakeupSpan) {
-                hdrMakeupSpan.innerText = makeupTotal;
-            }
         }
 
         // ==================== 班表相關 ====================
@@ -1425,8 +1258,6 @@
                 currentMonthNightFees = [];
                 let monthlyOtPay = 0; 
                 currentMonthOtFees = []; 
-                let monthlyMakeup = 0;
-                currentMonthMakeup = [];
 
                 weeks.forEach(week => {
                     week.forEach((slot, dIdx) => {
@@ -1462,14 +1293,6 @@
                                 monthlyNightFee += dailyFee;
                                 currentMonthNightFees.push({ date: dateKey, desc: feeDescs.join(', '), amount: dailyFee });
                             }
-                        }
-
-                        if (slot.type === 'current') {
-                            const makeupData = globalStats.makeup ? globalStats.makeup.filter(item => item.date === dateKey) : [];
-                            makeupData.forEach(item => {
-                                monthlyMakeup += item.amount;
-                                currentMonthMakeup.push({ date: dateKey, desc: item.subject ? `${item.subject}補課` : '加時補課', amount: item.amount });
-                            });
                         }
 
                         let hasAllowance = (globalStats.nightFee || []).some(item => item.date === dateKey);
@@ -1578,13 +1401,6 @@
                 document.getElementById('hdrNightFee').innerText = monthlyNightFee;
                 document.getElementById('hdrOtFee').innerText = monthlyOtPay;
                
-                const makeupBtn = document.querySelector('.header-btn-row .today-btn.small-btn');
-                if (makeupBtn) {
-                    const monthMakeupTotal = globalStats.makeup ? 
-                        globalStats.makeup.filter(item => item.date.startsWith(monthStr))
-                            .reduce((s, i) => s + i.amount, 0) : 0;
-                    makeupBtn.innerHTML = `📚 補課 ${monthMakeupTotal}`;
-                }
             } catch (error) { console.error(error); }
         }
 
