@@ -1732,7 +1732,7 @@
             let data = hoursSummary ? [...hoursSummary.records] : [...(globalStats[currentStatType] || [])];
             const sortByInputOrder = currentStatType === 'annualLeave';
             data.sort((a, b) => sortByInputOrder
-                ? getRecordCreatedAt(a) - getRecordCreatedAt(b)
+                ? getRecordCreatedAt(b) - getRecordCreatedAt(a)
                 : new Date(b.date) - new Date(a.date));
             
             let balance = hoursSummary ? hoursSummary.closingBalance : data.reduce((s, i) => s + i.amount, 0);
