@@ -836,15 +836,18 @@
             renderSweatGiftList();
         }
 
+        const SWEAT_GIFT_NAME_COLORS = ['#c9971f', '#278653', '#7a6baf', '#3f7fd0'];
+
         function renderSweatGiftList() {
             const list = document.getElementById('sweatGiftList');
             const weeks = getSweatGiftWeeks();
             list.innerHTML = weeks.map(week => {
                 const monthText = `${week.start.getMonth() + 1}/${week.start.getDate()} ～ ${week.end.getMonth() + 1}/${week.end.getDate()}`;
-                const rows = sweatGiftData.accounts.map(account => {
+                const rows = sweatGiftData.accounts.map((account, idx) => {
                     const checked = !!sweatGiftData.completed[week.key]?.[account.id];
+                    const nameColor = SWEAT_GIFT_NAME_COLORS[idx] || '#555';
                     return `<label style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 2px; border-top:1px solid #edf4ef; cursor:pointer;">
-                        <button onclick="event.preventDefault(); event.stopPropagation(); renameSweatGiftAccount('${account.id}')" style="background:none; border:none; padding:0; color:#555; font:inherit; font-weight:800; text-align:left; cursor:pointer;">${escapeSweatGiftText(account.name)} ✎</button>
+                        <button onclick="event.preventDefault(); event.stopPropagation(); renameSweatGiftAccount('${account.id}')" style="background:none; border:none; padding:0; color:${nameColor}; font:inherit; font-weight:800; text-align:left; cursor:pointer;">${escapeSweatGiftText(account.name)} ✎</button>
                         <span style="display:flex; align-items:center; gap:5px; color:${checked ? '#278653' : '#999'}; font-size:12px; font-weight:800; white-space:nowrap;">已完成
                             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSweatGiftComplete('${week.key}', '${account.id}', this.checked)" style="width:18px; height:18px; accent-color:#48a96e;">
                         </span>
