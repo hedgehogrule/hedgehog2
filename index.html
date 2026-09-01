@@ -1729,7 +1729,7 @@
         }
 
         function markHoursReconciled(id) {
-            globalStats.hoursReconciliationId = id;
+            globalStats.hoursReconciliationId = globalStats.hoursReconciliationId === id ? null : id;
             saveStats();
             renderStatsList();
         }
@@ -1773,7 +1773,6 @@
             let runningBalance = hoursSummary ? hoursSummary.openingBalance : 0;
             let balanceMap = {};
             const reconciledId = currentStatType === 'hours' ? globalStats.hoursReconciliationId : null;
-            const reconciledRecord = reconciledId ? (globalStats.hours || []).find(item => item.id === reconciledId) : null;
             sortedAsc.forEach(item => {
                 runningBalance += item.amount;
                 balanceMap[item.id] = runningBalance;
@@ -1783,19 +1782,13 @@
                 <div style="display:flex; justify-content:space-between; border-bottom:1px dashed #ddd; padding:0 0 8px; margin-bottom:4px; color:#7a6baf; font-size:12px; font-weight:800;">
                     <span>承接上月結餘</span><span>${hoursSummary.openingBalance}</span>
                 </div>` : "";
-            if (hoursSummary && reconciledRecord) {
-                html += `<div style="display:flex; justify-content:space-between; gap:8px; align-items:center; background:#eefaf3; border:1px solid #b7e3c8; border-radius:7px; padding:6px 8px; margin:7px 0; color:#278653; font-size:11px; font-weight:800;">
-                    <span>✓ 已核對至 ${reconciledRecord.date}｜${reconciledRecord.desc}</span>
-                    <button onclick="clearHoursReconciliation()" style="border:none; background:none; color:#278653; font:inherit; cursor:pointer; padding:0; white-space:nowrap;">清除</button>
-                </div>`;
-            }
             data.forEach(item => {
                 let isPos = item.amount >= 0;
                 let sign = isPos ? '+' : '';
                 let remain = balanceMap[item.id];
                 let remainColor = remain >= 0 ? '#3ba377' : '#ff6b6b';
                 let reconciliationIndicator = currentStatType === 'hours' && item.id === reconciledId
-                    ? `<span style="color:#278653; font-weight:900; font-size:11px; white-space:nowrap;">☑ 已核對</span>`
+                    ? `<span style="background:#48a96e; color:#fff; border-radius:12px; padding:3px 7px; font-weight:900; font-size:11px; white-space:nowrap;">☑ 已核對</span>`
                     : '';
                 let pressHandlers = currentStatType === 'hours'
                     ? `onpointerdown="startHoursReconciliationPress(event, '${item.id}')" onpointerup="cancelHoursReconciliationPress()" onpointerleave="cancelHoursReconciliationPress()" onpointercancel="cancelHoursReconciliationPress()" oncontextmenu="return false;"`
