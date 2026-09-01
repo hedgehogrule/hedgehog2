@@ -325,6 +325,7 @@
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
                 <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
                 <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
+                <button class="today-btn" style="color:#278653 !important; border-color:#8ed1a7 !important; background:#fff !important;" onclick="openSweatGiftModal()">💦 揮汗有禮</button>
                 <button class="today-btn search-btn" onclick="openSearchModal()">🔍 搜尋</button>
             </div>
             <div class="header-stats">
@@ -364,6 +365,17 @@
                     <div class="no-result">💡 可搜尋行程名稱、日期（如 2026-08）或班別（如 D、E1）</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sweatGiftModal" style="z-index: 50;">
+        <div class="modal-content" style="padding:15px 15px 30px; max-width:520px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h3 style="margin:0; font-size:19px; color:#278653;">💦 揮汗有禮</h3>
+                <button onclick="closeSweatGiftModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
+            </div>
+            <div style="font-size:12px; color:#777; margin-bottom:12px; line-height:1.5;">每週以星期一至星期日計算；勾選代表該帳號本週已完成。點帳號名稱可修改。</div>
+            <div id="sweatGiftList"></div>
         </div>
     </div>
 
@@ -736,6 +748,96 @@
         let batchSelectedDates = new Set();
 
         let tempCompletedMonths = [];
+
+        // ==================== 揮汗有禮 ====================
+        const sweatGiftDefaultAccounts = [
+            { id: 'sweat_1', name: '帳號 1' }, { id: 'sweat_2', name: '帳號 2' },
+            { id: 'sweat_3', name: '帳號 3' }, { id: 'sweat_4', name: '帳號 4' }
+        ];
+        let sweatGiftData = { accounts: sweatGiftDefaultAccounts.map(account => ({ ...account })), completed: {} };
+        try {
+            const savedSweatGift = JSON.parse(localStorage.getItem('sweatGiftTracker1'));
+            if (savedSweatGift) {
+                sweatGiftData.accounts = sweatGiftDefaultAccounts.map((account, index) => ({
+                    id: account.id,
+                    name: (savedSweatGift.accounts || [])[index]?.name || account.name
+                }));
+                sweatGiftData.completed = savedSweatGift.completed || {};
+            }
+        } catch (e) {}
+
+        function saveSweatGiftData() {
+            localStorage.setItem('sweatGiftTracker1', JSON.stringify(sweatGiftData));
+        }
+
+        function escapeSweatGiftText(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getSweatGiftWeeks() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const first = new Date(year, month, 1);
+            const last = new Date(year, month + 1, 0);
+            const firstMonday = new Date(year, month, 1 - ((first.getDay() + 6) % 7));
+            const lastSunday = new Date(year, month, last.getDate() + ((7 - last.getDay()) % 7));
+            const weeks = [];
+            for (let date = new Date(firstMonday); date <= lastSunday; date.setDate(date.getDate() + 7)) {
+                const start = new Date(date);
+                const end = new Date(date);
+                end.setDate(end.getDate() + 6);
+                weeks.push({ key: formatDateLocal(start), start, end });
+            }
+            return weeks;
+        }
+
+        function openSweatGiftModal() {
+            renderSweatGiftList();
+            document.getElementById('sweatGiftModal').style.display = 'flex';
+        }
+
+        function closeSweatGiftModal() {
+            document.getElementById('sweatGiftModal').style.display = 'none';
+        }
+
+        function toggleSweatGiftComplete(weekKey, accountId, checked) {
+            if (!sweatGiftData.completed[weekKey]) sweatGiftData.completed[weekKey] = {};
+            sweatGiftData.completed[weekKey][accountId] = checked;
+            saveSweatGiftData();
+            renderSweatGiftList();
+        }
+
+        function renameSweatGiftAccount(accountId) {
+            const account = sweatGiftData.accounts.find(item => item.id === accountId);
+            if (!account) return;
+            const name = prompt('帳號名稱', account.name);
+            if (name === null) return;
+            account.name = name.trim() || account.name;
+            saveSweatGiftData();
+            renderSweatGiftList();
+        }
+
+        function renderSweatGiftList() {
+            const list = document.getElementById('sweatGiftList');
+            const weeks = getSweatGiftWeeks();
+            list.innerHTML = weeks.map(week => {
+                const monthText = `${week.start.getMonth() + 1}/${week.start.getDate()} ～ ${week.end.getMonth() + 1}/${week.end.getDate()}`;
+                const rows = sweatGiftData.accounts.map(account => {
+                    const checked = !!sweatGiftData.completed[week.key]?.[account.id];
+                    return `<label style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 2px; border-top:1px solid #edf4ef; cursor:pointer;">
+                        <button onclick="event.preventDefault(); event.stopPropagation(); renameSweatGiftAccount('${account.id}')" style="background:none; border:none; padding:0; color:#555; font:inherit; font-weight:800; text-align:left; cursor:pointer;">${escapeSweatGiftText(account.name)} ✎</button>
+                        <span style="display:flex; align-items:center; gap:5px; color:${checked ? '#278653' : '#999'}; font-size:12px; font-weight:800; white-space:nowrap;">已完成
+                            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSweatGiftComplete('${week.key}', '${account.id}', this.checked)" style="width:18px; height:18px; accent-color:#48a96e;">
+                        </span>
+                    </label>`;
+                }).join('');
+                return `<section style="background:#fff; border:1.5px solid #c8e8d3; border-radius:12px; padding:10px 12px; margin-bottom:10px; box-shadow:0 2px 5px rgba(39,134,83,.06);">
+                    <div style="color:#278653; font-size:13px; font-weight:900; margin-bottom:5px;">第 ${formatDateLocal(week.start)} 週 <span style="font-weight:700; color:#777;">(${monthText})</span></div>${rows}
+                </section>`;
+            }).join('');
+        }
 
         // ==================== generateDayTags ====================
         function generateDayTags(finalShift, hasAllowance) {
