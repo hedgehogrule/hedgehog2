@@ -386,10 +386,12 @@
                 <h3 style="margin:0; font-size:19px; color:#7a6baf;">📝 短期記事</h3>
                 <button onclick="closeShortNotesModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
             </div>
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
                 <input id="shortNoteInput" type="text" maxlength="120" placeholder="輸入一則短期記事…" onkeydown="if(event.key === 'Enter') addShortNote()" style="flex:1; min-width:0; padding:10px; border:2px solid #ddd; border-radius:8px; font:inherit;">
                 <button onclick="addShortNote()" style="border:none; border-radius:8px; padding:8px 12px; background:#7a6baf; color:#fff; font:inherit; font-weight:800; cursor:pointer;">新增</button>
             </div>
+            <div id="shortNoteColorPicker" style="display:flex; gap:6px; align-items:center; margin-bottom:12px; flex-wrap:wrap;"></div>
+            <div id="shortNotesFilter" style="display:flex; gap:6px; align-items:center; margin-bottom:10px; flex-wrap:wrap;"></div>
             <div id="shortNotesList"></div>
         </div>
     </div>
@@ -855,8 +857,22 @@
         }
 
         // ==================== 短期記事 ====================
+        const SHORT_NOTE_COLORS = [
+            { key: 'default', name: '無', dot: '#c7c7d1', bar: '#e4e4ec', bg: '#fafafa' },
+            { key: 'pink',    name: '粉', dot: '#ff9ec4', bar: '#ff9ec4', bg: '#fff0f6' },
+            { key: 'purple',  name: '紫', dot: '#b8a4e8', bar: '#b8a4e8', bg: '#f3eefc' },
+            { key: 'blue',    name: '藍', dot: '#8fc4f0', bar: '#8fc4f0', bg: '#eef6fd' },
+            { key: 'green',   name: '綠', dot: '#8ed9b4', bar: '#8ed9b4', bg: '#ecfaf3' },
+            { key: 'yellow',  name: '黃', dot: '#f2c94c', bar: '#f2c94c', bg: '#fff9e8' },
+        ];
+        function shortNoteColor(key) {
+            return SHORT_NOTE_COLORS.find(c => c.key === key) || SHORT_NOTE_COLORS[0];
+        }
+
         let shortNotes = [];
         try { shortNotes = JSON.parse(localStorage.getItem('shortNotes1')) || []; } catch (e) {}
+        let selectedNoteColor = 'default';
+        let shortNoteFilter = 'all';
 
         function saveShortNotes() {
             localStorage.setItem('shortNotes1', JSON.stringify(shortNotes));
@@ -864,6 +880,9 @@
 
         function openShortNotesModal() {
             document.getElementById('shortNoteInput').value = '';
+            selectedNoteColor = 'default';
+            shortNoteFilter = 'all';
+            renderShortNoteColorPicker();
             renderShortNotes();
             document.getElementById('shortNotesModal').style.display = 'flex';
         }
@@ -872,11 +891,28 @@
             document.getElementById('shortNotesModal').style.display = 'none';
         }
 
+        function renderShortNoteColorPicker() {
+            const wrap = document.getElementById('shortNoteColorPicker');
+            wrap.innerHTML = '<span style="font-size:12px; color:#999; font-weight:700;">顏色</span>' +
+                SHORT_NOTE_COLORS.map(c => {
+                    const on = c.key === selectedNoteColor;
+                    return `<button type="button" onclick="setNewNoteColor('${c.key}')" title="${c.name}"
+                        style="width:24px; height:24px; border-radius:50%; cursor:pointer; padding:0;
+                        background:${c.dot}; border:2px solid ${on ? '#7a6baf' : 'transparent'};
+                        box-shadow:${on ? '0 0 0 2px #fff inset' : 'none'};"></button>`;
+                }).join('');
+        }
+
+        function setNewNoteColor(key) {
+            selectedNoteColor = key;
+            renderShortNoteColorPicker();
+        }
+
         function addShortNote() {
             const input = document.getElementById('shortNoteInput');
             const text = input.value.trim();
             if (!text) return;
-            shortNotes.unshift({ id: `note_${Date.now()}`, text });
+            shortNotes.unshift({ id: `note_${Date.now()}`, text, color: selectedNoteColor });
             saveShortNotes();
             input.value = '';
             renderShortNotes();
@@ -900,17 +936,56 @@
             renderShortNotes();
         }
 
+        function cycleShortNoteColor(id) {
+            const note = shortNotes.find(item => item.id === id);
+            if (!note) return;
+            const idx = SHORT_NOTE_COLORS.findIndex(c => c.key === (note.color || 'default'));
+            note.color = SHORT_NOTE_COLORS[(idx + 1) % SHORT_NOTE_COLORS.length].key;
+            saveShortNotes();
+            renderShortNotes();
+        }
+
+        function setShortNoteFilter(key) {
+            shortNoteFilter = key;
+            renderShortNotes();
+        }
+
+        function renderShortNotesFilter() {
+            const wrap = document.getElementById('shortNotesFilter');
+            if (shortNotes.length === 0) { wrap.innerHTML = ''; return; }
+            const counts = {};
+            shortNotes.forEach(n => { const k = n.color || 'default'; counts[k] = (counts[k] || 0) + 1; });
+            const chip = (key, label, dot) => {
+                const on = shortNoteFilter === key;
+                return `<button type="button" onclick="setShortNoteFilter('${key}')"
+                    style="display:inline-flex; align-items:center; gap:4px; border:2px solid ${on ? '#7a6baf' : '#e3e3ec'};
+                    background:${on ? '#f3eefc' : '#fff'}; color:#666; border-radius:999px; padding:3px 9px;
+                    font-size:12px; font-weight:800; cursor:pointer;">
+                    ${dot ? `<span style="width:10px; height:10px; border-radius:50%; background:${dot};"></span>` : ''}${label}</button>`;
+            };
+            let html = chip('all', `全部 ${shortNotes.length}`, '');
+            html += SHORT_NOTE_COLORS.filter(c => counts[c.key]).map(c => chip(c.key, `${counts[c.key]}`, c.dot)).join('');
+            wrap.innerHTML = html;
+        }
+
         function renderShortNotes() {
+            renderShortNotesFilter();
             const list = document.getElementById('shortNotesList');
-            if (shortNotes.length === 0) {
-                list.innerHTML = '<div style="text-align:center; color:#aaa; padding:18px 0; font-size:13px; font-weight:700;">目前沒有短期記事</div>';
+            const visible = shortNotes.filter(n => shortNoteFilter === 'all' || (n.color || 'default') === shortNoteFilter);
+            if (visible.length === 0) {
+                const msg = shortNotes.length === 0 ? '目前沒有短期記事' : '此顏色沒有記事';
+                list.innerHTML = `<div style="text-align:center; color:#aaa; padding:18px 0; font-size:13px; font-weight:700;">${msg}</div>`;
                 return;
             }
-            list.innerHTML = shortNotes.map(note => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:10px 2px;">
+            list.innerHTML = visible.map(note => {
+                const c = shortNoteColor(note.color || 'default');
+                return `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; border-left:5px solid ${c.bar}; background:${c.bg}; border-radius:6px; padding:10px 8px; margin-bottom:6px;">
+                <button onclick="cycleShortNoteColor('${note.id}')" title="點一下換顏色" style="flex:none; width:18px; height:18px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px ${c.dot}; background:${c.dot}; cursor:pointer; padding:0;"></button>
                 <span style="flex:1; color:#555; font-size:14px; font-weight:700; white-space:pre-wrap; word-break:break-word;">${escapeSweatGiftText(note.text)}</span>
                 <button onclick="editShortNote('${note.id}')" style="border:none; background:none; color:#7a6baf; font-size:16px; font-weight:900; cursor:pointer; padding:3px 5px;" title="編輯記事">✎</button>
                 <button onclick="deleteShortNote('${note.id}')" style="border:none; background:none; color:#ffaaaa; font-size:17px; font-weight:900; cursor:pointer; padding:3px 6px;" title="刪除記事">✕</button>
-            </div>`).join('');
+            </div>`;
+            }).join('');
         }
 
         // ==================== generateDayTags ====================
