@@ -714,12 +714,12 @@
         let calendarData = {};
         try { calendarData = JSON.parse(localStorage.getItem('myCustomCalendar8')) || {}; } catch(e) {}
         
-        let globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
+        let globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [], hoursReconciliationId: null };
         try { 
             let saved = JSON.parse(localStorage.getItem('myCustomCalendarStats8')) || { hours: [], annualLeave: [], makeup: [] };
-            globalStats = { hours: saved.hours || [], annualLeave: saved.annualLeave || [], makeup: saved.makeup || [], nightFee: saved.nightFee || [] };
+            globalStats = { hours: saved.hours || [], annualLeave: saved.annualLeave || [], makeup: saved.makeup || [], nightFee: saved.nightFee || [], hoursReconciliationId: saved.hoursReconciliationId || null };
         } catch(e) {
-            globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [] };
+            globalStats = { hours: [], annualLeave: [], makeup: [], nightFee: [], hoursReconciliationId: null };
         }
         
         let currentStatType = 'hours';
@@ -1728,6 +1728,18 @@
             return match ? Number(match[1]) : 0;
         }
 
+        function markHoursReconciled(id) {
+            globalStats.hoursReconciliationId = id;
+            saveStats();
+            renderStatsList();
+        }
+
+        function clearHoursReconciliation() {
+            globalStats.hoursReconciliationId = null;
+            saveStats();
+            renderStatsList();
+        }
+
         function renderStatsList() {
             const hoursSummary = currentStatType === 'hours' ? getHoursMonthSummary() : null;
             let data = hoursSummary ? [...hoursSummary.records] : [...(globalStats[currentStatType] || [])];
@@ -1744,6 +1756,8 @@
                 : new Date(a.date) - new Date(b.date));
             let runningBalance = hoursSummary ? hoursSummary.openingBalance : 0;
             let balanceMap = {};
+            const reconciledId = currentStatType === 'hours' ? globalStats.hoursReconciliationId : null;
+            const reconciledRecord = reconciledId ? (globalStats.hours || []).find(item => item.id === reconciledId) : null;
             sortedAsc.forEach(item => {
                 runningBalance += item.amount;
                 balanceMap[item.id] = runningBalance;
@@ -1753,11 +1767,20 @@
                 <div style="display:flex; justify-content:space-between; border-bottom:1px dashed #ddd; padding:0 0 8px; margin-bottom:4px; color:#7a6baf; font-size:12px; font-weight:800;">
                     <span>承接上月結餘</span><span>${hoursSummary.openingBalance}</span>
                 </div>` : "";
+            if (hoursSummary && reconciledRecord) {
+                html += `<div style="display:flex; justify-content:space-between; gap:8px; align-items:center; background:#eefaf3; border:1px solid #b7e3c8; border-radius:7px; padding:6px 8px; margin:7px 0; color:#278653; font-size:11px; font-weight:800;">
+                    <span>✓ 已核對至 ${reconciledRecord.date}｜${reconciledRecord.desc}</span>
+                    <button onclick="clearHoursReconciliation()" style="border:none; background:none; color:#278653; font:inherit; cursor:pointer; padding:0; white-space:nowrap;">清除</button>
+                </div>`;
+            }
             data.forEach(item => {
                 let isPos = item.amount >= 0;
                 let sign = isPos ? '+' : '';
                 let remain = balanceMap[item.id];
                 let remainColor = remain >= 0 ? '#3ba377' : '#ff6b6b';
+                let reconciliationButton = currentStatType === 'hours'
+                    ? `<button onclick="markHoursReconciled('${item.id}')" style="border:1px solid ${item.id === reconciledId ? '#48a96e' : '#b7e3c8'}; background:${item.id === reconciledId ? '#48a96e' : '#fff'}; color:${item.id === reconciledId ? '#fff' : '#278653'}; border-radius:5px; cursor:pointer; font-weight:800; font-size:10px; padding:3px 5px; white-space:nowrap;" title="標記此筆與更早紀錄已核對">${item.id === reconciledId ? '✓ 已核對' : '核對至此'}</button>`
+                    : '';
                 
                 html += `
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:8px 0;">
@@ -1770,6 +1793,7 @@
                                 <span style="color:${isPos?'#3ba377':'#ff6b6b'}; font-weight:900; font-size:14px;">${sign}${item.amount}</span>
                                 <div style="font-size:11px; color:${remainColor}; font-weight:700;">剩餘 ${remain}</div>
                             </div>
+                            ${reconciliationButton}
                             <button onclick="openEditStatModal('${item.id}')" style="background:none; border:none; color:#5b9bd5; cursor:pointer; font-weight:900; font-size:14px; padding:2px 4px;" title="編輯此筆紀錄">✎</button>
                             <button onclick="deleteStat('${item.id}')" style="background:none; border:none; color:#ffcccc; cursor:pointer; font-weight:900; font-size:16px; padding:2px 4px;" title="刪除此筆紀錄">X</button>
                         </div>
@@ -1862,6 +1886,9 @@
         }
 
         function deleteStat(id) {
+            if (currentStatType === 'hours' && globalStats.hoursReconciliationId === id) {
+                globalStats.hoursReconciliationId = null;
+            }
             globalStats[currentStatType] = globalStats[currentStatType].filter(i => i.id !== id);
             localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
             updateStatsDisplay(); 
