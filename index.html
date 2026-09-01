@@ -637,6 +637,7 @@
             ["D11", "D11", "D11", "D11", "D11", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D12", "D12", "D12", "D12", "D12", "OFF", "OFF"], ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D", "D", "D", "D", "D", "OFF", "OFF"],         ["D", "D", "D", "D", "D", "OFF", "OFF"],
+            ["D", "D", "D", "D", "D", "OFF", "OFF"],
             ["D", "D", "D", "D", "D", "OFF", "OFF"]
         ];
 
@@ -683,8 +684,8 @@
             let targetMon = new Date(y, m, d + diff);
             let ref = new Date(2026, 6, 6); 
             let weeksDiff = Math.floor(Math.round((targetMon - ref) / 864e5) / 7);
-            let idx = (13 + weeksDiff) % 35;
-            if (idx < 0) idx += 35; 
+            let idx = (13 + weeksDiff) % shiftPatterns.length;
+            if (idx < 0) idx += shiftPatterns.length;
             return { shift: shiftPatterns[idx][dayW === 0 ? 6 : dayW - 1], weekNumber: idx + 1 };
         }
 
