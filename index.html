@@ -889,6 +889,17 @@
             renderShortNotes();
         }
 
+        function editShortNote(id) {
+            const note = shortNotes.find(item => item.id === id);
+            if (!note) return;
+            const text = prompt('修改短期記事', note.text);
+            if (text === null) return;
+            if (!text.trim()) return;
+            note.text = text.trim();
+            saveShortNotes();
+            renderShortNotes();
+        }
+
         function renderShortNotes() {
             const list = document.getElementById('shortNotesList');
             if (shortNotes.length === 0) {
@@ -897,6 +908,7 @@
             }
             list.innerHTML = shortNotes.map(note => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:10px 2px;">
                 <span style="flex:1; color:#555; font-size:14px; font-weight:700; white-space:pre-wrap; word-break:break-word;">${escapeSweatGiftText(note.text)}</span>
+                <button onclick="editShortNote('${note.id}')" style="border:none; background:none; color:#7a6baf; font-size:16px; font-weight:900; cursor:pointer; padding:3px 5px;" title="編輯記事">✎</button>
                 <button onclick="deleteShortNote('${note.id}')" style="border:none; background:none; color:#ffaaaa; font-size:17px; font-weight:900; cursor:pointer; padding:3px 6px;" title="刪除記事">✕</button>
             </div>`).join('');
         }
