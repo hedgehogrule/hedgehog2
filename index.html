@@ -124,6 +124,7 @@
         .shift-xiu { background: #8877c4 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-guo { background: #d9534f !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-off-sm { font-size: 9px !important; padding: 1px 3px !important; }
+        #appendModeBtn.append-on { background: #7a6baf; color: #ffffff; border-color: #7a6baf; }
 
         .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
@@ -420,7 +421,7 @@
                 </div>
                 
                 <div class="quick-section">
-                    <div class="section-title">D 班系列</div>
+                    <div class="section-title">D 班系列<button id="appendModeBtn" type="button" onclick="toggleAppendMode()" style="margin-left:8px; border:1.5px solid #b8a4e8; background:#fff; color:#7a6baf; border-radius:6px; padding:1px 8px; font-size:12px; font-weight:800; cursor:pointer; vertical-align:middle; line-height:1.4;">＋附加</button></div>
                     <div class="quick-options">
                         <button class="quick-btn quick-btn-d" onclick="setShift('D')">D</button>
                         <button class="quick-btn quick-btn-d" onclick="setShift('D1')">D1</button>
@@ -1352,7 +1353,26 @@
             alert(`✅ 已成功標記 ${count} 天為老公休假日！`);
         }
 
-        function setShift(v) { document.getElementById('shiftInput').value = v; }
+        // 「＋附加」模式：開啟時,點班別鈕會加在現有班別後面而非取代
+        let appendMode = false;
+        function toggleAppendMode() {
+            appendMode = !appendMode;
+            const btn = document.getElementById('appendModeBtn');
+            btn.classList.toggle('append-on', appendMode);
+            btn.textContent = appendMode ? '＋附加中' : '＋附加';
+        }
+
+        function setShift(v) {
+            const input = document.getElementById('shiftInput');
+            const cur = input.value.trim();
+            if (appendMode && cur) {
+                if (cur !== v && !cur.split(/\s+/).includes(v)) {
+                    input.value = cur + ' ' + v;
+                }
+            } else {
+                input.value = v;
+            }
+        }
 
         // 「國」為附加標記，不覆蓋原本班別；再按一次可取消
         function toggleShiftGuo() {
@@ -1706,6 +1726,8 @@
                 historyStr = `<span style="font-size: 11px; color: #999; font-weight: normal; margin-left: 8px;">(變更紀錄: ${savedData.shiftHistory.join(' → ')})</span>`;
             }
             document.getElementById('shiftLabel').innerHTML = `班別 ${historyStr}`;
+
+            if (appendMode) toggleAppendMode();
 
             renderEventListInModal();
             document.getElementById('editModal').style.display = 'flex';
