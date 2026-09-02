@@ -120,6 +120,8 @@
         .shift-green { background: #5ece9d; color: white; border: none; }
         .shift-default { background: #e9ecef; color: #555; border: 0.5px solid #ccc; }
         .shift-off { background: #b6a4e3 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
+        .shift-li { background: #4a3a86 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
+        .shift-xiu { background: #8877c4 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
 
         .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
@@ -1009,11 +1011,19 @@
             tokens.forEach(p => {
                 let s = p.toUpperCase();
                 
-                if (s === "例休") { 
-                    bottomHtml += `<div class="shift-badge shift-off">例休</div>`; 
-                    hasBottom = true; 
+                if (s === "例休") {
+                    bottomHtml += `<div class="shift-badge shift-li">例</div><div class="shift-badge shift-xiu">休</div>`;
+                    hasBottom = true;
                 }
-                else if (s === "年休") { 
+                else if (s === "例") {
+                    bottomHtml += `<div class="shift-badge shift-li">例</div>`;
+                    hasBottom = true;
+                }
+                else if (s === "休") {
+                    bottomHtml += `<div class="shift-badge shift-xiu">休</div>`;
+                    hasBottom = true;
+                }
+                else if (s === "年休") {
                     bottomHtml += `<div class="shift-badge shift-off">年休</div>`; 
                     hasBottom = true; 
                 }
