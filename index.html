@@ -123,6 +123,7 @@
         .shift-li { background: #4a3a86 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-xiu { background: #8877c4 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-guo { background: #d9534f !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
+        .shift-off-sm { font-size: 9px !important; padding: 1px 3px !important; }
 
         .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
@@ -1049,8 +1050,8 @@
                     if (hasAllowance) {
                         bottomHtml += `<div class="shift-badge shift-green">${p}</div>`;
                     }
-                    else if (s.includes("OFF")) { 
-                        bottomHtml += `<div class="shift-badge shift-off">${p}</div>`; 
+                    else if (s.includes("OFF")) {
+                        bottomHtml += `<div class="shift-badge shift-off shift-off-sm">${p}</div>`;
                     }
                     else if (s.startsWith("D")) { 
                         bottomHtml += `<div class="shift-badge shift-d">${p}</div>`; 
