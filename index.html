@@ -122,6 +122,7 @@
         .shift-off { background: #b6a4e3 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-li { background: #4a3a86 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
         .shift-xiu { background: #8877c4 !important; color: white !important; border-radius: 6px !important; padding: 1px 4px !important; }
+        .shift-guo { background: #ffffff !important; color: #333 !important; border: 0.5px solid #bbb !important; }
 
         .manual-dot { display: none; position: absolute; top: 3px; right: 3px; width: 4px; height: 4px; background-color: #ff6b6b; border-radius: 50%; }
 
@@ -146,6 +147,7 @@
         .quick-btn-off { background: #b6a4e3; color: #ffffff; border: 1.5px solid #b6a4e3; }
         .quick-btn-li { background: #4a3a86; color: #ffffff; border: 1.5px solid #4a3a86; }
         .quick-btn-xiu { background: #8877c4; color: #ffffff; border: 1.5px solid #8877c4; }
+        .quick-btn-guo { background: #ffffff; color: #333; border: 1.5px solid #999; }
         .quick-btn-clear { background: #fff5f5; color: #ff6b6b; border: 1.5px solid #ffcccc; }
         
         .color-picker-options { display: flex; gap: 8px; margin-top: 4px; }
@@ -438,6 +440,7 @@
                         <button class="quick-btn quick-btn-xiu" onclick="setShift('休')">休</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('OFF')">OFF</button>
                         <button class="quick-btn quick-btn-off" onclick="setShift('年休')">年休</button>
+                        <button class="quick-btn quick-btn-guo" onclick="toggleShiftGuo()">國</button>
                     </div>
                 </div>
 
@@ -1026,6 +1029,10 @@
                     bottomHtml += `<div class="shift-badge shift-xiu">休</div>`;
                     hasBottom = true;
                 }
+                else if (s === "國") {
+                    bottomHtml += `<div class="shift-badge shift-guo">國</div>`;
+                    hasBottom = true;
+                }
                 else if (s === "年休") {
                     bottomHtml += `<div class="shift-badge shift-off">年休</div>`; 
                     hasBottom = true; 
@@ -1345,6 +1352,18 @@
         }
 
         function setShift(v) { document.getElementById('shiftInput').value = v; }
+
+        // 「國」為附加標記，不覆蓋原本班別；再按一次可取消
+        function toggleShiftGuo() {
+            const input = document.getElementById('shiftInput');
+            let tokens = input.value.split(/\s+/).filter(Boolean);
+            if (tokens.includes('國')) {
+                tokens = tokens.filter(t => t !== '國');
+            } else {
+                tokens.push('國');
+            }
+            input.value = tokens.join(' ');
+        }
 
         // ==================== 事件相關 ====================
         function toggleCompleteThisMonth() {
