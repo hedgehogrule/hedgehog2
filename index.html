@@ -2517,7 +2517,8 @@
             calendarData[sD].events.push(evObj);
             
             localStorage.setItem('myCustomCalendar8', JSON.stringify(calendarData));
-            renderEventListInModal(); renderCalendar(); closeEventDetailModal();
+            closeEventDetailModal();
+            saveShiftOnly();   // 一併存下班別並關閉編輯視窗,不用再按一次「儲存變更」
         }
 
         async function deleteCurrentEvent() {
