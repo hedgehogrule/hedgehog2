@@ -417,6 +417,7 @@
                 <div style="font-size:12px; font-weight:800; color:#9a6700; margin-bottom:6px;">拍攝／選擇薪資單後自動辨識；請確認金額再儲存。</div>
                 <input id="payrollImageInput" type="file" accept="image/*" onchange="recognizePayrollImage(event)" style="width:100%; font:inherit;">
                 <div id="payrollOcrStatus" style="font-size:12px; color:#777; margin-top:6px;"></div>
+                <details id="payrollOcrDetails" style="display:none; margin-top:6px;"><summary style="font-size:12px; color:#7a6baf; cursor:pointer;">查看辨識文字</summary><pre id="payrollOcrText" style="white-space:pre-wrap; word-break:break-word; max-height:140px; overflow:auto; margin:6px 0 0; font-size:10px; color:#666;"></pre></details>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
@@ -1085,6 +1086,7 @@
             ['payrollGross','payrollNet','payrollFixedIncome','payrollGovNight','payrollNightAllowance','payrollOther'].forEach(id => setPayrollField(id, ''));
             document.getElementById('payrollMonth').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
             document.getElementById('payrollImageInput').value = ''; document.getElementById('payrollOcrStatus').innerText = '';
+            document.getElementById('payrollOcrDetails').style.display = 'none';
             renderPayrollRecords(); document.getElementById('payrollModal').style.display = 'flex';
         }
         function parsePayrollText(text) {
@@ -1096,16 +1098,39 @@
                 .map(match => payrollNumber(match[2])).filter(amount => amount > 0 && amount < 5000).reduce((sum, amount) => sum + amount, 0);
             return { month: monthMatch ? `${monthMatch[1]}-${String(monthMatch[2]).padStart(2, '0')}` : '', gross: finalTotal ? payrollNumber(finalTotal[1]) : find('應領薪資合計'), net: finalTotal ? payrollNumber(finalTotal[2]) : find('給付淨額'), fixedIncome: find('薪津') + find('技術津貼') + find('執照費') + find('績效獎金'), govNight: find('夜班獎勵'), nightAllowance, other: 0 };
         }
+        async function preparePayrollImage(file) {
+            const source = await new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = URL.createObjectURL(file); });
+            const scale = Math.min(2, 2200 / Math.max(source.width, source.height));
+            const width = Math.round(source.width * scale), height = Math.round(source.height * scale);
+            const sourceCanvas = document.createElement('canvas'), sourceContext = sourceCanvas.getContext('2d');
+            sourceCanvas.width = width; sourceCanvas.height = height; sourceContext.drawImage(source, 0, 0, width, height);
+            const pixels = sourceContext.getImageData(0, 0, width, height).data;
+            let left = width, top = height, right = 0, bottom = 0;
+            for (let y = 0; y < height; y += 4) for (let x = 0; x < width; x += 4) {
+                const pos = (y * width + x) * 4, brightness = (pixels[pos] + pixels[pos + 1] + pixels[pos + 2]) / 3;
+                if (brightness > 35) { left = Math.min(left, x); right = Math.max(right, x); top = Math.min(top, y); bottom = Math.max(bottom, y); }
+            }
+            if (right <= left || bottom <= top) return sourceCanvas;
+            const pad = 12, cropLeft = Math.max(0, left - pad), cropTop = Math.max(0, top - pad), cropWidth = Math.min(width - cropLeft, right - left + pad * 2), cropHeight = Math.min(height - cropTop, bottom - top + pad * 2);
+            const output = document.createElement('canvas'), context = output.getContext('2d');
+            output.width = cropWidth * 2; output.height = cropHeight * 2;
+            context.filter = 'grayscale(1) contrast(1.7)';
+            context.drawImage(sourceCanvas, cropLeft, cropTop, cropWidth, cropHeight, 0, 0, output.width, output.height);
+            URL.revokeObjectURL(source.src); return output;
+        }
         async function recognizePayrollImage(event) {
             const file = event.target.files[0], status = document.getElementById('payrollOcrStatus'); if (!file) return;
             if (!window.Tesseract) { status.innerText = '辨識工具載入失敗，請手動填入金額。'; return; }
             try {
                 status.innerText = '正在辨識薪資單，請稍候…';
-                const result = await Tesseract.recognize(file, 'chi_tra+eng', { logger: m => { if (m.status === 'recognizing text') status.innerText = `正在辨識薪資單… ${Math.round(m.progress * 100)}%`; }});
+                const preparedImage = await preparePayrollImage(file);
+                const result = await Tesseract.recognize(preparedImage, 'chi_tra+eng', { logger: m => { if (m.status === 'recognizing text') status.innerText = `正在辨識薪資單… ${Math.round(m.progress * 100)}%`; }});
                 const data = parsePayrollText(result.data.text);
+                document.getElementById('payrollOcrText').innerText = result.data.text;
+                document.getElementById('payrollOcrDetails').style.display = 'block';
                 if (data.month) document.getElementById('payrollMonth').value = data.month;
                 setPayrollField('payrollGross', data.gross); setPayrollField('payrollNet', data.net); setPayrollField('payrollFixedIncome', data.fixedIncome); setPayrollField('payrollGovNight', data.govNight); setPayrollField('payrollNightAllowance', data.nightAllowance); setPayrollField('payrollOther', data.other);
-                status.innerText = '辨識完成，請核對金額後再儲存。';
+                status.innerText = data.gross || data.net ? '辨識完成，請核對金額後再儲存。' : '辨識到的欄位不足，請查看辨識文字或改用較清楚的薪資單截圖。';
             } catch (error) { console.error(error); status.innerText = '辨識失敗，請改用手動輸入。'; }
         }
         function savePayrollRecord() {
