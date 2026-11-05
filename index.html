@@ -414,13 +414,13 @@
             <div id="payrollYearSummary" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;"></div>
             <div style="background:#fff8eb; border:1px solid #f5d38d; border-radius:10px; padding:10px; margin-bottom:12px; font-size:12px; color:#9a6700; font-weight:800;">金額採手動輸入。固定收入已自動帶入，不需要每月重填。</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" onchange="loadPayrollMonth()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">固定收入（薪津 38,430＋技術津貼 9,000＋執照費 9,300）<input id="payrollFixedIncome" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">衛福部夜班獎勵<input id="payrollGovNight" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">夜班津貼（約 10 日發）<input id="payrollNightAllowance" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">績效獎金／其他額外收入<input id="payrollOther" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">其他額外收入（每行一筆，如：三節獎金 5000）<textarea id="payrollOtherItems" rows="3" oninput="updatePayrollOtherTotal()" placeholder="績效獎金 26369&#10;三節獎金 5000&#10;講師津貼 1200" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit; resize:vertical;"></textarea><div id="payrollOtherTotal" style="margin-top:3px; color:#7a6baf;">其他收入合計 $0</div></label>
             </div>
             <button onclick="savePayrollRecord()" style="width:100%; border:none; border-radius:9px; padding:10px; margin-top:12px; background:#b45309; color:#fff; font:inherit; font-weight:900; cursor:pointer;">儲存本月薪資</button>
             <div id="payrollRecords" style="margin-top:14px;"></div>
@@ -1078,10 +1078,31 @@
         function closePayrollModal() { document.getElementById('payrollModal').style.display = 'none'; }
         function setPayrollField(id, value) { document.getElementById(id).value = value || ''; }
         function openPayrollModal() {
-            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance','payrollOther'].forEach(id => setPayrollField(id, ''));
+            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance','payrollOtherItems'].forEach(id => setPayrollField(id, ''));
             setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
             document.getElementById('payrollMonth').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+            loadPayrollMonth();
             renderPayrollRecords(); document.getElementById('payrollModal').style.display = 'flex';
+        }
+        function loadPayrollMonth() {
+            const month = document.getElementById('payrollMonth').value;
+            const record = payrollRecords.find(item => item.month === month);
+            setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
+            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance'].forEach((id) => {
+                const key = id.replace('payroll', '').replace(/^./, char => char.toLowerCase());
+                setPayrollField(id, record ? (record[key] || '') : '');
+            });
+            setPayrollField('payrollOtherItems', record ? (record.otherItems || '') : '');
+            updatePayrollOtherTotal();
+        }
+        function getPayrollOtherTotal() {
+            return document.getElementById('payrollOtherItems').value.split(/\r?\n/).reduce((sum, line) => {
+                const numbers = line.match(/[\d,]+/g);
+                return sum + (numbers && numbers.length ? payrollNumber(numbers[numbers.length - 1]) : 0);
+            }, 0);
+        }
+        function updatePayrollOtherTotal() {
+            document.getElementById('payrollOtherTotal').innerText = `其他收入合計 $${getPayrollOtherTotal().toLocaleString()}`;
         }
         function parsePayrollText(text) {
             const clean = text.replace(/[\s　]+/g, '|');
@@ -1133,15 +1154,18 @@
         }
         function savePayrollRecord() {
             const month = document.getElementById('payrollMonth').value; if (!month) { alert('請選擇薪資月份'); return; }
-            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), fixedIncome: PAYROLL_FIXED_INCOME, govNight: payrollValue('payrollGovNight'), nightAllowance: payrollValue('payrollNightAllowance'), other: payrollValue('payrollOther') };
-            const index = payrollRecords.findIndex(item => item.month === month); if (index >= 0 && !confirm(`${month} 已有紀錄，是否覆蓋？`)) return; if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
+            const index = payrollRecords.findIndex(item => item.month === month), existing = index >= 0 ? payrollRecords[index] : {};
+            const valueOrExisting = (inputId, key) => { const value = document.getElementById(inputId).value.trim(); return value === '' ? (existing[key] || 0) : Number(value); };
+            const otherItems = document.getElementById('payrollOtherItems').value.trim();
+            const record = { month, gross: valueOrExisting('payrollGross', 'gross'), net: valueOrExisting('payrollNet', 'net'), fixedIncome: PAYROLL_FIXED_INCOME, govNight: valueOrExisting('payrollGovNight', 'govNight'), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), other: otherItems ? getPayrollOtherTotal() : (existing.other || 0), otherItems };
+            if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); alert('已儲存薪資紀錄');
         }
         function deletePayrollRecord(month) { if (!confirm(`刪除 ${month} 的薪資紀錄？`)) return; payrollRecords = payrollRecords.filter(item => item.month !== month); savePayrollRecords(); renderPayrollRecords(); }
         function renderPayrollRecords() {
             const year = String(currentDate.getFullYear()), records = payrollRecords.filter(item => item.month.startsWith(year)).sort((a, b) => b.month.localeCompare(a.month)), total = key => records.reduce((sum, item) => sum + (item[key] || 0), 0).toLocaleString(), nightAllowanceTotal = records.reduce((sum, item) => sum + (item.nightAllowance || 0) + (item.night || 0), 0).toLocaleString(), fixedIncomeTotal = records.reduce((sum, item) => sum + (item.fixedIncome || item.base || 0) + (item.allowance || 0) + (item.other || 0), 0).toLocaleString();
             document.getElementById('payrollYearSummary').innerHTML = `<div style="background:#fff5e7; border-radius:9px; padding:8px; color:#9a6700; font-size:12px; font-weight:800;">${year} 應領總額<br><span style="font-size:20px; color:#b45309;">$${total('gross')}</span></div><div style="background:#eefaf3; border-radius:9px; padding:8px; color:#278653; font-size:12px; font-weight:800;">${year} 實領總額<br><span style="font-size:20px; color:#278653;">$${total('net')}</span></div><div style="grid-column:span 2; background:#eef2ff; border-radius:9px; padding:8px; color:#4a4aff; font-size:12px; font-weight:800;">固定收入 $${fixedIncomeTotal}</div><div style="grid-column:span 2; background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800;">衛福部夜班獎勵 $${total('govNight')}　｜　夜班津貼 $${nightAllowanceTotal}</div>`;
-            document.getElementById('payrollRecords').innerHTML = records.length ? `<div style="font-size:13px; font-weight:900; color:#666; margin-bottom:5px;">本年度明細</div>` + records.map(item => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:8px 2px; font-size:12px;"><span style="font-weight:900; color:#555; width:55px;">${item.month}</span><span style="flex:1;">應領 $${item.gross.toLocaleString()}<br>實領 <b style="color:#278653;">$${item.net.toLocaleString()}</b></span><span style="color:#888;">固定 $${(item.fixedIncome || (item.base || 0) + (item.allowance || 0) + (item.other || 0)).toLocaleString()}｜衛福夜班 $${(item.govNight || 0).toLocaleString()}｜夜班津貼 $${((item.nightAllowance || 0) + (item.night || 0)).toLocaleString()}</span><button onclick="deletePayrollRecord('${item.month}')" style="border:none; background:none; color:#ffaaaa; font-size:16px; cursor:pointer;">✕</button></div>`).join('') : '<div style="text-align:center; color:#aaa; padding:12px; font-size:12px;">本年度尚無薪資紀錄</div>';
+            document.getElementById('payrollRecords').innerHTML = records.length ? `<div style="font-size:13px; font-weight:900; color:#666; margin-bottom:5px;">本年度明細</div>` + records.map(item => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:8px 2px; font-size:12px;"><span style="font-weight:900; color:#555; width:55px;">${item.month}</span><span style="flex:1;">應領 $${item.gross.toLocaleString()}<br>實領 <b style="color:#278653;">$${item.net.toLocaleString()}</b></span><span style="color:#888;">固定 $${(item.fixedIncome || (item.base || 0) + (item.allowance || 0) + (item.other || 0)).toLocaleString()}｜衛福夜班 $${(item.govNight || 0).toLocaleString()}｜夜班津貼 $${((item.nightAllowance || 0) + (item.night || 0)).toLocaleString()}｜其他 $${(item.other || 0).toLocaleString()}</span><button onclick="deletePayrollRecord('${item.month}')" style="border:none; background:none; color:#ffaaaa; font-size:16px; cursor:pointer;">✕</button></div>`).join('') : '<div style="text-align:center; color:#aaa; padding:12px; font-size:12px;">本年度尚無薪資紀錄</div>';
         }
 
         // ==================== generateDayTags ====================
