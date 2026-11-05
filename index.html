@@ -15,7 +15,6 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js">
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         :root {
@@ -413,20 +412,15 @@
                 <button onclick="closePayrollModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
             </div>
             <div id="payrollYearSummary" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;"></div>
-            <div style="background:#fff8eb; border:1px solid #f5d38d; border-radius:10px; padding:10px; margin-bottom:12px;">
-                <div style="font-size:12px; font-weight:800; color:#9a6700; margin-bottom:6px;">拍攝／選擇薪資單後自動辨識；請確認金額再儲存。</div>
-                <input id="payrollImageInput" type="file" accept="image/*" onchange="recognizePayrollImage(event)" style="width:100%; font:inherit;">
-                <div id="payrollOcrStatus" style="font-size:12px; color:#777; margin-top:6px;"></div>
-                <details id="payrollOcrDetails" style="display:none; margin-top:6px;"><summary style="font-size:12px; color:#7a6baf; cursor:pointer;">查看辨識文字</summary><pre id="payrollOcrText" style="white-space:pre-wrap; word-break:break-word; max-height:140px; overflow:auto; margin:6px 0 0; font-size:10px; color:#666;"></pre></details>
-            </div>
+            <div style="background:#fff8eb; border:1px solid #f5d38d; border-radius:10px; padding:10px; margin-bottom:12px; font-size:12px; color:#9a6700; font-weight:800;">金額採手動輸入。固定收入已自動帶入，不需要每月重填。</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">固定收入（薪津、技術津貼、執照費、績效獎金）<input id="payrollFixedIncome" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">固定收入（薪津 38,430＋技術津貼 9,000＋執照費 9,300）<input id="payrollFixedIncome" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">衛福部夜班獎勵<input id="payrollGovNight" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">夜班津貼（約 10 日發）<input id="payrollNightAllowance" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">其他額外收入<input id="payrollOther" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">績效獎金／其他額外收入<input id="payrollOther" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
             </div>
             <button onclick="savePayrollRecord()" style="width:100%; border:none; border-radius:9px; padding:10px; margin-top:12px; background:#b45309; color:#fff; font:inherit; font-weight:900; cursor:pointer;">儲存本月薪資</button>
             <div id="payrollRecords" style="margin-top:14px;"></div>
@@ -1077,16 +1071,16 @@
         // ==================== 薪資統計 ====================
         let payrollRecords = [];
         try { payrollRecords = JSON.parse(localStorage.getItem('payrollRecords1')) || []; } catch (e) {}
+        const PAYROLL_FIXED_INCOME = 38430 + 9000 + 9300;
         const payrollValue = id => Number(document.getElementById(id).value) || 0;
         const payrollNumber = value => Number(String(value || '').replace(/,/g, '')) || 0;
         function savePayrollRecords() { localStorage.setItem('payrollRecords1', JSON.stringify(payrollRecords)); }
         function closePayrollModal() { document.getElementById('payrollModal').style.display = 'none'; }
         function setPayrollField(id, value) { document.getElementById(id).value = value || ''; }
         function openPayrollModal() {
-            ['payrollGross','payrollNet','payrollFixedIncome','payrollGovNight','payrollNightAllowance','payrollOther'].forEach(id => setPayrollField(id, ''));
+            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance','payrollOther'].forEach(id => setPayrollField(id, ''));
+            setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
             document.getElementById('payrollMonth').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-            document.getElementById('payrollImageInput').value = ''; document.getElementById('payrollOcrStatus').innerText = '';
-            document.getElementById('payrollOcrDetails').style.display = 'none';
             renderPayrollRecords(); document.getElementById('payrollModal').style.display = 'flex';
         }
         function parsePayrollText(text) {
@@ -1139,7 +1133,7 @@
         }
         function savePayrollRecord() {
             const month = document.getElementById('payrollMonth').value; if (!month) { alert('請選擇薪資月份'); return; }
-            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), fixedIncome: payrollValue('payrollFixedIncome'), govNight: payrollValue('payrollGovNight'), nightAllowance: payrollValue('payrollNightAllowance'), other: payrollValue('payrollOther') };
+            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), fixedIncome: PAYROLL_FIXED_INCOME, govNight: payrollValue('payrollGovNight'), nightAllowance: payrollValue('payrollNightAllowance'), other: payrollValue('payrollOther') };
             const index = payrollRecords.findIndex(item => item.month === month); if (index >= 0 && !confirm(`${month} 已有紀錄，是否覆蓋？`)) return; if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); alert('已儲存薪資紀錄');
         }
