@@ -1091,12 +1091,16 @@
         }
         function parsePayrollText(text) {
             const clean = text.replace(/[\s　]+/g, '|');
-            const monthMatch = clean.match(/薪資月份\|?[:：]?\|?(\d{4})年\|?(\d{1,2})月/);
+            const compact = text.replace(/[\s　]+/g, '');
+            const monthMatch = compact.match(/薪資月份[:：]?(\d{4})年(\d{1,2})月/);
             const totals = [...clean.matchAll(/合計\|?([\d,]+)\|([\d,]+)/g)], finalTotal = totals.length ? totals[totals.length - 1] : null;
-            const find = label => { const match = clean.match(new RegExp(label + '\\|?([\\d,]+)')); return match ? payrollNumber(match[1]) : 0; };
+            const find = label => { const match = compact.match(new RegExp(label + '([\\d,]+)')); return match ? payrollNumber(match[1]) : 0; };
+            const grossFromTop = find('(?:合計|論計|總計)');
+            const netFromTop = (() => { const match = compact.match(/薪資月份[:：]?\d{4}年\d{1,2}月([\d,]+)有薪款日/); return match ? payrollNumber(match[1]) : 0; })();
             const nightAllowance = [...clean.matchAll(/薪資條\|(?:\d{2,3}\/\d{1,2}\/\d{1,2}\|)?([\d,]+)\|([\d,]+)/g)]
                 .map(match => payrollNumber(match[2])).filter(amount => amount > 0 && amount < 5000).reduce((sum, amount) => sum + amount, 0);
-            return { month: monthMatch ? `${monthMatch[1]}-${String(monthMatch[2]).padStart(2, '0')}` : '', gross: finalTotal ? payrollNumber(finalTotal[1]) : find('應領薪資合計'), net: finalTotal ? payrollNumber(finalTotal[2]) : find('給付淨額'), fixedIncome: find('薪津') + find('技術津貼') + find('執照費') + find('績效獎金'), govNight: find('夜班獎勵'), nightAllowance, other: 0 };
+            const gross = finalTotal ? payrollNumber(finalTotal[1]) : grossFromTop;
+            return { month: monthMatch ? `${monthMatch[1]}-${String(monthMatch[2]).padStart(2, '0')}` : '', gross, net: finalTotal ? payrollNumber(finalTotal[2]) : (netFromTop || find('給付淨額')), fixedIncome: gross, govNight: find('夜班獎勵'), nightAllowance, other: 0 };
         }
         async function preparePayrollImage(file) {
             const source = await new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = URL.createObjectURL(file); });
