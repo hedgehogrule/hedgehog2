@@ -140,10 +140,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 1); z-index: 10; font-family: inherit; justify-content: center; align-items: flex-start; }
         .modal-content { background: transparent; padding: 20px 15px; width: 100%; max-width: 100%; border-radius: 0; box-shadow: none; box-sizing: border-box; height: 100%; max-height: 100vh; overflow-y: auto; }
         #payrollEntryForm, #payrollEntryForm input, #payrollEntryForm select, #payrollEntryForm textarea { min-width: 0; max-width: 100%; box-sizing: border-box; }
-        @media (max-width: 420px) {
-            #payrollEntryForm > div[style*="display:grid"] { grid-template-columns: minmax(0, 1fr) !important; }
-            #payrollEntryForm > div[style*="display:grid"] > * { grid-column: span 1 !important; min-width: 0; }
-        }
+        #payrollEntryForm > div[style*="display:grid"] > * { min-width: 0; }
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 13px; margin-bottom: 4px; font-weight: bold; color: #666; }
         .input-group input, .input-group select { width: 100%; padding: 8px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fafafa; font-family: inherit; }
@@ -424,10 +421,8 @@
             <button onclick="togglePayrollEntryForm()" id="payrollEntryToggle" style="width:100%; border:1.5px solid #f5c56b; border-radius:9px; padding:9px; margin-bottom:12px; background:#fffaf0; color:#9a6700; font:inherit; font-weight:900; cursor:pointer;">＋ 輸入／編輯本月收入</button>
             <div id="payrollEntryForm" style="display:none;">
             <div style="background:#fff8eb; border:1px solid #f5d38d; border-radius:10px; padding:10px; margin-bottom:12px; font-size:12px; color:#9a6700; font-weight:800;">金額採手動輸入。固定收入已自動帶入，不需要每月重填。</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" onchange="loadPayrollMonth()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+            <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px;">
+                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">薪資月份<input id="payrollMonth" type="month" onchange="loadPayrollMonth()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">薪津（可改、可設為預設）<div style="display:flex; gap:5px; margin-top:3px;"><input id="payrollBaseSalary" type="number" min="0" oninput="updatePayrollFixedIncome()" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="savePayrollBaseDefault()" style="border:none; border-radius:7px; padding:5px 7px; background:#eee; color:#666; font-size:11px; font-weight:800; cursor:pointer;">設為預設</button></div></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">技術＋執照津貼<input value="18,300" type="text" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">績效獎金（計入固定收入）<input id="payrollPerformance" type="number" min="0" oninput="updatePayrollFixedIncome()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"></label>
@@ -442,6 +437,8 @@
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="nonPayrollType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
                     <button onclick="addNonPayrollType()" style="border:none; background:none; color:#5b9bd5; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
                 </div>
+                <label style="font-size:12px; font-weight:800; color:#666; order:99;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666; order:99;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
             </div>
             <button onclick="savePayrollRecord()" style="width:100%; border:none; border-radius:9px; padding:10px; margin-top:12px; background:#b45309; color:#fff; font:inherit; font-weight:900; cursor:pointer;">儲存本月薪資</button>
             </div>
