@@ -1978,35 +1978,7 @@
 
             if (!savedData.shiftHistory) savedData.shiftHistory = [];
 
-            let newTokens = shiftVal.split(/\s+/).filter(Boolean);
-            let oldTokens = (currentDisplayShift || "").split(/\s+/).filter(Boolean);
-            
-            let hasNewAnnualLeave = newTokens.some(t => t === '年休' || t.startsWith('年休-'));
-            let hadOldAnnualLeave = oldTokens.some(t => t === '年休' || t.startsWith('年休-'));
-
-            if (hasNewAnnualLeave && !hadOldAnnualLeave) {
-                let isFromQuick = newTokens.some(t => t.startsWith('年休-'));
-                if (!isFromQuick) {
-                    globalStats.annualLeave.push({
-                        id: "st_" + Date.now(),
-                        createdAt: Date.now(),
-                        date: selectedDateString,
-                        amount: -8,
-                        desc: "年休 (排班自動扣除)"
-                    });
-                    localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-                }
-            }
-            else if (!hasNewAnnualLeave && hadOldAnnualLeave) {
-                globalStats.annualLeave.push({
-                    id: "st_" + Date.now(),
-                    createdAt: Date.now(),
-                    date: selectedDateString,
-                    amount: +8,
-                    desc: "取消年休 (自動加回)"
-                });
-                localStorage.setItem('myCustomCalendarStats8', JSON.stringify(globalStats));
-            }
+            // 年休僅作為班表標記；年休時數由使用者在年休明細中手動管理。
 
             if (shiftVal === "" || shiftVal === autoInfo.shift) {
                 if (currentDisplayShift !== autoInfo.shift) savedData.shiftHistory.push(currentDisplayShift);
