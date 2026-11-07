@@ -418,6 +418,7 @@
                 <button onclick="closePayrollModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
             </div>
             <div id="payrollYearSummary" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;"></div>
+            <div id="payrollSummaryDetail"></div>
             <button onclick="togglePayrollEntryForm()" id="payrollEntryToggle" style="width:100%; border:1.5px solid #f5c56b; border-radius:9px; padding:9px; margin-bottom:12px; background:#fffaf0; color:#9a6700; font:inherit; font-weight:900; cursor:pointer;">＋ 輸入／編輯本月收入</button>
             <div id="payrollEntryForm" style="display:none;">
             <div style="background:#fff8eb; border:1px solid #f5d38d; border-radius:10px; padding:8px; margin-bottom:10px; font-size:12px; color:#9a6700; font-weight:800;">金額採手動輸入；薪津預設為 38,430 元，可直接修改。</div>
@@ -438,9 +439,8 @@
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="nonPayrollType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
                     <button onclick="addNonPayrollType()" style="border:none; background:none; color:#5b9bd5; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
                 </div>
-                <details style="font-size:11px; font-weight:800; color:#777; grid-column:span 2; order:1; border-top:1px dashed #ddd; padding-top:7px;">
-                    <summary style="cursor:pointer;">扣項</summary>
-                    <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px; margin-top:4px;">
+                <details id="payrollDeductionDetails" style="font-size:11px; font-weight:800; color:#777; grid-column:span 2; order:1;">
+                    <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px; margin-top:7px; padding-top:7px; border-top:1px dashed #ddd;">
                         <label style="font-size:10px;">勞保<input id="payrollLaborInsurance" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:1px; padding:3px 2px; border:1px solid #ddd; border-radius:5px; font-size:11px;"></label>
                         <label style="font-size:10px;">自提退休<input id="payrollPension" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:1px; padding:3px 2px; border:1px solid #ddd; border-radius:5px; font-size:11px;"></label>
                         <label style="font-size:10px;">健保<input id="payrollHealthInsurance" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:1px; padding:3px 2px; border:1px solid #ddd; border-radius:5px; font-size:11px;"></label>
@@ -449,7 +449,7 @@
                 </details>
                 <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; grid-column:span 2; order:2;">
                     <label style="font-size:11px; font-weight:800; color:#666;">應領總額<input id="payrollGross" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 4px; border:1px solid #ddd; border-radius:7px; background:#fff8eb; color:#9a6700; font-size:13px; font-weight:900;"></label>
-                    <label style="font-size:11px; font-weight:800; color:#666;">－ 扣項<input id="payrollDeductionTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 4px; border:1px solid #f2caca; border-radius:7px; background:#fff5f5; color:#dc2626; font-size:13px; font-weight:900;"></label>
+                    <label onclick="togglePayrollDeductionDetails()" style="font-size:11px; font-weight:800; color:#666; cursor:pointer;">－ 扣項<input id="payrollDeductionTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 4px; border:1px solid #f2caca; border-radius:7px; background:#fff5f5; color:#dc2626; font-size:13px; font-weight:900; cursor:pointer;"></label>
                     <label style="font-size:11px; font-weight:800; color:#666;">＝ 給付淨額<input id="payrollNet" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 4px; border:1px solid #ddd; border-radius:7px; background:#eefaf3; color:#278653; font-size:13px; font-weight:900;"></label>
                 </div>
             </div>
@@ -1132,6 +1132,10 @@
             setPayrollField('payrollFixedIncome', gross);
             updatePayrollTotals();
         }
+        function togglePayrollDeductionDetails() {
+            const details = document.getElementById('payrollDeductionDetails');
+            details.open = !details.open;
+        }
         function updatePayrollDeductionTotal() {
             const total = payrollValue('payrollLaborInsurance') + payrollValue('payrollPension') + payrollValue('payrollHealthInsurance') + payrollValue('payrollMutualAid');
             document.getElementById('payrollDeductionTotal').value = `$${total.toLocaleString()}`;
@@ -1287,10 +1291,30 @@
             savePayrollRecords(); renderPayrollRecords(); document.getElementById('payrollEntryForm').style.display = 'none'; document.getElementById('payrollEntryToggle').innerText = '＋ 輸入／編輯本月收入'; alert('已儲存薪資紀錄');
         }
         function deletePayrollRecord(month) { if (!confirm(`刪除 ${month} 的薪資紀錄？`)) return; payrollRecords = payrollRecords.filter(item => item.month !== month); savePayrollRecords(); renderPayrollRecords(); }
+        function payrollSummaryValue(item, key) {
+            if (key === 'deductions') return (item.laborInsurance || 0) + (item.pension || 0) + (item.healthInsurance || 0) + (item.mutualAid || 0);
+            if (key === 'nightAllowance') return (item.nightAllowance || 0) + (item.night || 0);
+            return item[key] || 0;
+        }
+        function showPayrollSummaryDetail(key) {
+            const detail = document.getElementById('payrollSummaryDetail');
+            if (detail.dataset.key === key) { detail.innerHTML = ''; detail.dataset.key = ''; return; }
+            const records = payrollRecords.filter(item => item.month.startsWith(String(currentDate.getFullYear()))).sort((a, b) => b.month.localeCompare(a.month));
+            const titles = { gross:'應領總額', net:'給付淨額', other:'其他額外收入', govNight:'衛福部夜班獎勵', nightAllowance:'夜班津貼', deductions:'扣項', nonPayroll:'業外收入' };
+            const extra = item => {
+                if (key === 'deductions') return `勞保 ${item.laborInsurance || 0}／退休 ${item.pension || 0}／健保 ${item.healthInsurance || 0}／互助 ${item.mutualAid || 0}`;
+                if (key === 'other' && item.otherItems?.length) return item.otherItems.map(entry => `${escapeSweatGiftText(entry.type)} ${entry.amount.toLocaleString()}`).join('、');
+                if (key === 'nonPayroll' && item.nonPayrollItems?.length) return item.nonPayrollItems.map(entry => `${escapeSweatGiftText(entry.name)} ${entry.amount.toLocaleString()}`).join('、');
+                return '';
+            };
+            detail.dataset.key = key;
+            detail.innerHTML = `<div style="margin:-4px 0 10px; padding:8px; border-radius:8px; background:#fafafa; font-size:12px; color:#666;"><b>${titles[key]}明細</b>${records.length ? records.map(item => `<div style="display:flex; gap:8px; padding:4px 0; border-bottom:1px solid #eee;"><span style="width:55px; font-weight:800;">${item.month}</span><span style="font-weight:800;">$${payrollSummaryValue(item, key).toLocaleString()}</span><span style="color:#888;">${extra(item)}</span></div>`).join('') : '<div style="padding-top:5px; color:#aaa;">尚無紀錄</div>'}</div>`;
+        }
         function renderPayrollRecords() {
-            const year = String(currentDate.getFullYear()), records = payrollRecords.filter(item => item.month.startsWith(year)).sort((a, b) => b.month.localeCompare(a.month)), total = key => records.reduce((sum, item) => sum + (item[key] || 0), 0).toLocaleString(), nightAllowanceTotal = records.reduce((sum, item) => sum + (item.nightAllowance || 0) + (item.night || 0), 0).toLocaleString(), fixedIncomeTotal = records.reduce((sum, item) => sum + (item.fixedIncome || item.base || 0) + (item.allowance || 0) + (item.other || 0), 0).toLocaleString();
-            const deductionTotal = records.reduce((sum, item) => sum + (item.laborInsurance || 0) + (item.pension || 0) + (item.healthInsurance || 0) + (item.mutualAid || 0), 0).toLocaleString();
-            document.getElementById('payrollYearSummary').innerHTML = `<div style="background:#fff5e7; border-radius:9px; padding:8px; color:#9a6700; font-size:12px; font-weight:800;">${year} 應領總額<br><span style="font-size:20px; color:#b45309;">$${total('gross')}</span></div><div style="background:#eefaf3; border-radius:9px; padding:8px; color:#278653; font-size:12px; font-weight:800;">${year} 實領總額<br><span style="font-size:20px; color:#278653;">$${total('net')}</span></div><div style="grid-column:span 2; background:#eef2ff; border-radius:9px; padding:8px; color:#4a4aff; font-size:12px; font-weight:800;">固定收入 $${fixedIncomeTotal}</div><div style="grid-column:span 2; background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800;">衛福部夜班獎勵 $${total('govNight')}　｜　夜班津貼 $${nightAllowanceTotal}</div><div style="grid-column:span 2; background:#fff0f0; border-radius:9px; padding:8px; color:#dc2626; font-size:12px; font-weight:800;">年度扣項 $${deductionTotal}</div><div style="grid-column:span 2; background:#eef6ff; border-radius:9px; padding:8px; color:#3c74a8; font-size:12px; font-weight:800;">業外收入年度小計 $${total('nonPayroll')}</div>`;
+            const year = String(currentDate.getFullYear()), records = payrollRecords.filter(item => item.month.startsWith(year)).sort((a, b) => b.month.localeCompare(a.month)), total = key => records.reduce((sum, item) => sum + payrollSummaryValue(item, key), 0).toLocaleString(), nightAllowanceTotal = total('nightAllowance'), otherTotal = total('other');
+            const deductionTotal = total('deductions');
+            document.getElementById('payrollSummaryDetail').innerHTML = ''; document.getElementById('payrollSummaryDetail').dataset.key = '';
+            document.getElementById('payrollYearSummary').innerHTML = `<div onclick="showPayrollSummaryDetail('gross')" style="background:#fff5e7; border-radius:9px; padding:8px; color:#9a6700; font-size:12px; font-weight:800; cursor:pointer;">${year} 應領總額<br><span style="font-size:20px; color:#b45309;">$${total('gross')}</span></div><div onclick="showPayrollSummaryDetail('net')" style="background:#eefaf3; border-radius:9px; padding:8px; color:#278653; font-size:12px; font-weight:800; cursor:pointer;">${year} 給付淨額<br><span style="font-size:20px; color:#278653;">$${total('net')}</span></div><div onclick="showPayrollSummaryDetail('other')" style="grid-column:span 2; background:#f5f1ff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800; cursor:pointer;">其他額外收入 $${otherTotal}</div><div style="grid-column:span 2; display:grid; grid-template-columns:1fr 1fr; gap:6px;"><div onclick="showPayrollSummaryDetail('govNight')" style="background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800; cursor:pointer;">衛福部夜班獎勵 $${total('govNight')}</div><div onclick="showPayrollSummaryDetail('nightAllowance')" style="background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800; cursor:pointer;">夜班津貼 $${nightAllowanceTotal}</div></div><div onclick="showPayrollSummaryDetail('deductions')" style="grid-column:span 2; background:#fff0f0; border-radius:9px; padding:8px; color:#dc2626; font-size:12px; font-weight:800; cursor:pointer;">年度扣項 $${deductionTotal}</div><div onclick="showPayrollSummaryDetail('nonPayroll')" style="grid-column:span 2; background:#eef6ff; border-radius:9px; padding:8px; color:#3c74a8; font-size:12px; font-weight:800; cursor:pointer;">業外收入年度小計 $${total('nonPayroll')}</div>`;
             document.getElementById('payrollRecords').innerHTML = records.length ? `<div style="font-size:13px; font-weight:900; color:#666; margin-bottom:5px;">本年度明細</div>` + records.map(item => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:8px 2px; font-size:12px;"><span style="font-weight:900; color:#555; width:55px;">${item.month}</span><span style="flex:1;">應領 $${item.gross.toLocaleString()}<br>實領 <b style="color:#278653;">$${item.net.toLocaleString()}</b></span><span style="color:#888;">固定 $${(item.fixedIncome || (item.base || 0) + (item.allowance || 0) + (item.other || 0)).toLocaleString()}｜衛福夜班 $${(item.govNight || 0).toLocaleString()}｜夜班津貼 $${((item.nightAllowance || 0) + (item.night || 0)).toLocaleString()}｜其他 $${(item.other || 0).toLocaleString()}</span><button onclick="deletePayrollRecord('${item.month}')" style="border:none; background:none; color:#ffaaaa; font-size:16px; cursor:pointer;">✕</button></div>`).join('') : '<div style="text-align:center; color:#aaa; padding:12px; font-size:12px;">本年度尚無薪資紀錄</div>';
         }
 
