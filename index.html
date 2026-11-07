@@ -333,7 +333,7 @@
             </div>
             <div class="header-btn-row">
                 <button class="today-btn" style="color:#5b9bd5 !important; border-color:#5b9bd5 !important;" onclick="toggleBatchMode()">🌿 森休假</button>
-                <button class="today-btn" style="color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important;" onclick="openOtFeeModal()">⏱️ 加班 $<span id="hdrOtFee">0</span></button>
+                <button class="today-btn" style="color:#6d5aaf !important; border-color:#c3b3ef !important; background:#fff !important;" onclick="openShiftFeeModal()">🌙 班務 <span id="hdrOtFee" style="display:none;">0</span><span id="hdrNightFee" style="display:none;">0</span></button>
                 <button class="today-btn" style="color:#7a6baf !important; border-color:#c3b3ef !important;" onclick="openBackupModal()">💾 備份</button>
                 <button class="today-btn search-btn" onclick="openSearchModal()">🔍 搜尋</button>
                 <button class="today-btn" style="color:#b45309 !important; border-color:#f5c56b !important; background:#fff !important;" onclick="openPayrollModal()">💰 薪資</button>
@@ -341,7 +341,6 @@
             <div class="header-stats">
                 <div class="stat-box" onclick="openStatsModal('hours')">⏳ 時數 <span id="hdrHours">0</span></div>
                 <div class="stat-box" onclick="openStatsModal('annualLeave')">🌸 年休 <span id="hdrAL">0</span></div>
-                <div class="stat-box night-fee" onclick="openNightFeeModal()">💰 夜班 $<span id="hdrNightFee">0</span></div>
             </div>
         </div>
         <button onclick="changeMonth(1)">&#10095;</button>
@@ -563,6 +562,16 @@
             <div style="text-align:center; margin-bottom:12px; font-weight:bold; color:#555; font-size:15px;">總計: $<span id="otFeeTotal" style="font-size:28px; color:#dc2626; margin-left:5px;">0</span></div>
             <div id="otFeeList" style="max-height: 50vh; overflow-y: auto; border: 2px solid #eee; border-radius: 12px; padding: 12px; background: #fafafa; font-family: 'Helvetica Neue', Arial, sans-serif;"></div>
             <button class="btn" style="width:100%; margin-top:12px; background:#f1f1f1; color:#666;" onclick="closeOtFeeModal()">關閉</button>
+        </div>
+    </div>
+
+    <div class="modal" id="shiftFeeModal" style="z-index: 35;">
+        <div class="modal-content" style="padding:15px 15px 30px; max-width:520px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:19px; color:#6d5aaf;">🌙 本月班務收入</h3>
+                <button onclick="closeShiftFeeModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
+            </div>
+            <div id="shiftFeeContent"></div>
         </div>
     </div>
 
@@ -3379,6 +3388,18 @@
             renderCalendar();
             openNightFeeModal();
         }
+
+        // ==================== 班務收入總覽 ====================
+        function openShiftFeeModal() {
+            const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+            const overtime = (globalStats.hours || []).filter(item => item.date.startsWith(monthKey) && item.desc.includes('加班') && (item.fee || 0) > 0).sort((a, b) => a.date.localeCompare(b.date));
+            const night = buildMonthNightFees();
+            const section = (title, color, total, items, itemText, empty) => `<section style="background:#fff; border:1.5px solid ${color}; border-radius:12px; padding:10px 12px; margin-bottom:12px;"><div style="display:flex; justify-content:space-between; font-weight:900; color:#555; margin-bottom:7px;"><span>${title}</span><span style="color:${color};">$${total.toLocaleString()}</span></div>${items.length ? items.map(item => `<div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding:6px 0; font-size:12px; color:#666;">${itemText(item)}</div>`).join('') : `<div style="color:#aaa; font-size:12px; padding:5px 0;">${empty}</div>`}</section>`;
+            const html = section('⏱️ 加班費', '#dc2626', overtime.reduce((sum, item) => sum + (item.fee || 0), 0), overtime, item => `<span>${item.date}｜${item.desc}</span><b>$${item.fee}</b>`, '本月無加班費紀錄') + section('🌙 夜班費', '#b45309', night.reduce((sum, item) => sum + item.amount, 0), night, item => `<span>${item.date}｜${item.desc}</span><b>$${item.amount}</b>`, '本月無夜班費紀錄');
+            document.getElementById('shiftFeeContent').innerHTML = html;
+            document.getElementById('shiftFeeModal').style.display = 'flex';
+        }
+        function closeShiftFeeModal() { document.getElementById('shiftFeeModal').style.display = 'none'; }
 
         // ==================== 夜班費明細（可修改 + 可刪除）====================
         function openNightFeeModal() {
