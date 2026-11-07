@@ -426,8 +426,8 @@
                     <button onclick="addPayrollOtherType()" style="border:none; background:none; color:#7a6baf; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="payrollOtherItemsList"></div><div id="payrollOtherTotal" style="margin-top:3px; color:#7a6baf;">其他收入合計 $0</div>
                 </div>
                 <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; border-top:1px dashed #ddd; padding-top:10px;">業外收入（不計入薪資）
-                    <div style="display:flex; gap:6px; margin-top:3px;"><input id="nonPayrollName" type="text" placeholder="收入名稱" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
-                    <div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
+                    <div style="display:flex; gap:6px; margin-top:3px;"><select id="nonPayrollType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
+                    <button onclick="addNonPayrollType()" style="border:none; background:none; color:#5b9bd5; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
                 </div>
             </div>
             <button onclick="savePayrollRecord()" style="width:100%; border:none; border-radius:9px; padding:10px; margin-top:12px; background:#b45309; color:#fff; font:inherit; font-weight:900; cursor:pointer;">儲存本月薪資</button>
@@ -1092,6 +1092,8 @@
         try { payrollRecords = JSON.parse(localStorage.getItem('payrollRecords1')) || []; } catch (e) {}
         let payrollOtherTypes = ['講師津貼', '三節津貼'];
         try { payrollOtherTypes = JSON.parse(localStorage.getItem('payrollOtherTypes1')) || payrollOtherTypes; } catch (e) {}
+        let nonPayrollTypes = ['其他業外收入'];
+        try { nonPayrollTypes = JSON.parse(localStorage.getItem('nonPayrollTypes1')) || nonPayrollTypes; } catch (e) {}
         let currentPayrollOtherItems = [];
         let currentNonPayrollItems = [];
         const PAYROLL_FIXED_INCOME = 38430 + 9000 + 9300;
@@ -1108,10 +1110,11 @@
         }
         function openPayrollModal() {
             ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
-            ['nonPayrollName','nonPayrollAmount'].forEach(id => setPayrollField(id, ''));
+            setPayrollField('nonPayrollAmount', '');
             currentPayrollOtherItems = [];
             currentNonPayrollItems = [];
             renderPayrollOtherTypes();
+            renderNonPayrollTypes();
             setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
             document.getElementById('payrollMonth').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
             loadPayrollMonth();
@@ -1159,11 +1162,20 @@
             updatePayrollOtherTotal();
         }
         function getNonPayrollTotal() { return currentNonPayrollItems.reduce((sum, item) => sum + item.amount, 0); }
+        function renderNonPayrollTypes() {
+            document.getElementById('nonPayrollType').innerHTML = nonPayrollTypes.map(type => `<option value="${escapeSweatGiftText(type)}">${escapeSweatGiftText(type)}</option>`).join('');
+        }
+        function addNonPayrollType() {
+            const type = prompt('新增業外收入類型，例如：投資收益');
+            if (!type || !type.trim() || nonPayrollTypes.includes(type.trim())) return;
+            nonPayrollTypes.push(type.trim()); localStorage.setItem('nonPayrollTypes1', JSON.stringify(nonPayrollTypes)); renderNonPayrollTypes();
+            document.getElementById('nonPayrollType').value = type.trim();
+        }
         function addNonPayrollItem() {
-            const name = document.getElementById('nonPayrollName').value.trim(), amount = payrollValue('nonPayrollAmount');
-            if (!name || amount <= 0) { alert('請輸入業外收入名稱與金額'); return; }
+            const name = document.getElementById('nonPayrollType').value, amount = payrollValue('nonPayrollAmount');
+            if (!name || amount <= 0) { alert('請選擇項目並輸入金額'); return; }
             currentNonPayrollItems.push({ id: `nonpay_${Date.now()}`, name, amount });
-            setPayrollField('nonPayrollName', ''); setPayrollField('nonPayrollAmount', ''); renderNonPayrollItems();
+            setPayrollField('nonPayrollAmount', ''); renderNonPayrollItems();
         }
         function deleteNonPayrollItem(id) { currentNonPayrollItems = currentNonPayrollItems.filter(item => item.id !== id); renderNonPayrollItems(); }
         function renderNonPayrollItems() {
