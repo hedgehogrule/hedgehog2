@@ -1,7 +1,8 @@
 {
     "name": "夢幻行事曆",
     "short_name": "行事曆",
-    "start_url": ".",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#ffe0f0",
     "theme_color": "#ffe0f0",
