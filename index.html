@@ -437,6 +437,14 @@
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="nonPayrollType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
                     <button onclick="addNonPayrollType()" style="border:none; background:none; color:#5b9bd5; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
                 </div>
+                <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; border-top:1px dashed #ddd; padding-top:10px;">扣除額
+                    <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; margin-top:4px;">
+                        <label>勞保費<input id="payrollLaborInsurance" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"></label>
+                        <label>自提退休<input id="payrollPension" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"></label>
+                        <label>健保費<input id="payrollHealthInsurance" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"></label>
+                        <label>醫療互助費<input id="payrollMutualAid" type="number" min="0" oninput="updatePayrollDeductionTotal()" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"></label>
+                    </div><div id="payrollDeductionTotal" style="margin-top:5px; color:#dc2626;">扣除額合計 $0</div>
+                </div>
                 <label style="font-size:12px; font-weight:800; color:#666; order:99;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666; order:99;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
             </div>
@@ -1108,6 +1116,7 @@
         let currentNonPayrollItems = [];
         const PAYROLL_FIXED_ALLOWANCES = 9000 + 9300;
         let payrollBaseDefault = Number(localStorage.getItem('payrollBaseDefault1')) || 38430;
+        const PAYROLL_DEFAULT_DEDUCTIONS = { laborInsurance: 1145, pension: 5526, healthInsurance: 2856, mutualAid: 50 };
         const payrollValue = id => Number(document.getElementById(id).value) || 0;
         const payrollNumber = value => Number(String(value || '').replace(/,/g, '')) || 0;
         function savePayrollRecords() { localStorage.setItem('payrollRecords1', JSON.stringify(payrollRecords)); }
@@ -1115,6 +1124,10 @@
         function setPayrollField(id, value) { document.getElementById(id).value = value || ''; }
         function updatePayrollFixedIncome() {
             setPayrollField('payrollFixedIncome', payrollValue('payrollBaseSalary') + PAYROLL_FIXED_ALLOWANCES + payrollValue('payrollPerformance'));
+        }
+        function updatePayrollDeductionTotal() {
+            const total = payrollValue('payrollLaborInsurance') + payrollValue('payrollPension') + payrollValue('payrollHealthInsurance') + payrollValue('payrollMutualAid');
+            document.getElementById('payrollDeductionTotal').innerText = `扣除額合計 $${total.toLocaleString()}`;
         }
         function savePayrollBaseDefault() {
             const base = payrollValue('payrollBaseSalary');
@@ -1130,6 +1143,7 @@
         }
         function openPayrollModal() {
             ['payrollGross','payrollNet','payrollPerformance','payrollGovNight','payrollNightAllowance','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
+            setPayrollField('payrollLaborInsurance', PAYROLL_DEFAULT_DEDUCTIONS.laborInsurance); setPayrollField('payrollPension', PAYROLL_DEFAULT_DEDUCTIONS.pension); setPayrollField('payrollHealthInsurance', PAYROLL_DEFAULT_DEDUCTIONS.healthInsurance); setPayrollField('payrollMutualAid', PAYROLL_DEFAULT_DEDUCTIONS.mutualAid);
             setPayrollField('nonPayrollAmount', '');
             currentPayrollOtherItems = [];
             currentNonPayrollItems = [];
@@ -1156,6 +1170,8 @@
             renderPayrollOtherItems();
             renderNonPayrollItems();
             updatePayrollFixedIncome();
+            ['payrollLaborInsurance','payrollPension','payrollHealthInsurance','payrollMutualAid'].forEach(id => { const key = id.replace('payroll', '').replace(/^./, char => char.toLowerCase()); setPayrollField(id, record ? (record[key] ?? PAYROLL_DEFAULT_DEDUCTIONS[key]) : PAYROLL_DEFAULT_DEDUCTIONS[key]); });
+            updatePayrollDeductionTotal();
         }
         function getPayrollOtherTotal() {
             return currentPayrollOtherItems.reduce((sum, item) => sum + item.amount, 0);
@@ -1258,14 +1274,15 @@
             const valueOrExisting = (inputId, key) => { const value = document.getElementById(inputId).value.trim(); return value === '' ? (existing[key] || 0) : Number(value); };
             const performance = valueOrExisting('payrollPerformance', 'performance');
             const baseSalary = payrollValue('payrollBaseSalary');
-            const record = { month, gross: valueOrExisting('payrollGross', 'gross'), net: valueOrExisting('payrollNet', 'net'), baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: valueOrExisting('payrollGovNight', 'govNight'), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), other: currentPayrollOtherItems.length ? getPayrollOtherTotal() : (existing.other || 0), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
+            const record = { month, gross: valueOrExisting('payrollGross', 'gross'), net: valueOrExisting('payrollNet', 'net'), baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: valueOrExisting('payrollGovNight', 'govNight'), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), laborInsurance: payrollValue('payrollLaborInsurance'), pension: payrollValue('payrollPension'), healthInsurance: payrollValue('payrollHealthInsurance'), mutualAid: payrollValue('payrollMutualAid'), other: currentPayrollOtherItems.length ? getPayrollOtherTotal() : (existing.other || 0), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
             if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); document.getElementById('payrollEntryForm').style.display = 'none'; document.getElementById('payrollEntryToggle').innerText = '＋ 輸入／編輯本月收入'; alert('已儲存薪資紀錄');
         }
         function deletePayrollRecord(month) { if (!confirm(`刪除 ${month} 的薪資紀錄？`)) return; payrollRecords = payrollRecords.filter(item => item.month !== month); savePayrollRecords(); renderPayrollRecords(); }
         function renderPayrollRecords() {
             const year = String(currentDate.getFullYear()), records = payrollRecords.filter(item => item.month.startsWith(year)).sort((a, b) => b.month.localeCompare(a.month)), total = key => records.reduce((sum, item) => sum + (item[key] || 0), 0).toLocaleString(), nightAllowanceTotal = records.reduce((sum, item) => sum + (item.nightAllowance || 0) + (item.night || 0), 0).toLocaleString(), fixedIncomeTotal = records.reduce((sum, item) => sum + (item.fixedIncome || item.base || 0) + (item.allowance || 0) + (item.other || 0), 0).toLocaleString();
-            document.getElementById('payrollYearSummary').innerHTML = `<div style="background:#fff5e7; border-radius:9px; padding:8px; color:#9a6700; font-size:12px; font-weight:800;">${year} 應領總額<br><span style="font-size:20px; color:#b45309;">$${total('gross')}</span></div><div style="background:#eefaf3; border-radius:9px; padding:8px; color:#278653; font-size:12px; font-weight:800;">${year} 實領總額<br><span style="font-size:20px; color:#278653;">$${total('net')}</span></div><div style="grid-column:span 2; background:#eef2ff; border-radius:9px; padding:8px; color:#4a4aff; font-size:12px; font-weight:800;">固定收入 $${fixedIncomeTotal}</div><div style="grid-column:span 2; background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800;">衛福部夜班獎勵 $${total('govNight')}　｜　夜班津貼 $${nightAllowanceTotal}</div><div style="grid-column:span 2; background:#eef6ff; border-radius:9px; padding:8px; color:#3c74a8; font-size:12px; font-weight:800;">業外收入年度小計 $${total('nonPayroll')}</div>`;
+            const deductionTotal = records.reduce((sum, item) => sum + (item.laborInsurance || 0) + (item.pension || 0) + (item.healthInsurance || 0) + (item.mutualAid || 0), 0).toLocaleString();
+            document.getElementById('payrollYearSummary').innerHTML = `<div style="background:#fff5e7; border-radius:9px; padding:8px; color:#9a6700; font-size:12px; font-weight:800;">${year} 應領總額<br><span style="font-size:20px; color:#b45309;">$${total('gross')}</span></div><div style="background:#eefaf3; border-radius:9px; padding:8px; color:#278653; font-size:12px; font-weight:800;">${year} 實領總額<br><span style="font-size:20px; color:#278653;">$${total('net')}</span></div><div style="grid-column:span 2; background:#eef2ff; border-radius:9px; padding:8px; color:#4a4aff; font-size:12px; font-weight:800;">固定收入 $${fixedIncomeTotal}</div><div style="grid-column:span 2; background:#f3efff; border-radius:9px; padding:8px; color:#6d5aaf; font-size:12px; font-weight:800;">衛福部夜班獎勵 $${total('govNight')}　｜　夜班津貼 $${nightAllowanceTotal}</div><div style="grid-column:span 2; background:#fff0f0; border-radius:9px; padding:8px; color:#dc2626; font-size:12px; font-weight:800;">年度扣除額 $${deductionTotal}</div><div style="grid-column:span 2; background:#eef6ff; border-radius:9px; padding:8px; color:#3c74a8; font-size:12px; font-weight:800;">業外收入年度小計 $${total('nonPayroll')}</div>`;
             document.getElementById('payrollRecords').innerHTML = records.length ? `<div style="font-size:13px; font-weight:900; color:#666; margin-bottom:5px;">本年度明細</div>` + records.map(item => `<div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding:8px 2px; font-size:12px;"><span style="font-weight:900; color:#555; width:55px;">${item.month}</span><span style="flex:1;">應領 $${item.gross.toLocaleString()}<br>實領 <b style="color:#278653;">$${item.net.toLocaleString()}</b></span><span style="color:#888;">固定 $${(item.fixedIncome || (item.base || 0) + (item.allowance || 0) + (item.other || 0)).toLocaleString()}｜衛福夜班 $${(item.govNight || 0).toLocaleString()}｜夜班津貼 $${((item.nightAllowance || 0) + (item.night || 0)).toLocaleString()}｜其他 $${(item.other || 0).toLocaleString()}</span><button onclick="deletePayrollRecord('${item.month}')" style="border:none; background:none; color:#ffaaaa; font-size:16px; cursor:pointer;">✕</button></div>`).join('') : '<div style="text-align:center; color:#aaa; padding:12px; font-size:12px;">本年度尚無薪資紀錄</div>';
         }
 
