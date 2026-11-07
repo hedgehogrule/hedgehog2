@@ -418,7 +418,10 @@
                 <label style="font-size:12px; font-weight:800; color:#666;">薪資月份<input id="payrollMonth" type="month" onchange="loadPayrollMonth()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">應領總額<input id="payrollGross" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">實領總額<input id="payrollNet" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
-                <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">固定收入（薪津 38,430＋技術津貼 9,000＋執照費 9,300）<input id="payrollFixedIncome" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666;">薪津（可改、可設為預設）<div style="display:flex; gap:5px; margin-top:3px;"><input id="payrollBaseSalary" type="number" min="0" oninput="updatePayrollFixedIncome()" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="savePayrollBaseDefault()" style="border:none; border-radius:7px; padding:5px 7px; background:#eee; color:#666; font-size:11px; font-weight:800; cursor:pointer;">設為預設</button></div></label>
+                <label style="font-size:12px; font-weight:800; color:#666;">技術＋執照津貼<input value="18,300" type="text" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666;">績效獎金（計入固定收入）<input id="payrollPerformance" type="number" min="0" oninput="updatePayrollFixedIncome()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
+                <label style="font-size:12px; font-weight:800; color:#666;">固定收入小計<input id="payrollFixedIncome" type="number" readonly style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px; background:#f5f5f5; color:#666;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">衛福部夜班獎勵<input id="payrollGovNight" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <label style="font-size:12px; font-weight:800; color:#666;">夜班津貼（約 10 日發）<input id="payrollNightAllowance" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">其他額外收入
@@ -1096,12 +1099,22 @@
         try { nonPayrollTypes = JSON.parse(localStorage.getItem('nonPayrollTypes1')) || nonPayrollTypes; } catch (e) {}
         let currentPayrollOtherItems = [];
         let currentNonPayrollItems = [];
-        const PAYROLL_FIXED_INCOME = 38430 + 9000 + 9300;
+        const PAYROLL_FIXED_ALLOWANCES = 9000 + 9300;
+        let payrollBaseDefault = Number(localStorage.getItem('payrollBaseDefault1')) || 38430;
         const payrollValue = id => Number(document.getElementById(id).value) || 0;
         const payrollNumber = value => Number(String(value || '').replace(/,/g, '')) || 0;
         function savePayrollRecords() { localStorage.setItem('payrollRecords1', JSON.stringify(payrollRecords)); }
         function closePayrollModal() { document.getElementById('payrollModal').style.display = 'none'; }
         function setPayrollField(id, value) { document.getElementById(id).value = value || ''; }
+        function updatePayrollFixedIncome() {
+            setPayrollField('payrollFixedIncome', payrollValue('payrollBaseSalary') + PAYROLL_FIXED_ALLOWANCES + payrollValue('payrollPerformance'));
+        }
+        function savePayrollBaseDefault() {
+            const base = payrollValue('payrollBaseSalary');
+            if (base <= 0) { alert('請先輸入薪津'); return; }
+            payrollBaseDefault = base; localStorage.setItem('payrollBaseDefault1', String(base));
+            alert(`之後新月份的薪津預設為 ${base.toLocaleString()}`);
+        }
         function togglePayrollEntryForm() {
             const form = document.getElementById('payrollEntryForm'), button = document.getElementById('payrollEntryToggle');
             const show = form.style.display === 'none';
@@ -1109,13 +1122,14 @@
             button.innerText = show ? '－ 收起輸入區' : '＋ 輸入／編輯本月收入';
         }
         function openPayrollModal() {
-            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
+            ['payrollGross','payrollNet','payrollPerformance','payrollGovNight','payrollNightAllowance','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
             setPayrollField('nonPayrollAmount', '');
             currentPayrollOtherItems = [];
             currentNonPayrollItems = [];
             renderPayrollOtherTypes();
             renderNonPayrollTypes();
-            setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
+            setPayrollField('payrollBaseSalary', payrollBaseDefault);
+            setPayrollField('payrollFixedIncome', payrollBaseDefault + PAYROLL_FIXED_ALLOWANCES);
             document.getElementById('payrollMonth').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
             loadPayrollMonth();
             document.getElementById('payrollEntryForm').style.display = 'none';
@@ -1125,8 +1139,8 @@
         function loadPayrollMonth() {
             const month = document.getElementById('payrollMonth').value;
             const record = payrollRecords.find(item => item.month === month);
-            setPayrollField('payrollFixedIncome', PAYROLL_FIXED_INCOME);
-            ['payrollGross','payrollNet','payrollGovNight','payrollNightAllowance'].forEach((id) => {
+            setPayrollField('payrollBaseSalary', record ? (record.baseSalary || payrollBaseDefault) : payrollBaseDefault);
+            ['payrollGross','payrollNet','payrollPerformance','payrollGovNight','payrollNightAllowance'].forEach((id) => {
                 const key = id.replace('payroll', '').replace(/^./, char => char.toLowerCase());
                 setPayrollField(id, record ? (record[key] || '') : '');
             });
@@ -1134,6 +1148,7 @@
             currentNonPayrollItems = Array.isArray(record?.nonPayrollItems) ? [...record.nonPayrollItems] : [];
             renderPayrollOtherItems();
             renderNonPayrollItems();
+            updatePayrollFixedIncome();
         }
         function getPayrollOtherTotal() {
             return currentPayrollOtherItems.reduce((sum, item) => sum + item.amount, 0);
@@ -1234,7 +1249,9 @@
             const month = document.getElementById('payrollMonth').value; if (!month) { alert('請選擇薪資月份'); return; }
             const index = payrollRecords.findIndex(item => item.month === month), existing = index >= 0 ? payrollRecords[index] : {};
             const valueOrExisting = (inputId, key) => { const value = document.getElementById(inputId).value.trim(); return value === '' ? (existing[key] || 0) : Number(value); };
-            const record = { month, gross: valueOrExisting('payrollGross', 'gross'), net: valueOrExisting('payrollNet', 'net'), fixedIncome: PAYROLL_FIXED_INCOME, govNight: valueOrExisting('payrollGovNight', 'govNight'), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), other: currentPayrollOtherItems.length ? getPayrollOtherTotal() : (existing.other || 0), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
+            const performance = valueOrExisting('payrollPerformance', 'performance');
+            const baseSalary = payrollValue('payrollBaseSalary');
+            const record = { month, gross: valueOrExisting('payrollGross', 'gross'), net: valueOrExisting('payrollNet', 'net'), baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: valueOrExisting('payrollGovNight', 'govNight'), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), other: currentPayrollOtherItems.length ? getPayrollOtherTotal() : (existing.other || 0), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
             if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); document.getElementById('payrollEntryForm').style.display = 'none'; document.getElementById('payrollEntryToggle').innerText = '＋ 輸入／編輯本月收入'; alert('已儲存薪資紀錄');
         }
