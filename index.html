@@ -3319,6 +3319,40 @@
             return { amount: amount, desc: descs.join(', ') };
         }
 
+        // --- 依班別推算衛福部夜班獎勵：12-8 $200、E $400、N $600 ---
+        function getRawGovNightAllowance(dateKey) {
+            const p = dateKey.split('-');
+            const savedData = calendarData[dateKey] || {};
+            const finalShift = savedData.shift !== undefined
+                ? savedData.shift
+                : getAutoShift(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).shift;
+            let amount = 0;
+            const descs = [];
+            if (finalShift) {
+                finalShift.trim().split(/\s+/).filter(Boolean).forEach(tok => {
+                    const shift = tok.toUpperCase();
+                    if (shift.startsWith('12-8')) { amount += 200; descs.push(`${tok} ($200)`); }
+                    else if (shift.startsWith('E')) { amount += 400; descs.push(`${tok} ($400)`); }
+                    else if (shift.startsWith('N')) { amount += 600; descs.push(`${tok} ($600)`); }
+                });
+            }
+            return amount ? { amount, desc: descs.join(', ') } : null;
+        }
+
+        function buildMonthGovNightAllowances() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const list = [];
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = `${monthKey}-${String(day).padStart(2, '0')}`;
+                const info = getRawGovNightAllowance(date);
+                if (info) list.push({ date, ...info });
+            }
+            return list;
+        }
+
         // --- 套用使用者調整後的夜班費 ---
         function computeAutoNightFee(dateKey) {
             const base = getRawNightFee(dateKey);
@@ -3453,8 +3487,9 @@
             const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
             const overtime = (globalStats.hours || []).filter(item => item.date.startsWith(monthKey) && item.desc.includes('加班') && (item.fee || 0) > 0).sort((a, b) => a.date.localeCompare(b.date));
             const night = buildMonthNightFees();
+            const govNight = buildMonthGovNightAllowances();
             const section = (title, color, total, items, itemText, empty) => `<section style="background:#fff; border:1.5px solid ${color}; border-radius:12px; padding:10px 12px; margin-bottom:12px;"><div style="display:flex; justify-content:space-between; font-weight:900; color:#555; margin-bottom:7px;"><span>${title}</span><span style="color:${color};">$${total.toLocaleString()}</span></div>${items.length ? items.map(item => `<div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding:6px 0; font-size:12px; color:#666;">${itemText(item)}</div>`).join('') : `<div style="color:#aaa; font-size:12px; padding:5px 0;">${empty}</div>`}</section>`;
-            const html = section('⏱️ 加班費', '#dc2626', overtime.reduce((sum, item) => sum + (item.fee || 0), 0), overtime, item => `<span>${item.date}｜${item.desc}</span><b>$${item.fee}</b>`, '本月無加班費紀錄') + section('🌙 夜班費', '#b45309', night.reduce((sum, item) => sum + item.amount, 0), night, item => `<span>${item.date}｜${item.desc}</span><b>$${item.amount}</b>`, '本月無夜班費紀錄');
+            const html = section('⏱️ 加班費', '#dc2626', overtime.reduce((sum, item) => sum + (item.fee || 0), 0), overtime, item => `<span>${item.date}｜${item.desc}</span><b>$${item.fee}</b>`, '本月無加班費紀錄') + section('🌙 夜班費', '#b45309', night.reduce((sum, item) => sum + item.amount, 0), night, item => `<span>${item.date}｜${item.desc}</span><b>$${item.amount}</b>`, '本月無夜班費紀錄') + section('🏥 衛福部夜班獎勵', '#278653', govNight.reduce((sum, item) => sum + item.amount, 0), govNight, item => `<span>${item.date}｜${item.desc}</span><b>$${item.amount}</b>`, '本月無符合班別的津貼');
             document.getElementById('shiftFeeContent').innerHTML = html;
             document.getElementById('shiftFeeModal').style.display = 'flex';
         }
