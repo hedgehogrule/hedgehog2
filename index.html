@@ -446,12 +446,11 @@
                     </div>
                 </details>
                 <div style="font-size:12px; font-weight:900; color:#5b7fa6; grid-column:span 2; order:3; border-top:1px dashed #bdd7ee; padding-top:10px;">不計入應領總額的收入
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px; font-size:10px; color:#666;">
+                    <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; margin-top:5px; font-size:10px; color:#666;">
                         <label>衛福部獎勵<input id="outsideGovNightTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #d8e8d9; border-radius:6px; background:#f3fbf4; color:#278653; font-size:12px; font-weight:900;"></label>
                         <label>夜班津貼<input id="outsideNightAllowanceTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #eee0c4; border-radius:6px; background:#fffaf0; color:#9a6700; font-size:12px; font-weight:900;"></label>
                         <label>額外收入<input id="outsideOtherTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #e2d9f5; border-radius:6px; background:#faf7ff; color:#6d5aaf; font-size:12px; font-weight:900;"></label>
-                        <label>業外收入<input id="outsideNonPayrollTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #d7e7f5; border-radius:6px; background:#f5faff; color:#3c74a8; font-size:12px; font-weight:900;"></label>
-                        <label style="grid-column:span 2; color:#5b7fa6;">衛福部獎勵＋夜班津貼＋額外收入＋業外收入＝<input id="outsideIncomeGrandTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 5px; border:1px solid #a9cbe8; border-radius:7px; background:#eef7ff; color:#2d6f9f; font-size:13px; font-weight:900;"></label>
+                        <label style="grid-column:span 3; color:#5b7fa6;">衛福部獎勵＋夜班津貼＋額外收入＝<input id="outsideIncomeGrandTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 5px; border:1px solid #a9cbe8; border-radius:7px; background:#eef7ff; color:#2d6f9f; font-size:13px; font-weight:900;"></label>
                     </div>
                 </div>
                 <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:3;">衛福部夜班獎勵
@@ -462,7 +461,7 @@
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="payrollOtherType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="payrollOtherAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addPayrollOtherItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#7a6baf; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
                     <button onclick="addPayrollOtherType()" style="border:none; background:none; color:#7a6baf; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="payrollOtherItemsList"></div><div id="payrollOtherTotal" style="margin-top:3px; color:#7a6baf;">額外收入合計 $0</div>
                 </div>
-                <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:3;">業外收入
+                <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:4; border-top:1px dashed #ddd; padding-top:10px;">業外收入
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="nonPayrollType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="nonPayrollAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addNonPayrollItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#5b9bd5; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
                     <button onclick="addNonPayrollType()" style="border:none; background:none; color:#5b9bd5; padding:5px 0 2px; font:inherit; font-size:11px; font-weight:800; cursor:pointer;">＋ 新增下拉選項</button><div id="nonPayrollItemsList"></div><div id="nonPayrollTotal" style="margin-top:3px; color:#5b9bd5;">業外收入合計 $0</div>
                 </div>
@@ -1259,12 +1258,11 @@
         function getPayrollOvertimeTotal() { return currentPayrollOvertimeItems.reduce((sum, item) => sum + item.amount, 0); }
         function getPayrollGovNightTotal() { return currentPayrollGovNightItems.reduce((sum, item) => sum + item.amount, 0); }
         function updateOutsideIncomeSummary() {
-            const gov = getPayrollGovNightTotal(), night = payrollValue('payrollNightAllowance'), other = getPayrollOtherTotal(), nonPayroll = getNonPayrollTotal();
+            const gov = getPayrollGovNightTotal(), night = payrollValue('payrollNightAllowance'), other = getPayrollOtherTotal();
             setPayrollField('outsideGovNightTotal', `$${gov.toLocaleString()}`);
             setPayrollField('outsideNightAllowanceTotal', `$${night.toLocaleString()}`);
             setPayrollField('outsideOtherTotal', `$${other.toLocaleString()}`);
-            setPayrollField('outsideNonPayrollTotal', `$${nonPayroll.toLocaleString()}`);
-            setPayrollField('outsideIncomeGrandTotal', `$${(gov + night + other + nonPayroll).toLocaleString()}`);
+            setPayrollField('outsideIncomeGrandTotal', `$${(gov + night + other).toLocaleString()}`);
         }
         function addPayrollOvertimeItem() {
             const amount = payrollValue('payrollOvertimeAmount'), note = document.getElementById('payrollOvertimeNote').value.trim();
