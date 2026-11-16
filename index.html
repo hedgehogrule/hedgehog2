@@ -408,6 +408,16 @@
             <div id="shortNoteColorPicker" style="display:flex; gap:6px; align-items:center; margin-bottom:12px; flex-wrap:wrap;"></div>
             <div id="shortNotesFilter" style="display:flex; gap:6px; align-items:center; margin-bottom:10px; flex-wrap:wrap;"></div>
             <div id="shortNotesList"></div>
+            <details style="margin-top:14px; padding-top:10px; border-top:1px dashed #c3b3ef;">
+                <summary style="cursor:pointer; color:#5b9bd5; font-weight:900;">🏷️ 圖示說明</summary>
+                <div style="font-size:12px; color:#888; margin:9px 0;">記下你常用圖示的意思，忘記時可在這裡查看。</div>
+                <div style="display:flex; gap:7px; margin-bottom:10px;">
+                    <input id="iconLegendIcon" type="text" maxlength="12" placeholder="圖示 🏥" style="width:90px; min-width:0; padding:9px; border:2px solid #ddd; border-radius:8px; font:inherit;">
+                    <input id="iconLegendMeaning" type="text" maxlength="80" placeholder="代表什麼？" onkeydown="if(event.key === 'Enter') addIconLegend()" style="flex:1; min-width:0; padding:9px; border:2px solid #ddd; border-radius:8px; font:inherit;">
+                    <button onclick="addIconLegend()" style="border:none; border-radius:8px; padding:8px 11px; background:#5b9bd5; color:#fff; font:inherit; font-weight:800; cursor:pointer;">新增</button>
+                </div>
+                <div id="iconLegendList"></div>
+            </details>
         </div>
     </div>
 
@@ -978,6 +988,34 @@
             }).join('');
         }
 
+        // ==================== 圖示說明 ====================
+        let iconLegend = [];
+        try { iconLegend = JSON.parse(localStorage.getItem('iconLegend1')) || []; } catch (e) {}
+        function saveIconLegend() { localStorage.setItem('iconLegend1', JSON.stringify(iconLegend)); }
+        function addIconLegend() {
+            const icon = document.getElementById('iconLegendIcon').value.trim();
+            const meaning = document.getElementById('iconLegendMeaning').value.trim();
+            if (!icon || !meaning) { alert('請填入圖示和它代表的意思'); return; }
+            iconLegend.unshift({ id: `icon_${Date.now()}`, icon, meaning });
+            saveIconLegend();
+            document.getElementById('iconLegendIcon').value = '';
+            document.getElementById('iconLegendMeaning').value = '';
+            renderIconLegend();
+        }
+        function editIconLegend(id) {
+            const item = iconLegend.find(entry => entry.id === id);
+            if (!item) return;
+            const icon = prompt('修改圖示', item.icon); if (icon === null || !icon.trim()) return;
+            const meaning = prompt('修改代表的意思', item.meaning); if (meaning === null || !meaning.trim()) return;
+            item.icon = icon.trim(); item.meaning = meaning.trim(); saveIconLegend(); renderIconLegend();
+        }
+        function deleteIconLegend(id) { iconLegend = iconLegend.filter(entry => entry.id !== id); saveIconLegend(); renderIconLegend(); }
+        function renderIconLegend() {
+            const list = document.getElementById('iconLegendList');
+            if (!iconLegend.length) { list.innerHTML = '<div style="text-align:center; color:#aaa; padding:18px 0; font-size:13px; font-weight:700;">還沒有圖示說明</div>'; return; }
+            list.innerHTML = iconLegend.map(item => `<div style="display:flex; align-items:center; gap:10px; border-bottom:1px solid #eee; padding:9px 3px;"><span style="font-size:22px; width:38px; text-align:center;">${escapeSweatGiftText(item.icon)}</span><span style="flex:1; color:#555; font-size:14px; font-weight:700; word-break:break-word;">${escapeSweatGiftText(item.meaning)}</span><button onclick="editIconLegend('${item.id}')" style="border:none; background:none; color:#5b9bd5; font-size:16px; font-weight:900; cursor:pointer; padding:3px 5px;">✎</button><button onclick="deleteIconLegend('${item.id}')" style="border:none; background:none; color:#ffaaaa; font-size:17px; font-weight:900; cursor:pointer; padding:3px 6px;">✕</button></div>`).join('');
+        }
+
         // ==================== 短期記事 ====================
         const SHORT_NOTE_COLORS = [
             { key: 'default', name: '無', dot: '#c7c7d1', bar: '#e4e4ec', bg: '#fafafa' },
@@ -1006,6 +1044,7 @@
             shortNoteFilter = 'all';
             renderShortNoteColorPicker();
             renderShortNotes();
+            renderIconLegend();
             document.getElementById('shortNotesModal').style.display = 'flex';
         }
 
@@ -2999,6 +3038,7 @@
                     extras: {
                         sweatGift: localStorage.getItem('sweatGiftTracker1'),
                         shortNotes: localStorage.getItem('shortNotes1'),
+                        iconLegend: localStorage.getItem('iconLegend1'),
                         payroll: localStorage.getItem('payrollRecords1')
                     },
                     photos: {}
@@ -3054,6 +3094,7 @@
                 if (backup.extras) {
                     if (backup.extras.sweatGift) localStorage.setItem('sweatGiftTracker1', backup.extras.sweatGift);
                     if (backup.extras.shortNotes) localStorage.setItem('shortNotes1', backup.extras.shortNotes);
+                    if (backup.extras.iconLegend) localStorage.setItem('iconLegend1', backup.extras.iconLegend);
                     if (backup.extras.payroll) localStorage.setItem('payrollRecords1', backup.extras.payroll);
                 }
                 
