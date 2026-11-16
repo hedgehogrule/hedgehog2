@@ -1011,18 +1011,22 @@
             document.getElementById('iconLegendMeaning').value = '';
             renderIconLegend();
         }
-        function editIconLegend(id) {
-            const item = iconLegend.find(entry => entry.id === id);
-            if (!item) return;
-            const icon = prompt('修改圖示', item.icon); if (icon === null || !icon.trim()) return;
-            const meaning = prompt('修改代表的意思', item.meaning); if (meaning === null || !meaning.trim()) return;
-            item.icon = icon.trim(); item.meaning = meaning.trim(); saveIconLegend(); renderIconLegend();
+        let iconLegendLongPressTimer = null;
+        function startIconLegendLongPress(id) {
+            clearTimeout(iconLegendLongPressTimer);
+            iconLegendLongPressTimer = setTimeout(() => {
+                iconLegendLongPressTimer = null;
+                const item = iconLegend.find(entry => entry.id === id);
+                if (item && confirm(`刪除「${item.icon} ${item.meaning}」？`)) {
+                    iconLegend = iconLegend.filter(entry => entry.id !== id); saveIconLegend(); renderIconLegend();
+                }
+            }, 650);
         }
-        function deleteIconLegend(id) { iconLegend = iconLegend.filter(entry => entry.id !== id); saveIconLegend(); renderIconLegend(); }
+        function cancelIconLegendLongPress() { clearTimeout(iconLegendLongPressTimer); iconLegendLongPressTimer = null; }
         function renderIconLegend() {
             const list = document.getElementById('iconLegendList');
             if (!iconLegend.length) { list.innerHTML = '<div style="text-align:center; color:#aaa; padding:18px 0; font-size:13px; font-weight:700;">還沒有圖示說明</div>'; return; }
-            list.innerHTML = iconLegend.map(item => `<div style="display:flex; align-items:center; gap:10px; border-bottom:1px solid #eee; padding:9px 3px;"><span style="font-size:22px; width:38px; text-align:center;">${escapeSweatGiftText(item.icon)}</span><span style="flex:1; color:#555; font-size:14px; font-weight:700; word-break:break-word;">${escapeSweatGiftText(item.meaning)}</span><button onclick="editIconLegend('${item.id}')" style="border:none; background:none; color:#5b9bd5; font-size:16px; font-weight:900; cursor:pointer; padding:3px 5px;">✎</button><button onclick="deleteIconLegend('${item.id}')" style="border:none; background:none; color:#ffaaaa; font-size:17px; font-weight:900; cursor:pointer; padding:3px 6px;">✕</button></div>`).join('');
+            list.innerHTML = `<div style="display:flex; flex-wrap:wrap; gap:7px;">${iconLegend.map(item => `<button onpointerdown="startIconLegendLongPress('${item.id}')" onpointerup="cancelIconLegendLongPress()" onpointerleave="cancelIconLegendLongPress()" onpointercancel="cancelIconLegendLongPress()" style="border:1px solid #bdd7ee; border-radius:999px; padding:5px 9px; background:#f4faff; color:#477da8; font:inherit; font-size:12px; font-weight:800; cursor:pointer; touch-action:manipulation;">${escapeSweatGiftText(item.icon)}　${escapeSweatGiftText(item.meaning)}</button>`).join('')}</div>`;
         }
 
         // ==================== 短期記事 ====================
