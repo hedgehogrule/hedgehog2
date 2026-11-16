@@ -440,9 +440,11 @@
                     <label style="font-size:11px; font-weight:800; color:#666;">績效獎金<input id="payrollPerformance" type="number" min="0" oninput="updatePayrollFixedIncome()" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 4px; border:1px solid #ddd; border-radius:7px; font-size:13px;"></label>
                 </div>
                 <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2;">加班費
-                    <div style="display:flex; gap:6px; margin-top:3px;"><input id="payrollOvertime" type="number" min="0" oninput="updatePayrollTotals()" placeholder="金額" style="width:100px; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><input id="payrollOvertimeNote" type="text" maxlength="80" placeholder="備註，例如：國定假日加班" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></div>
+                    <div style="display:flex; gap:6px; margin-top:3px;"><input id="payrollOvertimeAmount" type="number" min="0" placeholder="金額" style="width:82px; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><input id="payrollOvertimeNote" type="text" maxlength="80" placeholder="備註，例如：國定假日加班" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><button onclick="addPayrollOvertimeItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#dc2626; color:#fff; font-weight:800; cursor:pointer;">新增</button></div><div id="payrollOvertimeItemsList"></div><div id="payrollOvertimeTotal" style="margin-top:3px; color:#dc2626;">加班費合計 $0</div>
                 </div>
-                <label style="font-size:12px; font-weight:800; color:#666; order:3;">衛福部夜班獎勵<input id="payrollGovNight" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:14px;"><input id="payrollGovNightNote" type="text" placeholder="備註，例如：115/08" style="width:100%; box-sizing:border-box; margin-top:3px; padding:5px 7px; border:1px solid #ddd; border-radius:7px; font-size:12px;"></label>
+                <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:3;">衛福部夜班獎勵
+                    <div style="display:flex; gap:6px; margin-top:3px;"><input id="payrollGovNightAmount" type="number" min="0" placeholder="金額" style="width:82px; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><input id="payrollGovNightNote" type="text" maxlength="80" placeholder="備註，例如：115/08" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"><button onclick="addPayrollGovNightItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#278653; color:#fff; font-weight:800; cursor:pointer;">新增</button></div><div id="payrollGovNightItemsList"></div><div id="payrollGovNightTotal" style="margin-top:3px; color:#278653;">衛福部夜班獎勵合計 $0</div>
+                </div>
                 <label style="font-size:12px; font-weight:800; color:#666; order:3;">夜班津貼（約 10 日發）<input id="payrollNightAllowance" type="number" min="0" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
                 <div style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:4;">額外收入
                     <div style="display:flex; gap:6px; margin-top:3px;"><select id="payrollOtherType" style="flex:1; min-width:0; padding:8px; border:1px solid #ddd; border-radius:7px; font:inherit;"></select><input id="payrollOtherAmount" type="number" min="0" placeholder="金額" style="width:82px; padding:8px; border:1px solid #ddd; border-radius:7px;"><button onclick="addPayrollOtherItem()" style="border:none; border-radius:7px; padding:6px 9px; background:#7a6baf; color:#fff; font-weight:800; cursor:pointer;">新增</button></div>
@@ -1162,6 +1164,8 @@
         try { nonPayrollTypes = JSON.parse(localStorage.getItem('nonPayrollTypes1')) || nonPayrollTypes; } catch (e) {}
         let currentPayrollOtherItems = [];
         let currentNonPayrollItems = [];
+        let currentPayrollOvertimeItems = [];
+        let currentPayrollGovNightItems = [];
         const PAYROLL_FIXED_ALLOWANCES = 9000 + 9300;
         const payrollBaseDefault = 38430;
         const PAYROLL_DEFAULT_DEDUCTIONS = { laborInsurance: 1145, pension: 5526, healthInsurance: 2856, mutualAid: 50 };
@@ -1185,7 +1189,7 @@
             updatePayrollTotals();
         }
         function updatePayrollTotals() {
-            const gross = payrollValue('payrollBaseSalary') + PAYROLL_FIXED_ALLOWANCES + payrollValue('payrollPerformance') + payrollValue('payrollOvertime') + getPayrollOtherTotal();
+            const gross = payrollValue('payrollBaseSalary') + PAYROLL_FIXED_ALLOWANCES + payrollValue('payrollPerformance') + getPayrollOvertimeTotal() + getPayrollOtherTotal();
             const deductions = payrollValue('payrollLaborInsurance') + payrollValue('payrollPension') + payrollValue('payrollHealthInsurance') + payrollValue('payrollMutualAid') + payrollValue('payrollOtherDeduction');
             setPayrollField('payrollGross', gross);
             setPayrollField('payrollNet', gross - deductions);
@@ -1197,11 +1201,13 @@
             button.innerText = show ? '－ 收起輸入區' : '＋ 輸入／編輯本月收入';
         }
         function openPayrollModal() {
-            ['payrollGross','payrollNet','payrollPerformance','payrollGovNight','payrollGovNightNote','payrollNightAllowance','payrollOvertime','payrollOvertimeNote','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
+            ['payrollGross','payrollNet','payrollPerformance','payrollGovNightAmount','payrollGovNightNote','payrollNightAllowance','payrollOvertimeAmount','payrollOvertimeNote','payrollOtherAmount'].forEach(id => setPayrollField(id, ''));
             setPayrollField('payrollLaborInsurance', PAYROLL_DEFAULT_DEDUCTIONS.laborInsurance); setPayrollField('payrollPension', PAYROLL_DEFAULT_DEDUCTIONS.pension); setPayrollField('payrollHealthInsurance', PAYROLL_DEFAULT_DEDUCTIONS.healthInsurance); setPayrollField('payrollMutualAid', PAYROLL_DEFAULT_DEDUCTIONS.mutualAid); setPayrollField('payrollOtherDeduction', ''); setPayrollField('payrollOtherDeductionNote', '');
             setPayrollField('nonPayrollAmount', '');
             currentPayrollOtherItems = [];
             currentNonPayrollItems = [];
+            currentPayrollOvertimeItems = [];
+            currentPayrollGovNightItems = [];
             renderPayrollOtherTypes();
             renderNonPayrollTypes();
             setPayrollField('payrollBaseSalary', payrollBaseDefault);
@@ -1216,16 +1222,18 @@
             const month = document.getElementById('payrollMonth').value;
             const record = payrollRecords.find(item => item.month === month);
             setPayrollField('payrollBaseSalary', record ? (record.baseSalary || payrollBaseDefault) : payrollBaseDefault);
-            ['payrollGross','payrollNet','payrollPerformance','payrollGovNight','payrollNightAllowance','payrollOvertime'].forEach((id) => {
+            ['payrollGross','payrollNet','payrollPerformance','payrollNightAllowance'].forEach((id) => {
                 const key = id.replace('payroll', '').replace(/^./, char => char.toLowerCase());
                 setPayrollField(id, record ? (record[key] || '') : '');
             });
-            setPayrollField('payrollGovNightNote', record?.govNightNote || '');
-            setPayrollField('payrollOvertimeNote', record?.overtimeNote || '');
+            currentPayrollOvertimeItems = Array.isArray(record?.overtimeItems) ? [...record.overtimeItems] : (record?.overtime ? [{ id: `legacy_ot_${month}`, amount: record.overtime, note: record.overtimeNote || '' }] : []);
+            currentPayrollGovNightItems = Array.isArray(record?.govNightItems) ? [...record.govNightItems] : (record?.govNight ? [{ id: `legacy_gov_${month}`, amount: record.govNight, note: record.govNightNote || '' }] : []);
             currentPayrollOtherItems = Array.isArray(record?.otherItems) ? [...record.otherItems] : (record?.other ? [{ id: `legacy_other_${month}`, type: '額外收入', amount: record.other }] : []);
             currentNonPayrollItems = Array.isArray(record?.nonPayrollItems) ? [...record.nonPayrollItems] : [];
             renderPayrollOtherItems();
             renderNonPayrollItems();
+            renderPayrollOvertimeItems();
+            renderPayrollGovNightItems();
             updatePayrollFixedIncome();
             ['payrollLaborInsurance','payrollPension','payrollHealthInsurance','payrollMutualAid'].forEach(id => { const key = id.replace('payroll', '').replace(/^./, char => char.toLowerCase()); setPayrollField(id, record ? (record[key] ?? PAYROLL_DEFAULT_DEDUCTIONS[key]) : PAYROLL_DEFAULT_DEDUCTIONS[key]); });
             setPayrollField('payrollOtherDeduction', record?.otherDeduction || '');
@@ -1234,6 +1242,28 @@
         }
         function getPayrollOtherTotal() {
             return currentPayrollOtherItems.reduce((sum, item) => sum + item.amount, 0);
+        }
+        function getPayrollOvertimeTotal() { return currentPayrollOvertimeItems.reduce((sum, item) => sum + item.amount, 0); }
+        function getPayrollGovNightTotal() { return currentPayrollGovNightItems.reduce((sum, item) => sum + item.amount, 0); }
+        function addPayrollOvertimeItem() {
+            const amount = payrollValue('payrollOvertimeAmount'), note = document.getElementById('payrollOvertimeNote').value.trim();
+            if (amount <= 0) { alert('請輸入加班費金額'); return; }
+            currentPayrollOvertimeItems.push({ id: `ot_${Date.now()}`, amount, note }); setPayrollField('payrollOvertimeAmount', ''); setPayrollField('payrollOvertimeNote', ''); renderPayrollOvertimeItems();
+        }
+        function deletePayrollOvertimeItem(id) { currentPayrollOvertimeItems = currentPayrollOvertimeItems.filter(item => item.id !== id); renderPayrollOvertimeItems(); }
+        function renderPayrollOvertimeItems() {
+            document.getElementById('payrollOvertimeItemsList').innerHTML = currentPayrollOvertimeItems.map(item => `<div style="display:flex; justify-content:space-between; padding:4px 0; color:#666;"><span>$${item.amount.toLocaleString()}${item.note ? `　${escapeSweatGiftText(item.note)}` : ''}</span><button onclick="deletePayrollOvertimeItem('${item.id}')" style="border:none;background:none;color:#ffaaaa;cursor:pointer;">✕</button></div>`).join('');
+            document.getElementById('payrollOvertimeTotal').innerText = `加班費合計 $${getPayrollOvertimeTotal().toLocaleString()}`; updatePayrollTotals();
+        }
+        function addPayrollGovNightItem() {
+            const amount = payrollValue('payrollGovNightAmount'), note = document.getElementById('payrollGovNightNote').value.trim();
+            if (amount <= 0) { alert('請輸入衛福部夜班獎勵金額'); return; }
+            currentPayrollGovNightItems.push({ id: `gov_${Date.now()}`, amount, note }); setPayrollField('payrollGovNightAmount', ''); setPayrollField('payrollGovNightNote', ''); renderPayrollGovNightItems();
+        }
+        function deletePayrollGovNightItem(id) { currentPayrollGovNightItems = currentPayrollGovNightItems.filter(item => item.id !== id); renderPayrollGovNightItems(); }
+        function renderPayrollGovNightItems() {
+            document.getElementById('payrollGovNightItemsList').innerHTML = currentPayrollGovNightItems.map(item => `<div style="display:flex; justify-content:space-between; padding:4px 0; color:#666;"><span>$${item.amount.toLocaleString()}${item.note ? `　${escapeSweatGiftText(item.note)}` : ''}</span><button onclick="deletePayrollGovNightItem('${item.id}')" style="border:none;background:none;color:#ffaaaa;cursor:pointer;">✕</button></div>`).join('');
+            document.getElementById('payrollGovNightTotal').innerText = `衛福部夜班獎勵合計 $${getPayrollGovNightTotal().toLocaleString()}`;
         }
         function updatePayrollOtherTotal() {
             document.getElementById('payrollOtherTotal').innerText = `額外收入合計 $${getPayrollOtherTotal().toLocaleString()}`;
@@ -1334,7 +1364,7 @@
             const valueOrExisting = (inputId, key) => { const value = document.getElementById(inputId).value.trim(); return value === '' ? (existing[key] || 0) : Number(value); };
             const performance = valueOrExisting('payrollPerformance', 'performance');
             const baseSalary = payrollValue('payrollBaseSalary');
-            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), includesOtherInPay: true, baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: valueOrExisting('payrollGovNight', 'govNight'), govNightNote: document.getElementById('payrollGovNightNote').value.trim(), nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), overtime: valueOrExisting('payrollOvertime', 'overtime'), overtimeNote: document.getElementById('payrollOvertimeNote').value.trim(), laborInsurance: payrollValue('payrollLaborInsurance'), pension: payrollValue('payrollPension'), healthInsurance: payrollValue('payrollHealthInsurance'), mutualAid: payrollValue('payrollMutualAid'), otherDeduction: payrollValue('payrollOtherDeduction'), otherDeductionNote: document.getElementById('payrollOtherDeductionNote').value.trim(), other: getPayrollOtherTotal(), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
+            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), includesOtherInPay: true, baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: getPayrollGovNightTotal(), govNightItems: [...currentPayrollGovNightItems], nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), overtime: getPayrollOvertimeTotal(), overtimeItems: [...currentPayrollOvertimeItems], laborInsurance: payrollValue('payrollLaborInsurance'), pension: payrollValue('payrollPension'), healthInsurance: payrollValue('payrollHealthInsurance'), mutualAid: payrollValue('payrollMutualAid'), otherDeduction: payrollValue('payrollOtherDeduction'), otherDeductionNote: document.getElementById('payrollOtherDeductionNote').value.trim(), other: getPayrollOtherTotal(), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
             if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); document.getElementById('payrollEntryForm').style.display = 'none'; document.getElementById('payrollEntryToggle').innerText = '＋ 輸入／編輯本月收入'; alert('已儲存薪資紀錄');
         }
@@ -1352,7 +1382,7 @@
             const titles = { gross:'應領總額', net:'給付淨額', performance:'績效統計', other:'額外收入', govNight:'衛福部夜班獎勵', nightAllowance:'夜班津貼', deductions:'扣項', nonPayroll:'業外收入' };
             const extra = item => {
                 if (key === 'deductions') return `勞保 ${item.laborInsurance || 0}／退休 ${item.pension || 0}／健保 ${item.healthInsurance || 0}／互助 ${item.mutualAid || 0}${item.otherDeduction ? `／其他 ${item.otherDeduction}${item.otherDeductionNote ? `（${escapeSweatGiftText(item.otherDeductionNote)}）` : ''}` : ''}`;
-                if (key === 'govNight') return item.govNightNote ? `備註：${escapeSweatGiftText(item.govNightNote)}` : '';
+                if (key === 'govNight') return Array.isArray(item.govNightItems) ? item.govNightItems.map(entry => `${entry.amount.toLocaleString()}${entry.note ? `（${escapeSweatGiftText(entry.note)}）` : ''}`).join('、') : (item.govNightNote ? `備註：${escapeSweatGiftText(item.govNightNote)}` : '');
                 if (key === 'other' && item.otherItems?.length) return item.otherItems.map(entry => `${escapeSweatGiftText(entry.type)} ${entry.amount.toLocaleString()}`).join('、');
                 if (key === 'nonPayroll' && item.nonPayrollItems?.length) return item.nonPayrollItems.map(entry => `${escapeSweatGiftText(entry.name)} ${entry.amount.toLocaleString()}`).join('、');
                 return '';
