@@ -446,11 +446,11 @@
                     </div>
                 </details>
                 <div style="font-size:12px; font-weight:900; color:#5b7fa6; grid-column:span 2; order:3; border-top:1px dashed #bdd7ee; padding-top:10px;">不計入應領總額的收入
-                    <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; margin-top:5px; font-size:10px; color:#666;">
+                    <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px; margin-top:5px; font-size:10px; color:#666;">
                         <label>衛福部獎勵<input id="outsideGovNightTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #d8e8d9; border-radius:6px; background:#f3fbf4; color:#278653; font-size:12px; font-weight:900;"></label>
                         <label>夜班津貼<input id="outsideNightAllowanceTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #eee0c4; border-radius:6px; background:#fffaf0; color:#9a6700; font-size:12px; font-weight:900;"></label>
                         <label>額外收入<input id="outsideOtherTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 4px; border:1px solid #e2d9f5; border-radius:6px; background:#faf7ff; color:#6d5aaf; font-size:12px; font-weight:900;"></label>
-                        <label style="grid-column:span 3; color:#5b7fa6;">衛福部獎勵＋夜班津貼＋額外收入＝<input id="outsideIncomeGrandTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:6px 5px; border:1px solid #a9cbe8; border-radius:7px; background:#eef7ff; color:#2d6f9f; font-size:13px; font-weight:900;"></label>
+                        <label style="color:#5b7fa6;">＝總計<input id="outsideIncomeGrandTotal" type="text" readonly value="$0" style="width:100%; box-sizing:border-box; margin-top:2px; padding:5px 3px; border:1px solid #a9cbe8; border-radius:6px; background:#eef7ff; color:#2d6f9f; font-size:12px; font-weight:900;"></label>
                     </div>
                 </div>
                 <label style="font-size:12px; font-weight:800; color:#666; grid-column:span 2; order:3;">夜班津貼（約 10 日發）<input id="payrollNightAllowance" type="number" min="0" oninput="updateOutsideIncomeSummary()" style="width:100%; box-sizing:border-box; margin-top:3px; padding:8px; border:1px solid #ddd; border-radius:7px;"></label>
@@ -1389,7 +1389,7 @@
             const valueOrExisting = (inputId, key) => { const value = document.getElementById(inputId).value.trim(); return value === '' ? (existing[key] || 0) : Number(value); };
             const performance = valueOrExisting('payrollPerformance', 'performance');
             const baseSalary = payrollValue('payrollBaseSalary');
-            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), includesOtherInPay: false, baseSalary, performance, fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: getPayrollGovNightTotal(), govNightItems: [...currentPayrollGovNightItems], nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), overtime: getPayrollOvertimeTotal(), overtimeItems: [...currentPayrollOvertimeItems], laborInsurance: payrollValue('payrollLaborInsurance'), pension: payrollValue('payrollPension'), healthInsurance: payrollValue('payrollHealthInsurance'), mutualAid: payrollValue('payrollMutualAid'), otherDeduction: payrollValue('payrollOtherDeduction'), otherDeductionNote: document.getElementById('payrollOtherDeductionNote').value.trim(), other: getPayrollOtherTotal(), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
+            const record = { month, gross: payrollValue('payrollGross'), net: payrollValue('payrollNet'), includesOtherInPay: false, baseSalary, performance, performanceEntered: document.getElementById('payrollPerformance').value.trim() !== '', fixedIncome: baseSalary + PAYROLL_FIXED_ALLOWANCES + performance, govNight: getPayrollGovNightTotal(), govNightItems: [...currentPayrollGovNightItems], nightAllowance: valueOrExisting('payrollNightAllowance', 'nightAllowance'), overtime: getPayrollOvertimeTotal(), overtimeItems: [...currentPayrollOvertimeItems], laborInsurance: payrollValue('payrollLaborInsurance'), pension: payrollValue('payrollPension'), healthInsurance: payrollValue('payrollHealthInsurance'), mutualAid: payrollValue('payrollMutualAid'), otherDeduction: payrollValue('payrollOtherDeduction'), otherDeductionNote: document.getElementById('payrollOtherDeductionNote').value.trim(), other: getPayrollOtherTotal(), otherItems: [...currentPayrollOtherItems], nonPayroll: currentNonPayrollItems.length ? getNonPayrollTotal() : (existing.nonPayroll || 0), nonPayrollItems: [...currentNonPayrollItems] };
             if (index >= 0) payrollRecords[index] = record; else payrollRecords.push(record);
             savePayrollRecords(); renderPayrollRecords(); document.getElementById('payrollEntryForm').style.display = 'none'; document.getElementById('payrollEntryToggle').innerText = '＋ 輸入／編輯本月收入'; alert('已儲存薪資紀錄');
         }
@@ -1417,14 +1417,25 @@
             };
             const trend = (() => {
                 if (key !== 'performance') return '';
-                const year = String(currentDate.getFullYear());
-                const values = Array.from({ length: 12 }, (_, index) => {
-                    const month = `${year}-${String(index + 1).padStart(2, '0')}`;
-                    return payrollSummaryValue(records.find(item => item.month === month) || {}, 'performance');
+                const chartMonths = Array.from({ length: 12 }, (_, index) => {
+                    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11 + index, 1);
+                    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                 });
-                const max = Math.max(...values, 1), width = 280, height = 100, pad = 12;
-                const points = values.map((value, index) => `${pad + index * ((width - pad * 2) / 11)},${height - pad - value / max * (height - pad * 2)}`).join(' ');
-                return `<div style="margin:8px 0 5px;"><div style="font-weight:800; color:#6d5aaf; margin-bottom:3px;">年度趨勢圖</div><svg viewBox="0 0 ${width} ${height}" style="display:block; width:100%; height:auto; background:#fff; border-radius:7px;"><line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#ddd"/><polyline points="${points}" fill="none" stroke="#7a6baf" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${values.map((value, index) => `<circle cx="${pad + index * ((width - pad * 2) / 11)}" cy="${height - pad - value / max * (height - pad * 2)}" r="3" fill="#7a6baf"/>`).join('')}<text x="${pad}" y="${height - 1}" font-size="8" fill="#999">1月</text><text x="${width - pad - 14}" y="${height - 1}" font-size="8" fill="#999">12月</text></svg></div>`;
+                const values = chartMonths.map(month => {
+                    const record = payrollRecords.find(item => item.month === month);
+                    return record && (record.performanceEntered || (record.performance || 0) > 0) ? payrollSummaryValue(record, 'performance') : null;
+                });
+                const entered = values.map((value, index) => value === null ? null : { value, index }).filter(Boolean);
+                if (!entered.length) return '<div style="margin:8px 0 5px; color:#aaa; font-size:12px;">最近 12 個月尚無績效資料</div>';
+                const rawMin = Math.min(...entered.map(item => item.value)), rawMax = Math.max(...entered.map(item => item.value));
+                const padding = Math.max((rawMax - rawMin) * 0.25, rawMax * 0.08, 1000);
+                const chartMin = Math.max(0, rawMin - padding), chartMax = rawMax + padding;
+                const width = 280, height = 125, left = 30, right = 10, top = 16, bottom = 22;
+                const x = index => left + index * ((width - left - right) / 11);
+                const y = value => top + (chartMax - value) / (chartMax - chartMin) * (height - top - bottom);
+                const points = entered.map(item => `${x(item.index)},${y(item.value)}`).join(' ');
+                const firstLabel = `${Number(chartMonths[0].slice(5))}月`, lastLabel = `${Number(chartMonths[11].slice(5))}月`;
+                return `<div style="margin:8px 0 5px;"><div style="display:flex; justify-content:space-between; font-weight:800; color:#6d5aaf; margin-bottom:3px;"><span>最近 12 個月趨勢</span><span style="font-size:10px; color:#999;">已輸入 ${entered.length} 個月</span></div><svg viewBox="0 0 ${width} ${height}" style="display:block; width:100%; height:auto; background:#fff; border-radius:7px;"><line x1="${left}" y1="${top}" x2="${width - right}" y2="${top}" stroke="#eee"/><line x1="${left}" y1="${(top + height - bottom) / 2}" x2="${width - right}" y2="${(top + height - bottom) / 2}" stroke="#eee" stroke-dasharray="3 3"/><line x1="${left}" y1="${height - bottom}" x2="${width - right}" y2="${height - bottom}" stroke="#ddd"/><polyline points="${points}" fill="none" stroke="#d94b61" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${entered.map(item => `<circle cx="${x(item.index)}" cy="${y(item.value)}" r="4" fill="#d94b61" stroke="#fff" stroke-width="2"><title>${chartMonths[item.index]}　$${item.value.toLocaleString()}</title></circle>`).join('')}<text x="2" y="${top + 3}" font-size="8" fill="#999">$${Math.round(chartMax).toLocaleString()}</text><text x="2" y="${height - bottom + 3}" font-size="8" fill="#999">$${Math.round(chartMin).toLocaleString()}</text><text x="${left}" y="${height - 3}" font-size="8" fill="#999">${firstLabel}</text><text x="${width - right - 14}" y="${height - 3}" font-size="8" fill="#999">${lastLabel}</text></svg><div style="font-size:10px; color:#999; margin-top:2px;">未輸入月份會留白，不會以 $0 計算。</div></div>`;
             })();
             detail.dataset.key = key;
             detail.innerHTML = `<div style="margin:-4px 0 10px; padding:8px; border-radius:8px; background:#fafafa; font-size:12px; color:#666;"><b>${titles[key]}明細</b>${trend}${records.length ? records.map(item => `<div style="display:flex; gap:8px; padding:4px 0; border-bottom:1px solid #eee;"><span style="width:55px; font-weight:800;">${item.month}</span><span style="font-weight:800;">$${payrollSummaryValue(item, key).toLocaleString()}</span><span style="color:#888;">${extra(item)}</span></div>`).join('') : '<div style="padding-top:5px; color:#aaa;">尚無紀錄</div>'}</div>`;
