@@ -401,6 +401,11 @@
                 <h3 style="margin:0; font-size:19px; color:#7a6baf;">📝 短期記事</h3>
                 <button onclick="closeShortNotesModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button>
             </div>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+                <button id="shortNotesTab" onclick="setNotesPanel('short')" style="flex:1; border:1px solid #c3b3ef; border-radius:8px; padding:7px; background:#f3eefc; color:#6d5aaf; font:inherit; font-weight:800; cursor:pointer;">短期記事</button>
+                <button id="immediateNotesTab" onclick="setNotesPanel('immediate')" style="flex:1; border:1px solid #f0b2b2; border-radius:8px; padding:7px; background:#fff; color:#c62828; font:inherit; font-weight:800; cursor:pointer;">即時記事</button>
+            </div>
+            <div id="shortNotesPanel">
             <div style="display:flex; gap:8px; margin-bottom:8px;">
                 <input id="shortNoteInput" type="text" maxlength="120" placeholder="輸入一則短期記事…" onkeydown="if(event.key === 'Enter') addShortNote()" style="flex:1; min-width:0; padding:10px; border:2px solid #ddd; border-radius:8px; font:inherit;">
                 <button onclick="addShortNote()" style="border:none; border-radius:8px; padding:8px 12px; background:#7a6baf; color:#fff; font:inherit; font-weight:800; cursor:pointer;">新增</button>
@@ -418,6 +423,20 @@
                 </div>
                 <div id="iconLegendList"></div>
             </details>
+            </div>
+            <div id="immediateNotesPanel" style="display:none;">
+                <div style="font-size:12px; color:#a33; margin-bottom:9px; font-weight:800;">未完成的即時記事，每次開啟行事曆都會跳出提醒。</div>
+                <div style="display:flex; gap:8px; margin-bottom:10px;"><input id="immediateNoteInput" type="text" maxlength="120" placeholder="輸入需要立即處理的事…" onkeydown="if(event.key === 'Enter') addImmediateNote()" style="flex:1; min-width:0; padding:10px; border:2px solid #f0b2b2; border-radius:8px; font:inherit;"><button onclick="addImmediateNote()" style="border:none; border-radius:8px; padding:8px 12px; background:#d94b61; color:#fff; font:inherit; font-weight:800; cursor:pointer;">新增</button></div>
+                <div id="immediateNotesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="immediateReminderModal" style="z-index:60; background:rgba(255,255,255,0.97);">
+        <div class="modal-content" style="padding:18px 15px 30px; max-width:520px; height:auto; max-height:90vh; margin-top:5vh; background:#fff7f7; border-radius:16px; border:1px solid #f0b2b2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h3 style="margin:0; color:#c62828;">🔔 即時記事</h3><button onclick="closeImmediateReminderModal()" style="background:none; border:none; font-size:24px; color:#999; cursor:pointer;">✕</button></div>
+            <div style="font-size:13px; color:#a33; margin-bottom:10px;">以下事項尚未完成：</div>
+            <div id="immediateReminderList"></div>
         </div>
     </div>
 
@@ -1053,12 +1072,15 @@
 
         let shortNotes = [];
         try { shortNotes = JSON.parse(localStorage.getItem('shortNotes1')) || []; } catch (e) {}
+        let immediateNotes = [];
+        try { immediateNotes = JSON.parse(localStorage.getItem('immediateNotes1')) || []; } catch (e) {}
         let selectedNoteColor = 'default';
         let shortNoteFilter = 'all';
 
         function saveShortNotes() {
             localStorage.setItem('shortNotes1', JSON.stringify(shortNotes));
         }
+        function saveImmediateNotes() { localStorage.setItem('immediateNotes1', JSON.stringify(immediateNotes)); }
 
         function openShortNotesModal() {
             document.getElementById('shortNoteInput').value = '';
@@ -1067,12 +1089,45 @@
             renderShortNoteColorPicker();
             renderShortNotes();
             renderIconLegend();
+            renderImmediateNotes();
+            setNotesPanel('short');
             document.getElementById('shortNotesModal').style.display = 'flex';
         }
 
         function closeShortNotesModal() {
             document.getElementById('shortNotesModal').style.display = 'none';
         }
+        function setNotesPanel(panel) {
+            const isShort = panel === 'short';
+            document.getElementById('shortNotesPanel').style.display = isShort ? 'block' : 'none';
+            document.getElementById('immediateNotesPanel').style.display = isShort ? 'none' : 'block';
+            document.getElementById('shortNotesTab').style.background = isShort ? '#f3eefc' : '#fff';
+            document.getElementById('immediateNotesTab').style.background = isShort ? '#fff' : '#fff0f0';
+            if (!isShort) document.getElementById('immediateNoteInput').focus();
+        }
+        function addImmediateNote() {
+            const input = document.getElementById('immediateNoteInput'), text = input.value.trim();
+            if (!text) return;
+            immediateNotes.unshift({ id: `immediate_${Date.now()}`, text });
+            saveImmediateNotes(); input.value = ''; renderImmediateNotes();
+        }
+        function completeImmediateNote(id) {
+            immediateNotes = immediateNotes.filter(note => note.id !== id); saveImmediateNotes(); renderImmediateNotes(); renderImmediateReminder();
+            if (!immediateNotes.length) closeImmediateReminderModal();
+        }
+        function renderImmediateNotes() {
+            const list = document.getElementById('immediateNotesList'); if (!list) return;
+            list.innerHTML = immediateNotes.length ? immediateNotes.map(note => `<div style="display:flex; align-items:center; gap:8px; border-left:5px solid #d94b61; background:#fff4f4; border-radius:6px; padding:9px 8px; margin-bottom:6px;"><span style="flex:1; color:#555; font-size:14px; font-weight:700; word-break:break-word;">${escapeSweatGiftText(note.text)}</span><button onclick="completeImmediateNote('${note.id}')" style="border:none; border-radius:7px; padding:5px 8px; background:#d94b61; color:#fff; font:inherit; font-size:12px; font-weight:800; cursor:pointer;">完成</button></div>`).join('') : '<div style="text-align:center; color:#aaa; padding:16px 0; font-size:13px; font-weight:700;">目前沒有即時記事</div>';
+        }
+        function renderImmediateReminder() {
+            const list = document.getElementById('immediateReminderList'); if (!list) return;
+            list.innerHTML = immediateNotes.map(note => `<div style="display:flex; align-items:center; gap:8px; border-left:5px solid #d94b61; background:#fff; border-radius:7px; padding:11px 9px; margin-bottom:7px;"><span style="flex:1; color:#555; font-size:15px; font-weight:800; word-break:break-word;">${escapeSweatGiftText(note.text)}</span><button onclick="completeImmediateNote('${note.id}')" style="border:none; border-radius:8px; padding:7px 10px; background:#d94b61; color:#fff; font:inherit; font-weight:800; cursor:pointer;">完成</button></div>`).join('');
+        }
+        function openImmediateReminderModal() {
+            if (!immediateNotes.length) return;
+            renderImmediateReminder(); document.getElementById('immediateReminderModal').style.display = 'flex';
+        }
+        function closeImmediateReminderModal() { document.getElementById('immediateReminderModal').style.display = 'none'; }
 
         function renderShortNoteColorPicker() {
             const wrap = document.getElementById('shortNoteColorPicker');
@@ -3118,6 +3173,7 @@
                     extras: {
                         sweatGift: localStorage.getItem('sweatGiftTracker1'),
                         shortNotes: localStorage.getItem('shortNotes1'),
+                        immediateNotes: localStorage.getItem('immediateNotes1'),
                         iconLegend: localStorage.getItem('iconLegend1'),
                         payroll: localStorage.getItem('payrollRecords1')
                     },
@@ -3174,6 +3230,7 @@
                 if (backup.extras) {
                     if (backup.extras.sweatGift) localStorage.setItem('sweatGiftTracker1', backup.extras.sweatGift);
                     if (backup.extras.shortNotes) localStorage.setItem('shortNotes1', backup.extras.shortNotes);
+                    if (backup.extras.immediateNotes) localStorage.setItem('immediateNotes1', backup.extras.immediateNotes);
                     if (backup.extras.iconLegend) localStorage.setItem('iconLegend1', backup.extras.iconLegend);
                     if (backup.extras.payroll) localStorage.setItem('payrollRecords1', backup.extras.payroll);
                 }
@@ -3850,6 +3907,7 @@
             };
         })();        
         renderCalendar();
+        setTimeout(openImmediateReminderModal, 300);
     </script>
 </body>
 </html>
