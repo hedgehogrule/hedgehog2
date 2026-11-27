@@ -1460,6 +1460,13 @@
             const detail = document.getElementById('payrollSummaryDetail');
             if (detail.dataset.key === key) { detail.innerHTML = ''; detail.dataset.key = ''; return; }
             const records = payrollRecords.filter(item => item.month.startsWith(String(currentDate.getFullYear()))).sort((a, b) => b.month.localeCompare(a.month));
+            if (key === 'allIncome') {
+                const categories = [['給付淨額', 'net'], ['額外收入', 'other'], ['衛福部夜班獎勵', 'govNight'], ['夜班津貼', 'nightAllowance'], ['業外收入', 'nonPayroll']];
+                const sum = category => records.reduce((total, item) => total + payrollSummaryValue(item, category), 0);
+                detail.dataset.key = key;
+                detail.innerHTML = `<div style="margin:-4px 0 10px; padding:10px; border-radius:8px; background:#fafafa; font-size:13px; color:#666;"><b>年度收入細項</b>${categories.map(([label, category]) => `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee;"><span>${label}</span><b>$${sum(category).toLocaleString()}</b></div>`).join('')}<div style="display:flex; justify-content:space-between; padding-top:8px; color:#2d6f9f; font-weight:900;"><span>全部收入合計</span><span>$${sum('allIncome').toLocaleString()}</span></div></div>`;
+                return;
+            }
             const titles = { gross:'應領總額', net:'給付淨額', allIncome:'全部收入合計', performance:'績效統計', other:'額外收入', govNight:'衛福部夜班獎勵', nightAllowance:'夜班津貼', deductions:'扣項', nonPayroll:'業外收入' };
             const extra = item => {
                 if (key === 'gross') return `薪津 ${(item.baseSalary || item.base || 0).toLocaleString()}／技術＋執照 ${PAYROLL_FIXED_ALLOWANCES.toLocaleString()}／績效 ${(item.performance || 0).toLocaleString()}／加班 ${(item.overtime || 0).toLocaleString()}`;
